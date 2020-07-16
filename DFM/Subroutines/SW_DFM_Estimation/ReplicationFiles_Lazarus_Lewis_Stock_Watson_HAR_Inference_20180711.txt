@@ -1,0 +1,51 @@
+Replication files for
+
+"HAR Inference: Recommendations for Practice"
+E. Lazarus, D. Lewis, J. Stock, and M. Watson
+
+July 2018
+
+The main matlab programs are in the Matlab_Replication directory
+
+Listed below are the figures and tables and programs that are required to produce the associated results.
+
+Table 1: MC_Table_1.m
+Table 2: Optimal_Rule_Constants.m
+Table 3: Optimal_Rule_Constants.m
+Table 4: Direct calculation
+Table 5: See description in text
+
+Figure 1: Figure_1.m
+Figure 2: Figure_2.m
+
+Simulations for Gaussian location model in Figure 3 and 4 are carried out in: har_mc_glm_main.m  
+(Note: run this for each "experiment_group" = 1 through 4 for the results reported in the text.)
+Figure 3: Figure_3.m
+Figure 4: Figure_4.m
+
+Simulations for Figure 5:har_mc_regression_figure_5.m
+Figure_5: Figure_5.m
+
+Simulations for Figure 6:har_mc_regression_figure_6.m
+Figure 6: Figure_6.m
+
+Simulations for Figure 7:har_mc_regression_figure_7.m
+Figure 7: Figure_7.m
+
+
+Simulations for factor model DGP:
+To begin, the parameters of the factor model need be estimated, then these are used to generate data sets used in the regression simulations.
+The factor model estimation and data generation programs are in the directory Factor_Replication, with matlab programs in the matlab directory.
+Parameters are estimated using:  HAR_FACTOR_ESTIMATION.m
+Data are generated using:  HAR_FACTOR_Generate_normal.m (normal errors) and HAR_FACTOR_MODEL_Generate_empirical.m ('empirical' errors).
+Various autocovariances are computed using: HAR_FACTOR_MODEL_ACV.m and factor_model_acv_by_series.m
+Finally, the data can be plotted using: HAR_FACTOR_MODEL_Plot_Data.m
+
+After the simulated data are generated, these are used for regressions, test statistics, etc., to generate the results summarized in Table 6 and Figure 8.
+
+Regression models simulations: har_mc_factor_randn_regression.m  (Run twice, once with i_dgp = 2 and then with i_gdp = 3);
+Location model simulations: har_mc_glm_factor.m  (Run twice, once with i_dgp = 2 and then with i_gdp = 3);
+Table 6:  Row 0: table_6_row_9.m .. (Run twice, once with i_dgp = 2 and then with i_gdp = 3);
+Table 6:  Rows 1-23: table_6_rows_1_23.m .. (Run twice, once with i_dgp = 2 and then with i_gdp = 3);
+Figure 8:  Figure_8.m
+Figure 8 .. each series: Figure_8_ForEachSeries
