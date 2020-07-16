@@ -29,20 +29,23 @@ external_shock_index(1) = (overlap_time_range(1) - external_shock_time_range(1))
 external_shock_index(2) = (overlap_time_range(2) - external_shock_time_range(1)) * external_shock_time_range(3) + 1;
 
 % construct regressors
-X = factor_shock(factor_shock_index(1):factor_shock_index(2),:);
-X = [ones(size(X,1),1),X];
 Y = external_shock(external_shock_index(1):external_shock_index(2),1);
+X = [lagmatrix(Y,1), factor_shock(factor_shock_index(1):factor_shock_index(2),:)];
+X = [ones(size(X,1),1),X];
+Y = Y(2:end,1);
+X = X(2:end,:);
 
 % regress external shock on factor shocks
 [Beta,Sigma,~,~] = LS(Y,X);
 R2 = 1 - Sigma / var(Y); % adjusted R2
-weight = Beta(2:end);
+weight = Beta(3:end);
 alpha = sqrt(sum(weight.^2)); % IV shock coefficient
 weight = weight / sqrt(sum(weight.^2)); % weight on factor shock
 sigma_v = sqrt(Sigma); % IV noise
 nobs = size(Y,1); % number of observation
 
 % pack up result
+out.rho = Beta(2);
 out.weight = weight;
 out.alpha = alpha;
 out.sigma_v = sigma_v;

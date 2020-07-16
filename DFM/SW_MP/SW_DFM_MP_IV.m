@@ -8,7 +8,7 @@ clc
 clear all
 close all
 
-% path = 'D:\Dake\Princeton\Research\PlagborgMoller_LPVAR\MATLAB_file\Codes';
+% path = 'D:\Dake\Princeton\Research\PlagborgMoller_LPVAR\lp_var_simul';
 path = '/home/dakel/Codes';
 addpath(genpath([path '/Auxiliary_Functions']))
 addpath(genpath([path '/Estimation_Routines']))
@@ -192,7 +192,7 @@ settings.est.n_methods = length(settings.est.methods_name);
 settings.est.full_methods_name = {'svar','svar_corrbias','bvar','lp','lp_penalize','var_avg','svar_iv','lp_iv'};
 
 for i_method = 1:length(settings.est.full_methods_name)
-    thisMethod = settings.est.methods_name{i_method};
+    thisMethod = settings.est.full_methods_name{i_method};
     eval(['results_irf_' thisMethod ...
         '= NaN(settings.est.IRF_hor,settings.simul.n_MC,settings.specifications.n_spec);']); % IRF_hor*n_MC*n_spec
     eval(['results_n_lags_' thisMethod ...
@@ -250,9 +250,9 @@ DF_model.target_irf = DF_model.IV_irf(settings.est.IRF_select, :);
 %% MONTE CARLO ANALYSIS
 
 % parpool('local', 2)
-parpool('local', str2num(getenv('SLURM_CPUS_PER_TASK')))
-parfor i_MC = 1:settings.simul.n_MC
-% for i_MC = 1:settings.simul.n_MC
+% parpool('local', str2num(getenv('SLURM_CPUS_PER_TASK')))
+% parfor i_MC = 1:settings.simul.n_MC
+for i_MC = 1:settings.simul.n_MC
 
     if mod(i_MC, 10) == 0
         disp("Monte Carlo:")
