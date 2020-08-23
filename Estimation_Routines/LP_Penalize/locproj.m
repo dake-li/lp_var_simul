@@ -135,6 +135,7 @@ function obj = locproj(varargin)
     else
         obj.B      = B;
         obj.P      = P;
+        obj.D      = D;
         obj.lambda = lambda;
     end
     
