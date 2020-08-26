@@ -8,12 +8,13 @@ clc
 clear all
 close all
 
-path = 'D:\Dake\Princeton\Research\PlagborgMoller_LPVAR\MATLAB_file\Codes';
+% path = 'D:\Dake\Princeton\Research\PlagborgMoller_LPVAR\MATLAB_file\Codes';
+path = '/Users/christianwolf/Documents/GitHub/lp_var_simul';
 addpath(genpath([path '/Auxiliary_Functions']))
 addpath(genpath([path '/Estimation_Routines']))
 cd([path '/DSGE/SW_G']);
 addpath(genpath('../Subroutines'))
-addpath('C:\Softwares\dynare_4.5.7\matlab')
+% addpath('C:\Softwares\dynare_4.5.7\matlab')
 
 rng(1);
 
@@ -69,10 +70,10 @@ settings.specifications.plot_indx         = 1; % plot the only specification
 
 % shock position
 
-settings.est.manual_shock_pos        = 1; % manually choose which shock to be our true structural shock?
-settings.est.estimate_shock_weight   = 1; % estimate shock weights for true shock? 
-settings.est.shock_optimize          = 1; % use shock weights to optimize targeted IRF? otherwise use calibrated shock weights
-settings.est.shock_optimize_var      = 1; % for which variable in full model to choose optimal linear combination of shocks 
+settings.est.manual_shock_pos         = 1; % manually choose which shock to be our true structural shock?
+settings.est.estimate_shock_weight    = 0; % automatically estimate shock weights for true shock? 
+settings.est.shock_weight_calibrate   = 0; % when estimate shock weight, use calibrated result? or optimize targeted IRF
+settings.est.shock_optimize_var_IRF   = 12; % if not use calibrated result, for which variable in full model to choose optimal linear combination of shocks 
 
 % IRFs of interest
 
@@ -114,12 +115,10 @@ settings.est.n_lags_max     = 20; % maximal lag length for info criteria
 
 % BVAR prior
 
-settings.est.prior.tightMN  = 0.1;
-settings.est.prior.decay    = 0.5;
-settings.est.prior.sig      = 1;
-settings.est.prior.tightUR  = 5;
-settings.est.prior.tightC   = 5;
-settings.est.prior.tightVar = 0.1;
+settings.est.prior.tight_overall      = 0.04;
+settings.est.prior.tight_nonown_lag   = 0.25;
+settings.est.prior.decay_power        = 2;
+settings.est.prior.tight_exogenous    = 1e5;
 
 % LP smoothing
 
