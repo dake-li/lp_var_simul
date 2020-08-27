@@ -1,4 +1,4 @@
-function [slp] = LP_Penalize(Y,recurShock,respV,nlags,nhorizon,lambda,irfLimitOrder)
+function [y,x,w,H_min,H_max,r] = LP_Penalize_data(Y,recurShock,respV,nlags,nhorizon,lambda,irfLimitOrder)
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
 nv = size(Y,2); % order (r,x,y,q)
@@ -17,8 +17,6 @@ end
 w( ~isfinite(w) ) = 0;
 
 r = irfLimitOrder + 1;
-
-slp = locproj(y,x,w,H_min,H_max,'smooth',r,lambda); %IR from Smooth Local Projection
 
 end
 

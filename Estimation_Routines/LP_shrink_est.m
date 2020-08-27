@@ -56,20 +56,20 @@ else
     [~,nlags] = min(AIC);
 end
 
-% estimate LP
-slp = LP_Penalize(Y,recursiveShock,responseV,nlags,IRF_hor - 1,lambda,irfLimitOrder);
+% data for LP routine
+[y, x, w, H_min, H_max, r] = LP_Penalize_data(Y,recursiveShock,responseV,nlags,IRF_hor - 1,lambda,irfLimitOrder);
 
 % leave-one-out cross validation
 nT = size(Y,1);
 lambdaRange = lambdaRange * nT;
+K = 5; % TO DO: TURN THIS INTO A GLOBAL SETTING
 % lambdaRange = [0.01, lambdaRange, 1e10]; % allow regular OLS or completely smoothed
-slp_cv = locproj_cv(slp, lambdaRange);
-[~,lambda_opt_loc] = min(slp_cv.rss);
+rss_cv = locproj_cv(y, x, w, H_min, H_max, r, lambdaRange, K);
+[~,lambda_opt_loc] = min(rss_cv);
 lambda_opt = lambdaRange(lambda_opt_loc);
 
 % re-estimate
-slp = LP_Penalize(Y,recursiveShock,responseV,nlags,IRF_hor - 1,lambda_opt,irfLimitOrder);
-IRF_resp = slp.IR;
+IRF_resp = locproj(y, x, w, H_min, H_max, r, lambda_opt);
 IRF_normalize = IRF_LP(Y,recursiveShock,normalizeV,nlags,0);
 IRF = IRF_resp / IRF_normalize;
 
