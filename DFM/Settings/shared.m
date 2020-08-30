@@ -8,6 +8,14 @@ DF_model.n_fac      = 6; % number of factor
 DF_model.n_lags_fac = 2; % lag order of factor
 DF_model.n_lags_uar = 2; % lag order of measurement error
 
+% IV (may be overwritten later)
+
+DF_model.IV.rho     = 0.1; % IV persistence
+DF_model.IV.manual_alpha   = 1; % IV shock coefficient
+DF_model.IV.manual_sigma_v = 1; % IV noise
+
+DF_model.IV.IV_strength_calibrate = 0; % use calibrated IV strength
+
 
 %% Experiment Specification
 
@@ -25,7 +33,6 @@ settings.specifications.plot_indx             = 1; % plot the only specification
 settings.est.manual_shock_pos         = 1; % manually choose which shock to be our true structural shock?
 settings.est.estimate_shock_weight    = 1; % automatically estimate shock weights for true shock? 
 settings.est.shock_weight_calibrate = 0; % when estimate shock weight, use calibrated result? or optimize targeted IRF
-settings.est.shock_optimize_var_IRF   = settings.specifications.random_fixed_var; % if not use calibrated result, for which variable in full model to choose optimal linear combination of shocks 
 
 % IRFs of interest
 
@@ -55,7 +62,7 @@ settings.simul.T_burn = 100; % burn-in
 
 % choose estimand
 
-settings.est.methods_name    = [{'svar','svar_corrbias','bvar','lp','lp_penalize','var_avg'} settings.est.methods_name]; % choose estimands
+settings.est.methods_name    = {'svar','svar_corrbias','bvar','lp','lp_penalize','var_avg'}; % choose estimands (may be expanded later)
 
 % lag specification
 

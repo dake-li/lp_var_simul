@@ -4,12 +4,11 @@
 
 %% HOUSEKEEPING
 
-clc
 clear all
 close all
 
-addpath(genpath('Auxiliary_Functions'))
-addpath(genpath('Estimation_Routines'))
+addpath(genpath(fullfile('..', 'Auxiliary_Functions')))
+addpath(genpath(fullfile('..', 'Estimation_Routines')))
 addpath(genpath('Subroutines'))
 
 rng(1);
@@ -18,9 +17,9 @@ tic;
 % Parallel computing object
 num_workers = str2num(getenv('SLURM_CPUS_PER_TASK'));
 if ~isempty(num_workers)
-    parpool('local', num_workers);
+    poolobj = parpool('local', num_workers);
 else
-    parpool('local');
+    poolobj = parpool('local');
 end
 clear num_workers;
 
@@ -33,9 +32,9 @@ estimand_type = 'ObsShock'; % 'Recursive'; 'IV'; % Either 'ObsShock', 'Recursive
 
 %% SETTINGS
 
+run(fullfile('Settings', 'shared'));
 run(fullfile('Settings', dgp_type));
 run(fullfile('Settings', estimand_type));
-run(fullfile('Settings', 'shared'));
 
 
 %% DGP
@@ -404,6 +403,8 @@ clear i_method thisMethod
 
 mkdir('Results');
 save(fullfile('Results', strcat('DFM_', dgp_type, '_', estimand_type)),'DFM_estimate','DF_model','settings','results','-v7.3');
+
+delete(poolobj);
 toc;
 
 %% PLOT RESULTS
