@@ -1,0 +1,83 @@
+%% DGP
+
+% Stock-Watson DFM dimensions
+
+DF_model.n_y        = 207; % number of observables
+
+DF_model.n_fac      = 6; % number of factor
+DF_model.n_lags_fac = 2; % lag order of factor
+DF_model.n_lags_uar = 2; % lag order of measurement error
+
+
+%% Experiment Specification
+
+% variable selection
+
+settings.specifications.manual_var_select     = [1 142; 1 97]; % manually select specifications
+settings.specifications.random_select         = 1; % randomly select?
+settings.specifications.random_n_spec         = 100; % number of random specifications
+settings.specifications.random_n_var          = 5; % number of variables in each random specification
+settings.specifications.random_category_setup = {[1,2,3], 6}; % at least draw one from certain categories
+settings.specifications.plot_indx             = 1; % plot the only specification
+
+% shock position
+
+settings.est.manual_shock_pos         = 1; % manually choose which shock to be our true structural shock?
+settings.est.estimate_shock_weight    = 1; % automatically estimate shock weights for true shock? 
+settings.est.shock_weight_calibrate = 0; % when estimate shock weight, use calibrated result? or optimize targeted IRF
+settings.est.shock_optimize_var_IRF   = settings.specifications.random_fixed_var; % if not use calibrated result, for which variable in full model to choose optimal linear combination of shocks 
+
+% IRFs of interest
+
+settings.est.IRF_hor              = 20; % maximal horizon (include contemporary)
+settings.est.IRF_select           = 1:20; % which IRFs to summarize
+
+% compute R0_sq using VMA representation
+
+settings.est.VMA_nlags = 50;
+
+% compute largest root and VAR(p) fit in population using truncated infinite-order VAR 
+
+settings.est.VAR_infinity_truncate = 50; 
+
+% number of Monte Carlo draws
+
+settings.simul.n_MC    = 5000; % number of Monte Carlo reps
+settings.simul.seed    = (1:settings.simul.n_MC)*10 + randi([0,9],1,settings.simul.n_MC); % random seed
+
+% simulation details
+
+settings.simul.T      = 200; % time periods for each simulation
+settings.simul.T_burn = 100; % burn-in
+
+
+%% Estimation Settings
+
+% choose estimand
+
+settings.est.methods_name    = [{'svar','svar_corrbias','bvar','lp','lp_penalize','var_avg'} settings.est.methods_name]; % choose estimands
+
+% lag specification
+
+settings.est.est_n_lag      = 0; % estimate number of lags?
+settings.est.est_n_lag_BIC  = 0; % use BIC? otherwise use AIC
+settings.est.n_lags_fix     = 4; % default number of lags if not estimated
+settings.est.n_lags_max     = 20; % maximal lag length for info criteria
+
+% BVAR prior
+
+settings.est.prior.tight_overall      = 0.04;
+settings.est.prior.tight_nonown_lag   = 0.25;
+settings.est.prior.decay_power        = 2;
+settings.est.prior.tight_exogenous    = 1e5;
+
+% LP smoothing
+
+settings.est.lambda        = 10; % for lambda = 0 would just do OLS
+settings.est.lambdaRange   = [0.005:0.005:0.05, 0.1:0.05:0.5, 1:1:10, 20:10:100]; % cross validation grid, scaled up by T
+settings.est.irfLimitOrder = 2; % shrink towards polynomial of that order
+
+% VAR model averaging
+
+settings.est.average_store_weight = [2, 11, 20]; % store model weights at which horizon
+settings.est.average_max_lags     = 1; % include lags up to n_lags_max? otherwise up to estimated lags
