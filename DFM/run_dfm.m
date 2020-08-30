@@ -15,7 +15,14 @@ addpath(genpath('Subroutines'))
 rng(1);
 tic;
 
-parpool('local', str2num(getenv('SLURM_CPUS_PER_TASK')));
+% Parallel computing object
+num_workers = str2num(getenv('SLURM_CPUS_PER_TASK'));
+if ~isempty(num_workers)
+    parpool('local', num_workers);
+else
+    parpool('local');
+end
+clear num_workers;
 
 
 %% DECIDE WHICH EXPERIMENT TO RUN
