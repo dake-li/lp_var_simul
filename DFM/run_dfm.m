@@ -109,16 +109,9 @@ settings.specifications = pick_var_fn(DF_model, settings);
 %----------------------------------------------------------------
 
 settings.est.n_methods = length(settings.est.methods_name);
-settings.est.full_methods_name = {'svar','svar_corrbias','bvar','lp','lp_penalize','var_avg','svar_iv'};
 
-for i_method = 1:length(settings.est.full_methods_name)
-    thisMethod = settings.est.full_methods_name{i_method};
-    eval(['results_irf_' thisMethod ...
-        '= NaN(settings.est.IRF_hor,settings.simul.n_MC,settings.specifications.n_spec);']); % IRF_hor*n_MC*n_spec
-    eval(['results_n_lags_' thisMethod ...
-        '= NaN(settings.simul.n_MC,settings.specifications.n_spec);']); %n_MC*n_spec
-end
-clear i_method thisMethod
+results_irf = NaN(settings.est.n_methods,settings.est.IRF_hor,settings.simul.n_MC,settings.specifications.n_spec); % IRF_hor*n_MC*n_spec
+results_n_lags = NaN(settings.est.n_methods,settings.simul.n_MC,settings.specifications.n_spec); %n_MC*n_spec
 
 results_largest_root_svar = NaN(settings.simul.n_MC,settings.specifications.n_spec); % n_MC*n_spec
 results_LM_stat_svar = NaN(settings.simul.n_MC,settings.specifications.n_spec); % n_MC*n_spec
@@ -200,21 +193,8 @@ parfor i_MC = 1:settings.simul.n_MC
     % List All Temporary Storage for i_MC in parfor
     %----------------------------------------------------------------
     
-    temp_irf_svar = NaN(settings.est.IRF_hor,settings.specifications.n_spec);
-    temp_irf_svar_corrbias = NaN(settings.est.IRF_hor,settings.specifications.n_spec);
-    temp_irf_bvar = NaN(settings.est.IRF_hor,settings.specifications.n_spec);
-    temp_irf_lp = NaN(settings.est.IRF_hor,settings.specifications.n_spec);
-    temp_irf_lp_penalize = NaN(settings.est.IRF_hor,settings.specifications.n_spec);
-    temp_irf_var_avg = NaN(settings.est.IRF_hor,settings.specifications.n_spec);
-    temp_irf_svar_iv = NaN(settings.est.IRF_hor,settings.specifications.n_spec);
-    
-    temp_n_lags_svar = NaN(1,settings.specifications.n_spec);
-    temp_n_lags_svar_corrbias = NaN(1,settings.specifications.n_spec);
-    temp_n_lags_bvar = NaN(1,settings.specifications.n_spec);
-    temp_n_lags_lp = NaN(1,settings.specifications.n_spec);
-    temp_n_lags_lp_penalize = NaN(1,settings.specifications.n_spec);
-    temp_n_lags_var_avg = NaN(1,settings.specifications.n_spec);
-    temp_n_lags_svar_iv = NaN(1,settings.specifications.n_spec);
+    temp_irf = NaN(settings.est.n_methods,settings.est.IRF_hor,settings.specifications.n_spec);
+    temp_n_lags = NaN(settings.est.n_methods,settings.specifications.n_spec);
     
     temp_largest_root_svar = NaN(1,settings.specifications.n_spec);
     temp_LM_stat_svar = NaN(1,settings.specifications.n_spec);
@@ -234,54 +214,41 @@ parfor i_MC = 1:settings.simul.n_MC
         %----------------------------------------------------------------
         % IRF Estimation
         %----------------------------------------------------------------
-
-        % VAR
         
-        if any(strcmp(settings.est.methods_name, 'svar'))
-            [temp_irf_svar(:,i_spec),temp_n_lags_svar(1,i_spec),temp_largest_root_svar(1,i_spec),temp_LM_stat_svar(1,i_spec)]...
-                = SVAR_est(data_sim_select,settings);
-        end
+        for i_method = 1:settings.est.n_methods
+            
+            switch settings.est.methods_name{i_method}
 
-        % bias-corrected VAR
-        
-        if any(strcmp(settings.est.methods_name, 'svar_corrbias'))
-            [temp_irf_svar_corrbias(:,i_spec),temp_n_lags_svar_corrbias(1,i_spec)]...
-                = SVAR_corr_est(data_sim_select,settings);
-        end
+                case 'svar' % VAR
+                    [temp_irf(i_method,:,i_spec),temp_n_lags(i_method,i_spec),temp_largest_root_svar(i_spec),temp_LM_stat_svar(i_spec)]...
+                        = SVAR_est(data_sim_select,settings);
 
-        % Bayesian VAR
-        
-        if any(strcmp(settings.est.methods_name, 'bvar'))
-            [temp_irf_bvar(:,i_spec),temp_n_lags_bvar(1,i_spec)]...
-                = BVAR_est(data_sim_select,settings);
-        end
+                case 'svar_corrbias' % bias-corrected VAR
+                    [temp_irf(i_method,:,i_spec),temp_n_lags(i_method,i_spec)]...
+                        = SVAR_corr_est(data_sim_select,settings);
 
-        % LP
+                case 'bvar' % Bayesian VAR
+                    [temp_irf(i_method,:,i_spec),temp_n_lags(i_method,i_spec)]...
+                        = BVAR_est(data_sim_select,settings);
 
-        if any(strcmp(settings.est.methods_name, 'lp'))
-            [temp_irf_lp(:,i_spec),temp_n_lags_lp(1,i_spec)]...
-                = LP_est(data_sim_select,settings);
-        end
+                case 'lp' % LP
+                    [temp_irf(i_method,:,i_spec),temp_n_lags(i_method,i_spec)]...
+                        = LP_est(data_sim_select,settings);
 
-        % shrinkage LP
+                case 'lp_penalize' % shrinkage LP
+                    [temp_irf(i_method,:,i_spec),temp_n_lags(i_method,i_spec), temp_lambda_lp_penalize(i_spec)]...
+                        = LP_shrink_est(data_sim_select,settings);
 
-        if any(strcmp(settings.est.methods_name, 'lp_penalize'))
-            [temp_irf_lp_penalize(:,i_spec),temp_n_lags_lp_penalize(1,i_spec), temp_lambda_lp_penalize(1,i_spec)]...
-                = LP_shrink_est(data_sim_select,settings);
-        end
+                case 'var_avg' % VAR model averaging
+                    [temp_irf(i_method,:,i_spec),temp_n_lags(i_method,i_spec), temp_weight_var_avg(:,:,i_spec)]...
+                        = VAR_avg_est(data_sim_select,settings);
 
-        % VAR model averaging
-        
-        if any(strcmp(settings.est.methods_name, 'var_avg'))
-            [temp_irf_var_avg(:,i_spec),temp_n_lags_var_avg(1,i_spec), temp_weight_var_avg(:,:,i_spec)]...
-                = VAR_avg_est(data_sim_select,settings);
-        end
-        
-        % SVAR-IV       
-
-        if any(strcmp(settings.est.methods_name, 'svar_iv'))
-            [temp_irf_svar_iv(:,i_spec),temp_n_lags_svar_iv(1,i_spec),temp_F_stat_svar_iv(1,i_spec)]...
-                = SVAR_IV_est(data_sim_select,settings);
+                case 'svar_iv' % SVAR-IV       
+                    [temp_irf(i_method,:,i_spec),temp_n_lags(i_method,i_spec),temp_F_stat_svar_iv(i_spec)]...
+                        = SVAR_IV_est(data_sim_select,settings);
+                
+            end
+            
         end
         
     end
@@ -290,21 +257,8 @@ parfor i_MC = 1:settings.simul.n_MC
     % Move Results to Permanent Storage in parfor
     %----------------------------------------------------------------
     
-    results_irf_svar(:,i_MC,:) = temp_irf_svar;
-    results_irf_svar_corrbias(:,i_MC,:) = temp_irf_svar_corrbias;
-    results_irf_bvar(:,i_MC,:) = temp_irf_bvar;
-    results_irf_lp(:,i_MC,:) = temp_irf_lp;
-    results_irf_lp_penalize(:,i_MC,:) = temp_irf_lp_penalize;
-    results_irf_var_avg(:,i_MC,:) = temp_irf_var_avg;
-    results_irf_svar_iv(:,i_MC,:) = temp_irf_svar_iv;
-    
-    results_n_lags_svar(i_MC,:) = temp_n_lags_svar;
-    results_n_lags_svar_corrbias(i_MC,:) = temp_n_lags_svar_corrbias;
-    results_n_lags_bvar(i_MC,:) = temp_n_lags_bvar;
-    results_n_lags_lp(i_MC,:) = temp_n_lags_lp;
-    results_n_lags_lp_penalize(i_MC,:) = temp_n_lags_lp_penalize;
-    results_n_lags_var_avg(i_MC,:) = temp_n_lags_var_avg;
-    results_n_lags_svar_iv(i_MC,:) = temp_n_lags_svar_iv;
+    results_irf(:,:,i_MC,:) = temp_irf;
+    results_n_lags(:,i_MC,:) = temp_n_lags;
     
     results_largest_root_svar(i_MC,:) = temp_largest_root_svar;
     results_LM_stat_svar(i_MC,:) = temp_LM_stat_svar;
@@ -315,14 +269,7 @@ parfor i_MC = 1:settings.simul.n_MC
 end
 
 % clear temporary storage
-
-for i_method = 1:length(settings.est.full_methods_name)
-    thisMethod = settings.est.full_methods_name{i_method};
-    eval(['clear temp_irf_' thisMethod ';']);
-    eval(['clear temp_n_lags_' thisMethod ';']);
-end
-clear temp_largest_root_svar temp_LM_stat_svar temp_lambda_lp_penalize temp_weight_var_avg temp_F_stat_svar_iv
-clear i_MC i_spec data_sim_all data_sim_select i_method thisMethod
+clear temp_* i_MC i_spec data_sim_all data_sim_select i_method
 
 
 %% SUMMARIZE RESULTS
@@ -336,8 +283,8 @@ clear i_MC i_spec data_sim_all data_sim_select i_method thisMethod
 for i_method = 1:settings.est.n_methods
     
     thisMethod = settings.est.methods_name{i_method};
-    eval(['results.irf.' thisMethod '= results_irf_' thisMethod ';']);
-    eval(['results.n_lags.' thisMethod '= results_n_lags_' thisMethod ';']);
+    results.irf.(thisMethod) = permute(results_irf(i_method,settings.est.IRF_select,:,:), [2 3 4 1]);
+    results.n_lags.(thisMethod) = permute(results_n_lags(i_method,:,:), [2 3 1]);
     
 end
 
@@ -358,24 +305,7 @@ if any(strcmp(settings.est.methods_name, 'svar_iv'))
     results.F_stat.svar_iv = results_F_stat_svar_iv;
 end
 
-for i_method = 1:length(settings.est.full_methods_name)
-    thisMethod = settings.est.full_methods_name{i_method};
-    eval(['clear results_irf_' thisMethod ' results_n_lags_' thisMethod ';']);
-end
-
-clear results_largest_root_svar results_LM_stat_svar results_lambda_lp_penalize results_weight_var_avg results_F_stat_svar_iv
-clear i_method thisMethod
-
-% store IRF only at selected horizons
-
-for i_method = 1:settings.est.n_methods
-    
-    thisMethod = settings.est.methods_name{i_method};
-    eval(['results.irf.' thisMethod '= results.irf.' thisMethod '(settings.est.IRF_select,:,:);']);
-    
-end
-
-clear i_method thisMethod
+clear results_* i_method thisMethod
 
 %----------------------------------------------------------------
 % Compute Mean-Squared Errors, Bias-Squared, Variance
@@ -387,13 +317,13 @@ for i_method = 1:settings.est.n_methods
     
     thisMethod = settings.est.methods_name{i_method};
     
-    eval(['results.MSE.' thisMethod '= squeeze(mean((results.irf.' thisMethod ...
-        ' - permute(DF_model.target_irf,[1 3 2])).^2, 2));']);
+    results.MSE.(thisMethod) = squeeze(mean((results.irf.(thisMethod) ...
+        - permute(DF_model.target_irf,[1 3 2])).^2, 2));
     
-    eval(['results.BIAS2.' thisMethod '= (squeeze(mean(results.irf.' thisMethod ...
-        ', 2)) - DF_model.target_irf).^2;']);
+    results.BIAS2.(thisMethod) = (squeeze(mean(results.irf.(thisMethod) ...
+        , 2)) - DF_model.target_irf).^2;
     
-    eval(['results.VCE.' thisMethod '= squeeze(var(results.irf.' thisMethod ', 0, 2));']);
+    results.VCE.(thisMethod) = squeeze(var(results.irf.(thisMethod), 0, 2));
     
 end
 
