@@ -71,7 +71,7 @@ IRF = IRF';
 nv = size(Y,2);
 companion_form = diag(ones(1, nv*(nlags-1)), -nv);
 companion_form(1:nv,:) = reshape(By,[nv, nv*nlags]);
-largest_root = max(abs(eig(companion_form)));
+largest_root = abs(eigs(companion_form,1));
 
 % estimate LM-stat to examine VAR(p) fit
 
