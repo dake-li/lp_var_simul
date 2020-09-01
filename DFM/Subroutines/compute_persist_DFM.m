@@ -194,7 +194,7 @@ for i_spec = 1:n_spec
     VAR_companion_form((n_var+1):end, 1:(n_var*(VAR_infinity_truncate-1))) = eye(n_var*(VAR_infinity_truncate-1));
     
     % compute largest root in VAR
-    VAR_largest_root(i_spec) = max(abs(eig(VAR_companion_form)));
+    VAR_largest_root(i_spec) = eigs(VAR_companion_form,1);
     
     %----------------------------------------------------------------
     % Compute VAR(p) Fit by Examining Coefficients after Lag p
