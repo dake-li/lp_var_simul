@@ -62,9 +62,8 @@ end
 % leave-one-out cross validation
 nT = size(Y,1);
 lambdaRange = lambdaRange * nT;
-K = 5; % TO DO: TURN THIS INTO A GLOBAL SETTING
-% lambdaRange = [0.01, lambdaRange, 1e10]; % allow regular OLS or completely smoothed
-rss_cv = locproj_cv(y, x, w, H_min, H_max, r, lambdaRange, K);
+lambdaRange = [1e-4, lambdaRange, 1e10]; % allow regular OLS or completely smoothed
+rss_cv = locproj_cv(y, x, w, H_min, H_max, r, lambdaRange, settings.est.CV_folds);
 [~,lambda_opt_loc] = min(rss_cv);
 lambda_opt = lambdaRange(lambda_opt_loc);
 
