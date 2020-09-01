@@ -51,17 +51,8 @@ end
 
 % simulate IV
 
-z = 0;
-for t = 1:T_burn
-    z = rho * z + alpha * data_eps(t,:) * shock_weight +...
-        sigma_v * randn(1);
-end
-data_z = NaN(T, 1);
-for t = 1:T
-    z = rho * z + alpha * data_eps(t + T_burn,:) * shock_weight +...
-        sigma_v * randn(1);
-    data_z(t,1) = z;
-end
+z = filter(1, [1 -rho], alpha * data_eps * shock_weight + sigma_v * randn(T+T_burn,1));
+data_z = z(T_burn+1:end);
 
 % collect results and shift timing
 
