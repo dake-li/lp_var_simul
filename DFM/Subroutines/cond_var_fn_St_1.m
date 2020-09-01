@@ -1,4 +1,4 @@
-function cond_var = cond_var_fn_St_1(A, B, C, D, n_iter)
+function cond_var = cond_var_fn_St_1(A, B, C, D)
 %UNTITLED Summary of this function goes here
 %   state-space form (A,B,C,D) based on FRS paper (2005)
 %   y_t = C * x_t + D w_t
