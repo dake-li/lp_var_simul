@@ -25,6 +25,9 @@ settings.specifications.manual_var_select     = [1 142; 1 97]; % manually select
 settings.specifications.random_select         = 1; % randomly select?
 settings.specifications.random_n_spec         = 100; % number of random specifications
 settings.specifications.random_n_var          = 5; % number of variables in each random specification
+settings.random_category_range                = [1 20; 21 31; 32 76; 77 86; 87 94; 95 131; 132 141;...
+                                                 142 159; 160 171; 172 180; 181 207];
+                                                   % category ranges
 settings.specifications.random_category_setup = {[1,2,3], 6}; % at least draw one from certain categories
 settings.specifications.plot_indx             = 1; % plot the only specification
 
