@@ -7,8 +7,8 @@ function specifications = pick_var_fn(model, settings)
     n_y = model.n_y;
     
     manual_var_select = specifications.manual_var_select;
-    
     random_select = specifications.random_select;
+    random_category_range = specifications.random_category_range;
 
     % randomly choose
     
@@ -26,7 +26,7 @@ function specifications = pick_var_fn(model, settings)
 
         var_select = nan(random_n_spec, random_n_var);
         var_select(:, 1) = random_fixed_var;
-        fixed_category = sum(random_fixed_var > settings.random_category_range(:,2)) + 1; % category of fixed variable
+        fixed_category = sum(random_fixed_var > random_category_range(:,2)) + 1; % category of fixed variable
         
         for i_spec = 1:random_n_spec % draw for each specification
             
@@ -38,7 +38,7 @@ function specifications = pick_var_fn(model, settings)
                 else
                     feasible_range = [];
                     for icat = random_category_setup{iv}
-                        feasible_range = [feasible_range, settings.random_category_range(icat,1):settings.random_category_range(icat,2)];
+                        feasible_range = [feasible_range, random_category_range(icat,1):random_category_range(icat,2)];
                     end
                 end
 
