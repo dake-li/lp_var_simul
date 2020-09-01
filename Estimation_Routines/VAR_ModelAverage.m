@@ -1,6 +1,8 @@
 function [combination_irf,weights,H] = VAR_ModelAverage(dat,recurShock,respV,p,hmax)
 % Creates h-step impulse response functions from estimated VAR(p) model with intercept
-% (modified based on Hansen's "cvar_ir.m" code)
+% (modified based on Bruce Hansen's "cvar_ir.m" code)
+% https://www.ssc.wisc.edu/~bhansen/progs/var.html
+
 % Inputs:
 %	dat 			nxm data matrix
 %	p			VAR order p >= 1
