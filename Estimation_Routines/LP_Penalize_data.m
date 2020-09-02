@@ -1,4 +1,4 @@
-function [y,x,w,H_min,H_max,r] = LP_Penalize_data(Y,recurShock,respV,nlags,nhorizon,lambda,irfLimitOrder)
+function [y,x,w,H_min,H_max,r] = LP_Penalize_data(Y,recurShock,respV,nlags,nhorizon,irfLimitOrder)
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
 nv = size(Y,2); % order (r,x,y,q)

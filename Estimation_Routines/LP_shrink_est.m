@@ -57,7 +57,7 @@ else
 end
 
 % data for LP routine
-[y, x, w, H_min, H_max, r] = LP_Penalize_data(Y,recursiveShock,responseV,nlags,IRF_hor - 1,lambda,irfLimitOrder);
+[y, x, w, H_min, H_max, r] = LP_Penalize_data(Y,recursiveShock,responseV,nlags,IRF_hor - 1,irfLimitOrder);
 
 % leave-one-out cross validation
 nT = size(Y,1);
