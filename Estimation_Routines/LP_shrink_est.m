@@ -57,7 +57,12 @@ else
 end
 
 % data for LP routine
-[y, x, w, H_min, H_max, r] = LP_Penalize_data(Y,recursiveShock,responseV,nlags,IRF_hor - 1,irfLimitOrder);
+[y, x, w] = LP_gen_data(Y,recursiveShock,responseV,nlags,0);
+
+% settings for LP shrinkage method
+H_min = 0;
+H_max = IRF_hor - 1;
+r = irfLimitOrder + 1;
 
 % leave-one-out cross validation
 nT = size(Y,1);
