@@ -14,7 +14,9 @@ if recurShock > 1
 else
     w  = lagmatrix( Y , 1:nlags );
 end
-w( ~isfinite(w) ) = 0;
+y = y((nlags + 1):end);
+x = x((nlags + 1):end);
+w = w((nlags + 1):end, :);
 
 r = irfLimitOrder + 1;
 

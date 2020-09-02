@@ -77,13 +77,15 @@ largest_root = max(abs(eig(companion_form)));
 
 nT = size(Y,1);
 Y_lag = lagmatrix(Y,1:nlags); % lagged Y as explanatory variables
-Y_lag = Y_lag((nlags+1):end,:);
-Res_lag = lagmatrix(Res,1:res_autocorr_nlags); % lagged residual (missing values filled with 0)
-Res_lag(isnan(Res_lag)) = 0;
-X_auxiliary = [ones(nT-nlags,1), Y_lag, Res_lag];
-[~,~,~,Res_aux]=LS(Res, X_auxiliary);
-Sigma_original = cov(Res,1);
+Y_lag = Y_lag((nlags+res_autocorr_nlags+1):end,:);
+Res_lag = lagmatrix(Res,1:res_autocorr_nlags); % lagged residual
+Res_lag = Res_lag((res_autocorr_nlags+1):end, :);
+X_auxiliary = [ones(nT-nlags-res_autocorr_nlags,1), Y_lag, Res_lag];
+Res_current = Res((res_autocorr_nlags+1):end, :); % current residual
+[~,~,~,Res_aux] = LS(Res_current, X_auxiliary);
+Sigma_original = cov(Res_current,1);
 Sigma_auxiliary = cov(Res_aux,1);
-LM_stat = (nT-nlags - nv*nlags - 1 - nv*res_autocorr_nlags - 0.5) * log(det(Sigma_original) / det(Sigma_auxiliary));
+LM_stat = (nT-nlags-res_autocorr_nlags - nv*nlags - 1 - nv*res_autocorr_nlags - 0.5) *...
+    log(det(Sigma_original) / det(Sigma_auxiliary));
 
 end
