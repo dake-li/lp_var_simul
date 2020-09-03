@@ -73,6 +73,7 @@ settings.est.est_n_lag      = 0; % estimate number of lags?
 settings.est.est_n_lag_BIC  = 0; % use BIC? otherwise use AIC
 settings.est.n_lags_fix     = 4; % default number of lags if not estimated
 settings.est.n_lags_max     = 20; % maximal lag length for info criteria
+settings.est.res_autocorr_nlags = 4; % check autocorr of VAR(p) residuals up to this order
 
 % BVAR prior
 
