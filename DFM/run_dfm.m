@@ -221,11 +221,11 @@ parfor i_MC = 1:settings.simul.n_MC
 
                 case 'svar' % VAR
                     [temp_irf(i_method,:,i_spec),temp_n_lags(i_method,i_spec),temp_largest_root_svar(i_spec),temp_LM_stat_svar(i_spec)]...
-                        = SVAR_est(data_sim_select,settings);
+                        = SVAR_est(data_sim_select,settings,0);
 
                 case 'svar_corrbias' % bias-corrected VAR
                     [temp_irf(i_method,:,i_spec),temp_n_lags(i_method,i_spec)]...
-                        = SVAR_corr_est(data_sim_select,settings);
+                        = SVAR_est(data_sim_select,settings,1);
 
                 case 'bvar' % Bayesian VAR
                     [temp_irf(i_method,:,i_spec),temp_n_lags(i_method,i_spec)]...
