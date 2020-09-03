@@ -2,7 +2,6 @@ function [IRF,nlags,lambda_opt] = LP_shrink_est(data_sim,settings);
 
 % preparations
 
-lambda = settings.est.lambda;
 lambdaRange = settings.est.lambdaRange;
 irfLimitOrder = settings.est.irfLimitOrder;
 run('Estimation_Setup');

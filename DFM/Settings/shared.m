@@ -84,7 +84,6 @@ settings.est.prior.tight_exogenous    = 1e5;
 
 % LP smoothing
 
-settings.est.lambda        = 10; % for lambda = 0 would just do OLS
 settings.est.lambdaRange   = [0.01:0.01:0.05, 0.1:0.05:0.5, 1:1:10, 20:10:100]; % cross validation grid, scaled up by T
 settings.est.irfLimitOrder = 2; % shrink towards polynomial of that order
 settings.est.CV_folds      = 5; % Number of folds used for cross validation
