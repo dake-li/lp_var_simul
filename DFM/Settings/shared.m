@@ -23,7 +23,7 @@ DF_model.IV.IV_strength_calibrate = 0; % use calibrated IV strength
 
 settings.specifications.manual_var_select     = [1 142; 1 97]; % manually select specifications
 settings.specifications.random_select         = 1; % randomly select?
-settings.specifications.random_n_spec         = 100; % number of random specifications
+settings.specifications.random_n_spec         = 700; % number of random specifications
 settings.specifications.random_n_var          = 5; % number of variables in each random specification
 settings.specifications.random_category_range = [1 20; 21 31; 32 76; 77 86; 87 94; 95 131; 132 141;...
                                                  142 159; 160 171; 172 180; 181 207];
@@ -65,7 +65,7 @@ settings.simul.T_burn = 100; % burn-in
 
 % choose estimand
 
-settings.est.methods_name    = {'svar','svar_corrbias','bvar','lp','lp_penalize','var_avg'}; % choose estimands (may be expanded later)
+settings.est.methods_name    = {'svar','svar_corrbias','bvar','lp','lp_penalize'}; % choose estimands (may be expanded later)
 
 % lag specification
 
@@ -84,7 +84,7 @@ settings.est.prior.tight_exogenous    = 1e5;
 
 % LP smoothing
 
-settings.est.lambdaRange   = [0.01:0.01:0.05, 0.1:0.05:0.5, 1:1:10, 20:10:100]; % cross validation grid, scaled up by T
+settings.est.lambdaRange   = [0.001:0.005:0.021, 0.05:0.1:1.05, 2:1:19, 20:20:100, 200:200:2000]; % cross validation grid, scaled up by T
 settings.est.irfLimitOrder = 2; % shrink towards polynomial of that order
 settings.est.CV_folds      = 5; % Number of folds used for cross validation
 

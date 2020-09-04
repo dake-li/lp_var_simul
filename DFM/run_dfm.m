@@ -173,8 +173,8 @@ end
 
 %% MONTE CARLO ANALYSIS
 
-parfor i_MC = 1:settings.simul.n_MC
-% for i_MC = 1:settings.simul.n_MC
+% parfor i_MC = 1:settings.simul.n_MC
+for i_MC = 1:settings.simul.n_MC
 
     if mod(i_MC, 10) == 0
         disp("Monte Carlo:")
