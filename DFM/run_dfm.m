@@ -23,6 +23,9 @@ else
 end
 clear num_workers;
 
+% Storage folder for results
+save_folder = '/tigress/dakel'; % use ' ' or '/tigress/dakel'
+
 
 %% DECIDE WHICH EXPERIMENT TO RUN
 
@@ -331,11 +334,14 @@ clear i_method thisMethod
 
 % export results
 
+cd(save_folder);
 mkdir('Results');
 save(fullfile('Results', strcat('DFM_', dgp_type, '_', estimand_type)),'DFM_estimate','DF_model','settings','results','-v7.3');
 
 delete(poolobj);
+clear save_folder
 toc;
+
 
 %% PLOT RESULTS
 
