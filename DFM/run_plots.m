@@ -7,16 +7,16 @@ clear all;
 %% Settings
 
 % Results .mat files
-mat_rootfolder = '../../stored_result'; % Root folder with files
-mat_folders = {'fix_lag_4_var_5', ...
-               }; % Folders with files % 'estimate_lag_IV_not_calibrated', 'fix_lag_4_IV_not_calibrated', 'fix_lag_8_IV_not_calibrated'
+mat_rootfolder = 'Results'; % Root folder with files
+mat_folders = {'lag4', ...
+               }; % Folders with files
 mat_files = {'SW_DFM_G_IV', 'SW_DFM_G_ObsShock', 'SW_DFM_G_Recursive', ...
              'SW_DFM_MP_IV', 'SW_DFM_MP_ObsShock', 'SW_DFM_MP_Recursive'}; % Files in each of the above folders
 % mat_folders = {'SW_G'};
 % mat_files = {{'SW_DFM_G_IV'}};
 
 % Output settings for figures
-output_dir = 'fig';     % Folder
+output_dir = 'Figures'; % Folder
 output_suffix = 'png';  % File suffix
 
 % Plotting
