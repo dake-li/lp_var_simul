@@ -25,6 +25,21 @@ mat_files = {'DFM_G_ObsShock', 'DFM_G_Recursive', ...
 output_dir = 'fig';     % Folder
 output_suffix = 'png';  % File suffix
 
+% colormap
+n = 200;
+clear cmap
+cmap(1,:) = [0 0 0];
+cmap(2,:) = [0.5 0.5 0.5];
+cmap(3,:) = [1 1 1];
+
+[X,Y] = meshgrid([1:3],[1:50]);
+
+cmap = interp2(X([1,25,50],:),Y([1,25,50],:),cmap,X,Y);
+
+% weight grid
+n_weight    = 1001;
+weight_grid = linspace(1,0,n_weight)';
+
 %% RAW FIGURES
 
 for nf=1:length(mat_folders) % For each folder...
@@ -51,27 +66,30 @@ for nf=1:length(mat_folders) % For each folder...
             thisMethod = res.settings.est.methods_name{i_method};
             benchMethod = res.settings.est.methods_name{1};
 
-            eval(['res.results.MSE.' thisMethod '= median(squeeze(mean((res.results.irf.' thisMethod ...
-                ' - permute(res.DF_model.target_irf,[1 3 2])).^2, 2)),2);']);
+            eval(['res.results.MSE.' thisMethod '= squeeze(mean((res.results.irf.' thisMethod ...
+                ' - permute(res.DF_model.target_irf,[1 3 2])).^2, 2));']);
 
-            eval(['res.results.BIAS2.' thisMethod '= median((squeeze(mean(res.results.irf.' thisMethod ...
-                ', 2)) - res.DF_model.target_irf).^2,2);']);
+            eval(['res.results.BIAS2.' thisMethod '= (squeeze(mean(res.results.irf.' thisMethod ...
+                ', 2)) - res.DF_model.target_irf).^2;']);
 
-            eval(['res.results.VCE.' thisMethod '= median(squeeze(var(res.results.irf.' thisMethod ', 0, 2)),2);']);
+            eval(['res.results.VCE.' thisMethod '= squeeze(var(res.results.irf.' thisMethod ', 0, 2));']);
 
-            eval(['res.results.BIAS.' thisMethod '= median(sqrt((squeeze(mean(res.results.irf.' thisMethod ...
-                ', 2)) - res.DF_model.target_irf).^2),2);']);
+            eval(['res.results.BIAS.' thisMethod '= sqrt((squeeze(mean(res.results.irf.' thisMethod ...
+                ', 2)) - res.DF_model.target_irf).^2);']);
 
-            eval(['res.results.SD.' thisMethod '= median(sqrt(squeeze(var(res.results.irf.' thisMethod ', 0, 2))),2);']);
+            eval(['res.results.SD.' thisMethod '= sqrt(squeeze(var(res.results.irf.' thisMethod ', 0, 2)));']);
 
-            eval(['res.results.BIASrel.' thisMethod '= median(sqrt((squeeze(mean(res.results.irf.' thisMethod ...
-                ', 2)) - res.DF_model.target_irf).^2) ./ sqrt(mean(res.DF_model.target_irf.^2)),2);']);
+            eval(['res.results.BIASrel.' thisMethod '= sqrt((squeeze(mean(res.results.irf.' thisMethod ...
+                ', 2)) - res.DF_model.target_irf).^2) ./ sqrt(mean(res.DF_model.target_irf.^2));']);
 
-            eval(['res.results.SDrel.' thisMethod '= median(sqrt(squeeze(var(res.results.irf.' thisMethod ...
-                ', 0, 2))) ./ sqrt(mean(res.DF_model.target_irf.^2)),2);']);
+            eval(['res.results.SDrel.' thisMethod '= sqrt(squeeze(var(res.results.irf.' thisMethod ...
+                ', 0, 2))) ./ sqrt(mean(res.DF_model.target_irf.^2));']);
 
-            eval(['res.results.MSErel.' thisMethod '= median(squeeze(mean((res.results.irf.' thisMethod ...
-                ' - permute(res.DF_model.target_irf,[1 3 2])).^2, 2)) ./ sqrt(mean(res.DF_model.target_irf.^2)),2);']);
+%             eval(['res.results.MSErel.' thisMethod '= median(squeeze(mean((res.results.irf.' thisMethod ...
+%                 ' - permute(res.DF_model.target_irf,[1 3 2])).^2, 2)) ./ sqrt(mean(res.DF_model.target_irf.^2)),2);']);
+
+            eval(['res.results.MSErel.' thisMethod '= 0.5 * res.results.BIASrel.' thisMethod ...
+                '.^2 + 0.5 * res.results.SDrel.' thisMethod '.^2;']);
             
             eval(['res.results.biasweight.' thisMethod ...
                 '= (res.results.SDrel.' thisMethod '.^2 - res.results.SDrel.' benchMethod ...
@@ -89,7 +107,7 @@ for nf=1:length(mat_folders) % For each folder...
         figure;
         for i_method = 1:res.settings.est.n_methods
             thisMethod = res.settings.est.methods_name{i_method};
-            resultsthisMethod = eval(['res.results.BIASrel.' thisMethod '']);
+            resultsthisMethod = median(eval(['res.results.BIASrel.' thisMethod '']),2);
             plot(res.settings.est.IRF_select-1,resultsthisMethod,'Linewidth',3.5)
             hold on
         end
@@ -103,7 +121,7 @@ for nf=1:length(mat_folders) % For each folder...
         figure;
         for i_method = 1:res.settings.est.n_methods
             thisMethod = res.settings.est.methods_name{i_method};
-            resultsthisMethod = eval(['res.results.SDrel.' thisMethod '']);
+            resultsthisMethod = median(eval(['res.results.SDrel.' thisMethod '']),2);
             plot(res.settings.est.IRF_select-1,resultsthisMethod,'Linewidth',3.5)
             hold on
         end
@@ -117,7 +135,7 @@ for nf=1:length(mat_folders) % For each folder...
         figure;
         for i_method = 1:res.settings.est.n_methods
             thisMethod = res.settings.est.methods_name{i_method};
-            resultsthisMethod = eval(['res.results.MSErel.' thisMethod '']);
+            resultsthisMethod = median(eval(['res.results.MSErel.' thisMethod '']),2);
             plot(res.settings.est.IRF_select-1,resultsthisMethod,'Linewidth',3.5)
             hold on
         end
@@ -129,182 +147,168 @@ for nf=1:length(mat_folders) % For each folder...
         % LP vs. VAR
         
         figure;
-        subplot(2,3,1)
-        for i_method = [1,4,5]
-            thisMethod = res.settings.est.methods_name{i_method};
-            resultsthisMethod = eval(['res.results.BIASrel.' thisMethod '']);
-            plot(res.settings.est.IRF_select-1,resultsthisMethod,'Linewidth',3.5)
-            hold on
+        
+        pref_VAR = zeros(n_weight,max(res.settings.est.IRF_select),size(res.results.BIASrel.svar,2));
+        for i_weight = 1:n_weight
+            loss_VAR   = weight_grid(i_weight) * res.results.BIASrel.svar.^2 + (1-weight_grid(i_weight)) * res.results.SDrel.svar.^2;
+            loss_other = weight_grid(i_weight) * res.results.BIASrel.lp.^2 + (1-weight_grid(i_weight)) * res.results.SDrel.lp.^2;
+
+            pref_VAR(i_weight,:,:) = (loss_VAR <= loss_other);
         end
-        title(strcat(exper_name,': Bias'), 'Interpreter', 'none');
-        hold off
+        pref_VAR = mean(pref_VAR,3);
         
-        subplot(2,3,2)
-        for i_method = [1,4,5]
-            thisMethod = res.settings.est.methods_name{i_method};
-            resultsthisMethod = eval(['res.results.SDrel.' thisMethod '']);
-            plot(res.settings.est.IRF_select-1,resultsthisMethod,'Linewidth',3.5)
-            hold on
+        subplot(1,2,1)
+        h_VAR = heatmap(pref_VAR,'ColorbarVisible','off','GridVisible','off');
+        h_VAR.XLabel = 'Horizon';
+        h_VAR.YLabel = 'Bias Weight';
+        h_VAR.FontSize = 10;
+        h_VAR.Colormap = cmap;
+        h_VAR.ColorLimits = [0 1];
+        h_VAR.CellLabelColor = 'none';
+        CustomXLabels = string(res.settings.est.IRF_select-1);
+        CustomXLabels(mod(res.settings.est.IRF_select-1,2) ~= 0) = " ";
+        h_VAR.XDisplayLabels = CustomXLabels';
+        CustomYLabels = weight_grid;
+        CustomYLabels(mod(round(weight_grid,5),0.1) ~= 0) = " ";
+        h_VAR.YDisplayLabels = CustomYLabels';
+        set(struct(h_VAR).NodeChildren(3), 'XTickLabelRotation', 0);
+        a2 = axes('Position', h_VAR.Position);               %new axis on top
+        a2.Color = 'none';  
+        a2.Title = title(strcat(exper_name,': Indifference: VAR vs. LP'), 'Interpreter', 'none');
+        a2.XTick = [];
+        a2.YTick = [];
+        
+        pref_VAR = zeros(n_weight,max(res.settings.est.IRF_select),size(res.results.BIASrel.svar,2));
+        for i_weight = 1:n_weight
+            loss_VAR   = weight_grid(i_weight) * res.results.BIASrel.svar.^2 + (1-weight_grid(i_weight)) * res.results.SDrel.svar.^2;
+            loss_other = weight_grid(i_weight) * res.results.BIASrel.lp_penalize.^2 + (1-weight_grid(i_weight)) * res.results.SDrel.lp_penalize.^2;
+
+            pref_VAR(i_weight,:,:) = (loss_VAR <= loss_other);
         end
-        title(strcat(exper_name,': Std'), 'Interpreter', 'none');
-        legend(res.settings.est.methods_name{[1,4,5]}, 'Location', 'north', 'Interpreter', 'none','Orientation','horizontal');
-        hold off
+        pref_VAR = mean(pref_VAR,3);
         
-        subplot(2,3,3)
-        for i_method = [1,4,5]
-            thisMethod = res.settings.est.methods_name{i_method};
-            resultsthisMethod = eval(['res.results.MSErel.' thisMethod '']);
-            plot(res.settings.est.IRF_select-1,resultsthisMethod,'Linewidth',3.5)
-            hold on
-        end
-        title(strcat(exper_name,': RMSE'), 'Interpreter', 'none');
-        hold off
-        
-        pref_VAR = res.results.BIASrel.svar < res.results.BIASrel.lp & res.results.SDrel.svar < res.results.SDrel.lp;
-        pref_LP  = res.results.BIASrel.svar > res.results.BIASrel.lp & res.results.SDrel.svar > res.results.SDrel.lp;
-        
-        subplot(2,3,4)
-        for i = 1:max(res.settings.est.IRF_select-1)
-            if pref_VAR(i) == 1
-                patch([i-1 i i i-1],[0 0 1 1],[135/255 206/255 250/255],'EdgeColor','none')
-            elseif pref_LP(i) == 1
-                patch([i-1 i i i-1],[0 0 1 1],[255/255 204/255 203/255],'EdgeColor','none')
-            end
-            hold on
-        end
-        hold on
-        thisMethod = res.settings.est.methods_name{4};
-        resultsthisMethod = eval(['res.results.biasweight.' thisMethod '']);
-        plot(res.settings.est.IRF_select-1,resultsthisMethod,'-s',...
-            'MarkerSize',5,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[0 0 0],'Linewidth',3,'Color',[0 0 0])
-        hold on
-        title(strcat(exper_name,': Indifference: VAR vs. LP'), 'Interpreter', 'none');
-        hold off
-        
-        pref_VAR = res.results.BIASrel.svar < res.results.BIASrel.lp_penalize & res.results.SDrel.svar < res.results.SDrel.lp_penalize;
-        pref_LP  = res.results.BIASrel.svar > res.results.BIASrel.lp_penalize & res.results.SDrel.svar > res.results.SDrel.lp_penalize;
-        
-        subplot(2,3,5)
-        for i = 1:max(res.settings.est.IRF_select)-1
-            if pref_VAR(i) == 1
-                patch([i-1 i i i-1],[0 0 1 1],[135/255 206/255 250/255],'EdgeColor','none')
-            elseif pref_LP(i) == 1
-                patch([i-1 i i i-1],[0 0 1 1],[255/255 204/255 203/255],'EdgeColor','none')
-            end
-            hold on
-        end
-        thisMethod = res.settings.est.methods_name{5};
-        resultsthisMethod = eval(['res.results.biasweight.' thisMethod '']);
-        plot(res.settings.est.IRF_select-1,resultsthisMethod,'-s',...
-            'MarkerSize',5,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[0 0 0],'Linewidth',3,'Color',[0 0 0])
-        hold on
-        title(strcat(exper_name,': Indifference: VAR vs. pen. LP'), 'Interpreter', 'none');
-        hold off
+        subplot(1,2,2)
+        h_VAR = heatmap(pref_VAR,'ColorbarVisible','off','GridVisible','off');
+        h_VAR.XLabel = 'Horizon';
+        h_VAR.YLabel = 'Bias Weight';
+        h_VAR.FontSize = 10;
+        h_VAR.Colormap = cmap;
+        h_VAR.ColorLimits = [0 1];
+        h_VAR.CellLabelColor = 'none';
+        CustomXLabels = string(res.settings.est.IRF_select-1);
+        CustomXLabels(mod(res.settings.est.IRF_select-1,2) ~= 0) = " ";
+        h_VAR.XDisplayLabels = CustomXLabels';
+        CustomYLabels = weight_grid;
+        CustomYLabels(mod(round(weight_grid,5),0.1) ~= 0) = " ";
+        h_VAR.YDisplayLabels = CustomYLabels';
+        set(struct(h_VAR).NodeChildren(3), 'XTickLabelRotation', 0);
+        a2 = axes('Position', h_VAR.Position);               %new axis on top
+        a2.Color = 'none';  
+        a2.Title = title(strcat(exper_name,': Indifference: VAR vs. pen. LP'), 'Interpreter', 'none');
+        a2.XTick = [];
+        a2.YTick = [];
         
         pos = get(gcf, 'Position');
-        set(gcf, 'Position', [pos(1) pos(2) 1.75*pos(3) 1.5*pos(4)]);
+        set(gcf, 'Position', [pos(1) pos(2) 1.6*pos(3) 0.8*pos(4)]);
         set(gcf, 'PaperPositionMode', 'auto');
         saveas(gcf, strcat(strcat(output_folder,'/',exper_name,'_varvslp'), '.', output_suffix));
         
         % VAR methods
         
         figure;
-        subplot(2,3,1)
-        for i_method = [1,2,3]
-            thisMethod = res.settings.est.methods_name{i_method};
-            resultsthisMethod = eval(['res.results.BIASrel.' thisMethod '']);
-            plot(res.settings.est.IRF_select-1,resultsthisMethod,'Linewidth',3.5)
-            hold on
+        
+        pref_VAR = zeros(n_weight,max(res.settings.est.IRF_select),size(res.results.BIASrel.svar,2));
+        for i_weight = 1:n_weight
+            loss_VAR   = weight_grid(i_weight) * res.results.BIASrel.svar.^2 + (1-weight_grid(i_weight)) * res.results.SDrel.svar.^2;
+            loss_other = weight_grid(i_weight) * res.results.BIASrel.svar_corrbias.^2 + (1-weight_grid(i_weight)) * res.results.SDrel.svar_corrbias.^2;
+
+            pref_VAR(i_weight,:,:) = (loss_VAR <= loss_other);
         end
-        title(strcat(exper_name,': Bias'), 'Interpreter', 'none');
-        hold off
+        pref_VAR = mean(pref_VAR,3);
         
-        subplot(2,3,2)
-        for i_method = [1,2,3]
-            thisMethod = res.settings.est.methods_name{i_method};
-            resultsthisMethod = eval(['res.results.SDrel.' thisMethod '']);
-            plot(res.settings.est.IRF_select-1,resultsthisMethod,'Linewidth',3.5)
-            hold on
+        subplot(1,3,1)
+        h_VAR = heatmap(pref_VAR,'ColorbarVisible','off','GridVisible','off');
+        h_VAR.XLabel = 'Horizon';
+        h_VAR.YLabel = 'Bias Weight';
+        h_VAR.FontSize = 10;
+        h_VAR.Colormap = cmap;
+        h_VAR.ColorLimits = [0 1];
+        h_VAR.CellLabelColor = 'none';
+        CustomXLabels = string(res.settings.est.IRF_select-1);
+        CustomXLabels(mod(res.settings.est.IRF_select-1,2) ~= 0) = " ";
+        h_VAR.XDisplayLabels = CustomXLabels';
+        CustomYLabels = weight_grid;
+        CustomYLabels(mod(round(weight_grid,5),0.1) ~= 0) = " ";
+        h_VAR.YDisplayLabels = CustomYLabels';
+        set(struct(h_VAR).NodeChildren(3), 'XTickLabelRotation', 0);
+        a2 = axes('Position', h_VAR.Position);               %new axis on top
+        a2.Color = 'none';  
+        a2.Title = title(strcat(exper_name,': Indifference: VAR vs. bias-c. VAR'), 'Interpreter', 'none');
+        a2.XTick = [];
+        a2.YTick = [];
+        
+        pref_VAR = zeros(n_weight,max(res.settings.est.IRF_select),size(res.results.BIASrel.svar,2));
+        for i_weight = 1:n_weight
+            loss_VAR   = weight_grid(i_weight) * res.results.BIASrel.svar.^2 + (1-weight_grid(i_weight)) * res.results.SDrel.svar.^2;
+            loss_other = weight_grid(i_weight) * res.results.BIASrel.bvar.^2 + (1-weight_grid(i_weight)) * res.results.SDrel.bvar.^2;
+
+            pref_VAR(i_weight,:,:) = (loss_VAR <= loss_other);
         end
-        title(strcat(exper_name,': Std'), 'Interpreter', 'none');
-        legend(res.settings.est.methods_name{[1,2,3,6]}, 'Location', 'north', 'Interpreter', 'none','Orientation','horizontal');
-        hold off
+        pref_VAR = mean(pref_VAR,3);
         
-        subplot(2,3,3)
-        for i_method = [1,2,3]
-            thisMethod = res.settings.est.methods_name{i_method};
-            resultsthisMethod = eval(['res.results.MSErel.' thisMethod '']);
-            plot(res.settings.est.IRF_select-1,resultsthisMethod,'Linewidth',3.5)
-            hold on
+        subplot(1,3,2)
+        h_VAR = heatmap(pref_VAR,'ColorbarVisible','off','GridVisible','off');
+        h_VAR.XLabel = 'Horizon';
+        h_VAR.YLabel = 'Bias Weight';
+        h_VAR.FontSize = 10;
+        h_VAR.Colormap = cmap;
+        h_VAR.ColorLimits = [0 1];
+        h_VAR.CellLabelColor = 'none';
+        CustomXLabels = string(res.settings.est.IRF_select-1);
+        CustomXLabels(mod(res.settings.est.IRF_select-1,2) ~= 0) = " ";
+        h_VAR.XDisplayLabels = CustomXLabels';
+        CustomYLabels = weight_grid;
+        CustomYLabels(mod(round(weight_grid,5),0.1) ~= 0) = " ";
+        h_VAR.YDisplayLabels = CustomYLabels';
+        set(struct(h_VAR).NodeChildren(3), 'XTickLabelRotation', 0);
+        a2 = axes('Position', h_VAR.Position);               %new axis on top
+        a2.Color = 'none';  
+        a2.Title = title(strcat(exper_name,': Indifference: VAR vs. BVAR'), 'Interpreter', 'none');
+        a2.XTick = [];
+        a2.YTick = [];
+        
+        pref_VAR = zeros(n_weight,max(res.settings.est.IRF_select),size(res.results.BIASrel.svar,2));
+        for i_weight = 1:n_weight
+            loss_VAR   = weight_grid(i_weight) * res.results.BIASrel.svar.^2 + (1-weight_grid(i_weight)) * res.results.SDrel.svar.^2;
+            loss_other = weight_grid(i_weight) * res.results.BIASrel.var_avg.^2 + (1-weight_grid(i_weight)) * res.results.SDrel.var_avg.^2;
+
+            pref_VAR(i_weight,:,:) = (loss_VAR <= loss_other);
         end
-        title(strcat(exper_name,': RMSE'), 'Interpreter', 'none');
-        hold off
+        pref_VAR = mean(pref_VAR,3);
         
-        pref_VAR   = res.results.BIASrel.svar < res.results.BIASrel.svar_corrbias & res.results.SDrel.svar < res.results.SDrel.svar_corrbias;
-        pref_cbias = res.results.BIASrel.svar > res.results.BIASrel.svar_corrbias & res.results.SDrel.svar > res.results.SDrel.svar_corrbias;
-        
-        subplot(2,3,4)
-        for i = 1:max(res.settings.est.IRF_select-1)
-            if pref_VAR(i) == 1
-                patch([i-1 i i i-1],[0 0 1 1],[135/255 206/255 250/255],'EdgeColor','none')
-            elseif pref_cbias(i) == 1
-                patch([i-1 i i i-1],[0 0 1 1],[255/255 204/255 203/255],'EdgeColor','none')
-            end
-            hold on
-        end
-        hold on
-        thisMethod = res.settings.est.methods_name{2};
-        resultsthisMethod = eval(['res.results.biasweight.' thisMethod '']);
-        plot(res.settings.est.IRF_select-1,resultsthisMethod,'-s',...
-            'MarkerSize',5,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[0 0 0],'Linewidth',3,'Color',[0 0 0])
-        hold on
-        title(strcat(exper_name,': Indifference: VAR vs. bias-c. VAR'), 'Interpreter', 'none');
-        hold off
-        
-        pref_VAR   = res.results.BIASrel.svar < res.results.BIASrel.bvar & res.results.SDrel.svar < res.results.SDrel.bvar;
-        pref_bvar  = res.results.BIASrel.svar > res.results.BIASrel.bvar & res.results.SDrel.svar > res.results.SDrel.bvar;
-        
-        subplot(2,3,5)
-        for i = 1:max(res.settings.est.IRF_select-1)
-            if pref_VAR(i) == 1
-                patch([i-1 i i i-1],[0 0 1 1],[135/255 206/255 250/255],'EdgeColor','none')
-            elseif pref_bvar(i) == 1
-                patch([i-1 i i i-1],[0 0 1 1],[255/255 204/255 203/255],'EdgeColor','none')
-            end
-            hold on
-        end
-        hold on  
-        thisMethod = res.settings.est.methods_name{3};
-        resultsthisMethod = eval(['res.results.biasweight.' thisMethod '']);
-        plot(res.settings.est.IRF_select-1,resultsthisMethod,'-s',...
-            'MarkerSize',5,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[0 0 0],'Linewidth',3,'Color',[0 0 0])
-        hold on
-        title(strcat(exper_name,': Indifference: VAR vs. BVAR'), 'Interpreter', 'none');
-        hold off
-        
-        pref_VAR    = res.results.BIASrel.svar < res.results.BIASrel.var_avg & res.results.SDrel.svar < res.results.SDrel.var_avg;
-        pref_VARavg = res.results.BIASrel.svar > res.results.BIASrel.var_avg & res.results.SDrel.svar > res.results.SDrel.var_avg;
-        
-        subplot(2,3,6)
-        for i = 1:max(res.settings.est.IRF_select-1)
-            if pref_VAR(i) == 1
-                patch([i-1 i i i-1],[0 0 1 1],[135/255 206/255 250/255],'EdgeColor','none')
-            elseif pref_VARavg(i) == 1
-                patch([i-1 i i i-1],[0 0 1 1],[255/255 204/255 203/255],'EdgeColor','none')
-            end
-            hold on
-        end
-        hold on   
-        thisMethod = res.settings.est.methods_name{6};
-        resultsthisMethod = eval(['res.results.biasweight.' thisMethod '']);
-        plot(res.settings.est.IRF_select-1,resultsthisMethod,'-s',...
-            'MarkerSize',5,'MarkerEdgeColor',[0 0 0],'MarkerFaceColor',[0 0 0],'Linewidth',3,'Color',[0 0 0])
-        hold on
-        title(strcat(exper_name,': Indifference: VAR vs. avg. VAR'), 'Interpreter', 'none');
-        hold off
+        subplot(1,3,3)
+        h_VAR = heatmap(pref_VAR,'ColorbarVisible','off','GridVisible','off');
+        h_VAR.XLabel = 'Horizon';
+        h_VAR.YLabel = 'Bias Weight';
+        h_VAR.FontSize = 10;
+        h_VAR.Colormap = cmap;
+        h_VAR.ColorLimits = [0 1];
+        h_VAR.CellLabelColor = 'none';
+        CustomXLabels = string(res.settings.est.IRF_select-1);
+        CustomXLabels(mod(res.settings.est.IRF_select-1,2) ~= 0) = " ";
+        h_VAR.XDisplayLabels = CustomXLabels';
+        CustomYLabels = weight_grid;
+        CustomYLabels(mod(round(weight_grid,5),0.1) ~= 0) = " ";
+        h_VAR.YDisplayLabels = CustomYLabels';
+        set(struct(h_VAR).NodeChildren(3), 'XTickLabelRotation', 0);
+        a2 = axes('Position', h_VAR.Position);               %new axis on top
+        a2.Color = 'none';  
+        a2.Title = title(strcat(exper_name,': Indifference: VAR vs. avg. VAR'), 'Interpreter', 'none');
+        a2.XTick = [];
+        a2.YTick = [];
         
         pos = get(gcf, 'Position');
-        set(gcf, 'Position', [pos(1) pos(2) 1.75*pos(3) 1.5*pos(4)]);
+        set(gcf, 'Position', [pos(1) pos(2) 2*pos(3) 0.8*pos(4)]);
         set(gcf, 'PaperPositionMode', 'auto');
         saveas(gcf, strcat(strcat(output_folder,'/',exper_name,'_vars_comp'), '.', output_suffix));
         
