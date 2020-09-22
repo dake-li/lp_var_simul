@@ -1,19 +1,15 @@
 clear all;
 
 % Plot simulation results
-% MPM 2020-01-07
 
 
 %% Settings
 
 % Results .mat files
 mat_rootfolder = 'Results'; % Root folder with files
-mat_folders = {'lag4', ...
-               }; % Folders with files
-mat_files = {'SW_DFM_G_IV', 'SW_DFM_G_ObsShock', 'SW_DFM_G_Recursive', ...
-             'SW_DFM_MP_IV', 'SW_DFM_MP_ObsShock', 'SW_DFM_MP_Recursive'}; % Files in each of the above folders
-% mat_folders = {'SW_G'};
-% mat_files = {{'SW_DFM_G_IV'}};
+mat_folders = {'lag4', 'lag8'}; % Folders with files
+mat_files = {'DFM_G_IV', 'DFM_G_ObsShock', 'DFM_G_Recursive', ...
+             'DFM_MP_IV', 'DFM_MP_ObsShock', 'DFM_MP_Recursive'}; % Files in each of the above folders
 
 % Output settings for figures
 output_dir = 'Figures'; % Folder
