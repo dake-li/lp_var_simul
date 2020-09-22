@@ -11,7 +11,7 @@ addpath(genpath(fullfile('..', 'Auxiliary_Functions')))
 addpath(genpath(fullfile('..', 'Estimation_Routines')))
 addpath(genpath('Subroutines'))
 
-rng(1);
+rng(1, 'twister');
 tic;
 
 % Parallel computing object
@@ -23,21 +23,28 @@ else
 end
 clear num_workers;
 
-% Storage folder for results
-save_folder = '/tigress/dakel'; % use ' ' or '/tigress/dakel'
-
 
 %% DECIDE WHICH EXPERIMENT TO RUN
 
 dgp_type = 'G'; % 'MP'; % Either 'G' or 'MP'
 estimand_type = 'ObsShock'; % 'Recursive'; 'IV'; % Either 'ObsShock', 'Recursive', or 'IV'
+lag_type = 4; % No. of lags to impose in estimation, or [] (meaning AIC)
 
 
 %% SETTINGS
 
+% Apply shared settings as well as settings specific to DGP and estimand type
 run(fullfile('Settings', 'shared'));
 run(fullfile('Settings', dgp_type));
 run(fullfile('Settings', estimand_type));
+
+% Storage folder for results
+if isempty(lag_type)
+    save_suff = '_aic';
+else
+    save_suff = num2str(lag_type);
+end
+save_folder = fullfile('Results', strcat('lag', save_suff));
 
 
 %% DGP
@@ -334,9 +341,8 @@ clear i_method thisMethod
 
 % export results
 
-cd(save_folder);
-mkdir('Results');
-save(fullfile('Results', strcat('DFM_', dgp_type, '_', estimand_type)),'DFM_estimate','DF_model','settings','results','-v7.3');
+mkdir(save_folder);
+save(fullfile(save_folder, strcat('DFM_', dgp_type, '_', estimand_type)),'DFM_estimate','DF_model','settings','results','-v7.3');
 
 delete(poolobj);
 clear save_folder
