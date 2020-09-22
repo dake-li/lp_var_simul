@@ -1,3 +1,6 @@
 *.asv
 *.log
 *.mat
+*.fig
+*.png
+*.eps
