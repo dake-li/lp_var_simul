@@ -8,8 +8,8 @@ clear all;
 % Results .mat files
 mat_rootfolder = 'Results'; % Root folder with files
 mat_folders = {'lag4', 'lag8'}; % Folders with files
-mat_files = {'DFM_G_IV', 'DFM_G_ObsShock', 'DFM_G_Recursive', ...
-             'DFM_MP_IV', 'DFM_MP_ObsShock', 'DFM_MP_Recursive'}; % Files in each of the above folders
+mat_files = {'DFM_G_ObsShock', 'DFM_G_Recursive', 'DFM_G_IV', ...
+             'DFM_MP_ObsShock', 'DFM_MP_Recursive', 'DFM_MP_IV'}; % Files in each of the above folders
 
 % Output settings for figures
 output_dir = 'Figures'; % Folder
@@ -50,11 +50,19 @@ for nf=1:length(mat_folders) % For each folder...
         
         % Persistence
         figure;
-%         histogram(mean(res.DF_model.persistency,2), 'Normalization', 'probability');
-%         title(strjoin({exper_name, ': average persistence'}), 'Interpreter', 'none');
         histogram(res.DF_model.LRV_Cov_tr_ratio, 'Normalization', 'probability');
         title(strjoin({exper_name, ': LRV to Var ratio'}), 'Interpreter', 'none');
-        plot_save(fullfile(output_folder, 'persistence'), output_suffix);
+        plot_save(fullfile(output_folder, 'LRVVar'), output_suffix);
+        
+        figure;
+        histogram(res.DF_model.VAR_largest_root, 'Normalization', 'probability');
+        title(strjoin({exper_name, ': largest VAR root'}), 'Interpreter', 'none');
+        plot_save(fullfile(output_folder, 'largroot'), output_suffix);
+        
+        figure;
+        histogram(res.DF_model.frac_coef_for_large_lags, 'Normalization', 'probability');
+        title(strjoin({exper_name, ': fraction of long-lag VAR coefs'}), 'Interpreter', 'none');
+        plot_save(fullfile(output_folder, 'longlag'), output_suffix);
         
         % IV strength
         if isfield(res.DF_model, 'IV_strength')
@@ -79,17 +87,19 @@ for nf=1:length(mat_folders) % For each folder...
         title(strjoin({exper_name, ': std (across sims) of number of lags'}), 'Interpreter', 'none');
         plot_save(fullfile(output_folder, 'nlags_std'), output_suffix);
 
-%         % Shrinkage penalty
-%         the_lambda = res.results.lambda.lp_penalize;
-%         figure;
-%         histogram(the_lambda(:), 'Normalization', 'probability');
-%         title(strjoin({exper_name, ': shrinkage penalty (across specs+sims)'}), 'Interpreter', 'none');
-%         plot_save(fullfile(output_folder, 'lambda'), output_suffix);
-%         
-%         figure;
-%         histogram(std(the_lambda), 'Normalization', 'probability');
-%         title(strjoin({exper_name, ': std (across sims) of shrinkage penalty'}), 'Interpreter', 'none');
-%         plot_save(fullfile(output_folder, 'lambda_std'), output_suffix);
+        % Shrinkage penalty
+        the_lambda = res.results.lambda.lp_penalize;
+        figure;
+        [~,the_edges] = histcounts(log10(the_lambda));
+        histogram(the_lambda,10.^the_edges);
+        set(gca, 'xscale','log'); % Log scale for x axis
+        title(strjoin({exper_name, ': shrinkage penalty (across specs+sims)'}), 'Interpreter', 'none');
+        plot_save(fullfile(output_folder, 'lambda'), output_suffix);
+        
+        figure;
+        histogram(std(log(the_lambda)), 'Normalization', 'probability');
+        title(strjoin({exper_name, ': std (across sims) of log shrinkage penalty'}), 'Interpreter', 'none');
+        plot_save(fullfile(output_folder, 'lambda_logstd'), output_suffix);
         
         % Model-averaging weights
         the_weights = res.results.weight.var_avg;
