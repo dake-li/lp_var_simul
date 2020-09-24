@@ -23,6 +23,7 @@ for K = 1:length(plot_legend)
     hidden_h(K) = surf(uint8([K K;K K]), 'edgecolor', 'none');
 end
 hold off;
+colormap(lines(length(plot_legend)));
 uistack(hidden_h, 'bottom');
 legend(hidden_h, plot_legend, 'Location', 'southoutside', 'NumColumns', 3, 'interpreter', 'latex','FontSize',16);
 
