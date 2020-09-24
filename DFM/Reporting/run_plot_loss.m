@@ -15,52 +15,20 @@ addpath('Plotting_Functions')
 % Root Folders
 %----------------------------------------------------------------
 
-% file origin
-
-rootfolder = '/Users/christianwolf/Dropbox/Research/lp_var_simul/stored_result/small_run_0916'; % Root folder with files
-
 % select lag length specifications
-
-lags_list      = {'lag4','lag8'}; % Folders with files
 lags_select    = [1 2];
-lags_folders   = lags_list(lags_select);
 
 % select experiments
-
-exper_list        = {'DFM_G_IV', 'DFM_G_ObsShock', 'DFM_G_Recursive', ...
-                        'DFM_MP_IV', 'DFM_MP_ObsShock', 'DFM_MP_Recursive'}; % Files in each of the above folders
-exper_names_list  = {'G IV', 'G ObsShock', 'G Recursive', ...
-                        'MP IV', 'MP ObsShock', 'MP Recursive'}; % Experiment names for plots
-         
 exper_select = [2 6];
 
-exper_files   = exper_list(exper_select);
-exper_names   = exper_names_list(exper_select);
-
 % select estimation methods for each experiment
-
-methods_iv_names        = {'SVAR','Bias-Corr. SVAR','BVAR','LP','Penalized LP','VAR Avg.','SVAR-IV'};
-methods_obsshock_names  = {'SVAR','Bias-Corr. SVAR','BVAR','LP','Penalized LP','VAR Avg.'};
-methods_recursive_names = {'SVAR','Bias-Corr. SVAR','BVAR','LP','Penalized LP','VAR Avg.'};
-
 methods_iv_select        = [1 2 3 4 5 7];
 methods_obsshock_select  = [1 2 3 4 5 6];
 methods_recursive_select = [1 2 3 4 5 6];
 
-methods_select = {methods_iv_select,methods_obsshock_select,methods_recursive_select,...
-                    methods_iv_select,methods_obsshock_select,methods_recursive_select};
-methods_select = methods_select(exper_select);
+% Apply shared settings
+settings_shared;
 
-methods_names = {methods_iv_names(methods_iv_select),methods_obsshock_names(methods_obsshock_select),methods_recursive_names(methods_recursive_select),...
-                    methods_iv_names(methods_iv_select),methods_obsshock_names(methods_obsshock_select),methods_recursive_names(methods_recursive_select)};
-methods_names = methods_names(exper_select);
-
-%----------------------------------------------------------------
-% Figure Output
-%----------------------------------------------------------------
-
-output_dir = 'fig';     % Folder
-output_suffix = 'png';  % File suffix
 
 %% FIGURES
 
@@ -68,23 +36,8 @@ for nf=1:length(lags_folders) % For each folder...
 
     for ne=1:length(exper_files) % For each experiment in folder...
         
-        %----------------------------------------------------------------
-        % File/Folder Names
-        %----------------------------------------------------------------
-        
-        exper_filename = exper_files{ne}; % Name of current experiment
-        exper_plotname = exper_names{ne};
-        file_name = fullfile(lags_folders{nf}, exper_filename); % Name of .mat results file
-        output_folder = fullfile(output_dir, file_name); % Name of output folder
-        mkdir(output_folder); % Create output folder        
-
-        %----------------------------------------------------------------
-        % Load Simulation Results
-        %----------------------------------------------------------------
-
-        res = load(fullfile(rootfolder, strcat(file_name, '.mat'))); % Load
-        horzs = res.settings.est.IRF_select; % Impulse response horizons
-        methods_names_plot = methods_names{ne};
+        % Load results
+        load_results;
         
         %----------------------------------------------------------------
         % Compute Reporting Results
