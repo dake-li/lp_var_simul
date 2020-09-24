@@ -7,7 +7,7 @@ clc
 clear all
 close all
 
-addpath('Auxiliary_Functions')
+addpath('Plotting_Functions')
 warning('off','MATLAB:structOnObject')
 
 %% SETTINGS
@@ -23,7 +23,7 @@ rootfolder = '/Users/christianwolf/Dropbox/Research/lp_var_simul/stored_result/s
 % select lag length specifications
 
 lags_list      = {'lag4','lag8'}; % Folders with files
-lags_select    = [1];
+lags_select    = [1 2];
 lags_folders   = lags_list(lags_select);
 
 % select experiments

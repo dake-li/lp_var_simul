@@ -7,7 +7,7 @@ clc
 clear all
 close all
 
-addpath('Auxiliary_Functions')
+addpath('Plotting_Functions')
 
 %% SETTINGS
 
@@ -32,7 +32,7 @@ exper_list        = {'DFM_G_IV', 'DFM_G_ObsShock', 'DFM_G_Recursive', ...
 exper_names_list  = {'G IV', 'G ObsShock', 'G Recursive', ...
                         'MP IV', 'MP ObsShock', 'MP Recursive'}; % Experiment names for plots
          
-exper_select = [1 2 3 4 5 6];
+exper_select = [2 6];
 
 exper_files   = exper_list(exper_select);
 exper_names   = exper_names_list(exper_select);
