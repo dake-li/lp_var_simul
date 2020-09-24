@@ -73,7 +73,7 @@ for nf=1:length(lags_folders) % For each folder...
                 % Conditional loss
                 the_irf_err_rel_sel = the_irf_err_rel;
                 the_irf_err_rel_sel(true(size(the_irf_err_rel))==permute(~the_select,[3 1 2 4]))=nan; % Set irrelevant obs. to NaN
-                the_bias_rel_cond = squeeze(nanmean(the_irf_err_rel_sel,2)); % Conditional bias
+                the_bias_rel_cond = squeeze(abs(nanmean(the_irf_err_rel_sel,2))); % Conditional bias
                 the_std_rel_cond = squeeze(nanstd(the_irf_err_rel_sel,1,2)); % Conditional std dev
                 
                 % Conditional bias
