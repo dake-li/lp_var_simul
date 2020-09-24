@@ -11,10 +11,6 @@ addpath('Plotting_Functions')
 
 %% SETTINGS
 
-%----------------------------------------------------------------
-% Root Folders
-%----------------------------------------------------------------
-
 % select lag length specifications
 lags_select    = [1 2];
 
@@ -53,10 +49,17 @@ for nf=1:length(lags_folders) % For each folder...
 
             the_result = sqrt(extract_struct(res.results.(the_objects{j})));
             the_result = the_result(:,:,methods_select{ne});
+            the_ranks = permute(tiedrank(permute(the_result, [3 1 2])), [2 3 1]); % Rank procedures from lowest to highest (break ties by averaging)
 
+            % Loss
             plot_loss(horzs(2:end)-1, squeeze(median(the_result(2:end,:,:)./the_rms_irf, 2)), [], ...
                 strjoin({exper_plotname, ': Relative', the_titles{j}}), methods_names_plot);
             plot_save(fullfile(output_folder, strcat(lower(the_titles{j}), '_reltruth')), output_suffix);
+            
+            % Average rank
+            plot_loss(horzs(2:end)-1, squeeze(mean(the_ranks(2:end,:,:), 2)), [], ...
+                strjoin({exper_plotname, ': Average rank of', the_titles{j}}), methods_names_plot);
+            plot_save(fullfile(output_folder, strcat(lower(the_titles{j}), '_avgrank')), output_suffix);
 
         end
         
