@@ -116,7 +116,6 @@ for nf=1:length(lags_folders) % For each folder...
         if isfield(res.results, 'F_stat')
             
             the_Fstats = res.results.F_stat.svar_iv;
-            the_rse_acrosshorz = sqrt(squeeze(mean((extract_struct(res.results.irf)-permute(the_true_irf, [1 3 2])).^2,1))); % Root squared estimation error averaged across horizons (for each spec+sim)
             
             % Average F stat
             figure;
