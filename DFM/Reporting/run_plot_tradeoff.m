@@ -39,17 +39,6 @@ weight_grid = linspace(1,0,n_weight)';
 
 % base_names = {'SVAR','LP'};
 base_names = {'SVAR'};
-base_indic = NaN(length(exper_files),length(base_names));
-
-for ne=1:length(exper_files)
-    for nb=1:length(base_names)
-        if sum(strcmp(methods_names{ne}, base_names(nb))) == 0
-            error('The base method is not included!')
-        else
-            base_indic(ne,nb) = find(strcmp(methods_names{ne}, base_names(nb)));
-        end
-    end
-end
 
 %----------------------------------------------------------------
 % Colors
@@ -74,12 +63,37 @@ cmap_inv = interp2(X([1,25,50],:),Y([1,25,50],:),cmap_inv,X,Y);
 
 %% FIGURES
 
+% Find index of reference method
+base_indic = NaN(length(exper_files),length(base_names));
+
+for ne=1:length(exper_files)
+    for nb=1:length(base_names)
+        if sum(strcmp(methods_names{ne}, base_names(nb))) == 0
+            error('The base method is not included!')
+        else
+            base_indic(ne,nb) = find(strcmp(methods_names{ne}, base_names(nb)));
+        end
+    end
+end
+
 for nf=1:length(lags_folders) % For each folder...
 
     for ne=1:length(exper_files) % For each experiment in folder...
         
         % Load results
         load_results;
+        
+        % Results relative to true IRF
+        the_true_irf = res.DF_model.target_irf; % True IRF
+        the_rms_irf = sqrt(mean(the_true_irf.^2)); % Root average squared true IRF across horizons
+        
+        the_BIAS2 = extract_struct(res.results.BIAS2);
+        the_BIAS2 = the_BIAS2(:,:,methods_select{ne});
+        the_VCE   = extract_struct(res.results.VCE);
+        the_VCE   = the_VCE(:,:,methods_select{ne});
+
+        the_BIAS2rel = the_BIAS2./the_rms_irf.^2;
+        the_VCErel   = the_VCE./the_rms_irf.^2;
         
         %----------------------------------------------------------------
         % Compute Comparison Results
@@ -89,23 +103,14 @@ for nf=1:length(lags_folders) % For each folder...
         
         base_method_name = methods_names_plot{base_indic(ne,nb)};
         
-        the_true_irf = res.DF_model.target_irf; % True IRF
-        the_rms_irf = sqrt(mean(the_true_irf.^2)); % Root average squared true IRF across horizons
-        
         the_objects = methods_names_plot; % Objects to plot
         the_titles =  methods_names_plot; % Plot titles/file names
 
         for j=1:length(the_objects)
             
-            if j ~= base_indic(ne,nb)
-
-            the_BIAS2 = extract_struct(res.results.BIAS2);
-            the_BIAS2 = the_BIAS2(:,:,methods_select{ne});
-            the_VCE   = extract_struct(res.results.VCE);
-            the_VCE   = the_VCE(:,:,methods_select{ne});
-            
-            the_BIAS2rel = the_BIAS2./the_rms_irf.^2;
-            the_VCErel   = the_VCE./the_rms_irf.^2;
+            if j == base_indic(ne,nb)
+                continue
+            end
             
             pref_base = zeros(n_weight,max(res.settings.est.IRF_select),size(the_BIAS2rel,2));
             for i_weight = 1:n_weight
@@ -120,8 +125,6 @@ for nf=1:length(lags_folders) % For each folder...
                 strjoin({exper_plotname, ':', the_titles{j}, 'Preferred Over', base_method_name}))
             plot_save(fullfile(output_folder, strcat(lower(the_titles{j}), '_vs_', lower(base_method_name))), output_suffix);
 
-            end
-
         end
         
         end
@@ -129,14 +132,6 @@ for nf=1:length(lags_folders) % For each folder...
         %----------------------------------------------------------------
         % Compute Choice Results
         %----------------------------------------------------------------
-        
-        the_BIAS2 = extract_struct(res.results.BIAS2);
-        the_BIAS2 = the_BIAS2(:,:,methods_select{ne});
-        the_VCE   = extract_struct(res.results.VCE);
-        the_VCE   = the_VCE(:,:,methods_select{ne});
-
-        the_BIAS2rel = the_BIAS2./the_rms_irf.^2;
-        the_VCErel   = the_VCE./the_rms_irf.^2;
         
         choice_raw = zeros(n_weight,max(res.settings.est.IRF_select));
         for i_weight = 1:n_weight
