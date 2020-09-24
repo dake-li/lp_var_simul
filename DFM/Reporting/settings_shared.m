@@ -19,9 +19,9 @@ exper_names   = exper_names_list(exper_select);
 
 % select estimation methods for each experiment
 
-methods_iv_names        = {'SVAR','Bias-Corr. SVAR','BVAR','LP','Penalized LP','VAR Avg.','SVAR-IV'};
-methods_obsshock_names  = {'SVAR','Bias-Corr. SVAR','BVAR','LP','Penalized LP','VAR Avg.'};
-methods_recursive_names = {'SVAR','Bias-Corr. SVAR','BVAR','LP','Penalized LP','VAR Avg.'};
+methods_iv_names        = {'SVAR','B-C SVAR','BVAR','LP','Pen. LP','VAR Avg.','SVAR-IV'};
+methods_obsshock_names  = {'SVAR','B-C SVAR','BVAR','LP','Pen. LP','VAR Avg.'};
+methods_recursive_names = {'SVAR','B-C SVAR','BVAR','LP','Pen. LP','VAR Avg.'};
 
 methods_select = {methods_iv_select,methods_obsshock_select,methods_recursive_select,...
                     methods_iv_select,methods_obsshock_select,methods_recursive_select};

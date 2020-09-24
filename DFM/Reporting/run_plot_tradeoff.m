@@ -51,14 +51,6 @@ for ne=1:length(exper_files)
     end
 end
 
-% bias-variance ordering
-
-trade_off_pos = [4 3 6 1 2 5 7];
-
-% construction of choice plots: average over specifications?
-
-choice_averaging = 1;
-
 %----------------------------------------------------------------
 % Colors
 %----------------------------------------------------------------
@@ -125,7 +117,7 @@ for nf=1:length(lags_folders) % For each folder...
             pref_base = mean(pref_base,3);
 
             plot_tradeoff(pref_base(:,2:end), cmap_inv, horzs(2:end)-1, weight_grid, ...
-                strjoin({exper_plotname, ': Trade-Off for', the_titles{j}, 'vs', base_method_name}))
+                strjoin({exper_plotname, ':', the_titles{j}, 'Preferred Over', base_method_name}))
             plot_save(fullfile(output_folder, strcat(lower(the_titles{j}), '_vs_', lower(base_method_name))), output_suffix);
 
             end
@@ -146,36 +138,15 @@ for nf=1:length(lags_folders) % For each folder...
         the_BIAS2rel = the_BIAS2./the_rms_irf.^2;
         the_VCErel   = the_VCE./the_rms_irf.^2;
         
-        if choice_averaging == 0
-
         choice_raw = zeros(n_weight,max(res.settings.est.IRF_select));
         for i_weight = 1:n_weight
             loss_all = weight_grid(i_weight) * the_BIAS2rel + (1-weight_grid(i_weight)) * the_VCErel;
             loss_all = squeeze(mean(loss_all,2));
             [~,choice_raw(i_weight,:)] = min(loss_all,[],2);
         end
-        choice = NaN(n_weight,max(res.settings.est.IRF_select));
-        for i_method = 1:length(methods_names{ne})
-            choice(choice_raw == i_method) = trade_off_pos(methods_select{ne}(i_method));
-        end
         
-        else
-
-        choice_raw = zeros(n_weight,max(res.settings.est.IRF_select),size(the_BIAS2rel,2));
-        for i_weight = 1:n_weight
-            loss_all = weight_grid(i_weight) * the_BIAS2rel + (1-weight_grid(i_weight)) * the_VCErel;
-            [~,choice_raw(i_weight,:,:)] = min(loss_all,[],3);
-        end
-        choice = NaN(n_weight,max(res.settings.est.IRF_select),size(the_BIAS2rel,2));
-        for i_method = 1:length(methods_names{ne})
-            choice(choice_raw == i_method) = trade_off_pos(methods_select{ne}(i_method));
-        end
-        choice = mean(choice,3);
-        
-        end
-        
-        plot_choice(choice(:,2:end), cmap_inv, horzs(2:end)-1, weight_grid, methods_select{ne}, ...
-                strjoin({exper_plotname, ': Method Choice'}))
+        plot_choice(choice_raw(:,2:end), horzs(2:end)-1, weight_grid, ...
+                strjoin({exper_plotname, ': Method Choice'}), methods_names_plot);
         plot_save(fullfile(output_folder, 'method_choice'), output_suffix);    
         
     end
