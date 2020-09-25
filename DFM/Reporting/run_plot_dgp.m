@@ -93,22 +93,26 @@ for nf=1:length(lags_folders) % For each folder...
         plot_save(fullfile(output_folder, 'lambda_logstd'), output_suffix);
         
         % Model-averaging weights
-        the_weights = res.results.weight.var_avg;
-        the_store_weights = res.settings.est.average_store_weight;
-        the_maxlag = res.settings.est.n_lags_max;
-        figure;
-        for j=1:length(the_store_weights) % For each horizon where weights are stored...
-            subplot(1,length(the_store_weights),j);
-            plot(1:the_maxlag, mean(reshape(the_weights(1:the_maxlag,j,:,:), the_maxlag, []), 2)); % AR weights
-            hold on;
-            plot(1:the_maxlag, mean(reshape(the_weights(the_maxlag+1:end,j,:,:), the_maxlag, []), 2)); % VAR weights
-            hold off;
-            title(sprintf('%s%d', 'h = ', the_store_weights(j)));
-            xlabel('no. of lags');
-            legend('AR', 'VAR', 'Location', 'NorthEast');
+        if isfield(res.results, 'weight')
+            
+            the_weights = res.results.weight.var_avg;
+            the_store_weights = res.settings.est.average_store_weight;
+            the_maxlag = res.settings.est.n_lags_max;
+            figure;
+            for j=1:length(the_store_weights) % For each horizon where weights are stored...
+                subplot(1,length(the_store_weights),j);
+                plot(1:the_maxlag, mean(reshape(the_weights(1:the_maxlag,j,:,:), the_maxlag, []), 2)); % AR weights
+                hold on;
+                plot(1:the_maxlag, mean(reshape(the_weights(the_maxlag+1:end,j,:,:), the_maxlag, []), 2)); % VAR weights
+                hold off;
+                title(sprintf('%s%d', 'h = ', the_store_weights(j)));
+                xlabel('no. of lags');
+                legend('AR', 'VAR', 'Location', 'NorthEast');
+            end
+            sgtitle(strjoin({exper_plotname, ': average model-avg weight (across specs+sims)'}), 'FontSize', 11, 'FontWeight', 'bold', 'Interpreter', 'none');
+            plot_save(fullfile(output_folder, 'weight'), output_suffix);
+            
         end
-        sgtitle(strjoin({exper_plotname, ': average model-avg weight (across specs+sims)'}), 'FontSize', 11, 'FontWeight', 'bold', 'Interpreter', 'none');
-        plot_save(fullfile(output_folder, 'weight'), output_suffix);
         
         
         %% IV F-stat
