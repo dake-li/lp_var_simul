@@ -59,6 +59,8 @@ for nf=1:length(lags_folders) % For each folder...
 
             f_bias = figure('Position', [100 100 1000 400]);
             f_std = figure('Position', [100 100 1000 400]);
+            ylim_bias = [];
+            ylim_std = [];
             
             for iq=1:2 % For lower and upper quantile...
                 
@@ -80,13 +82,22 @@ for nf=1:length(lags_folders) % For each folder...
                 figure(f_bias);
                 subplot(1,2,iq);
                 plot_loss(horzs(2:end)-1, squeeze(median(the_bias_rel_cond(2:end,:,:), 2)), [], ...
-                    strjoin({exper_plotname, ': Relative Bias', title_qs{iq}}), methods_names_plot, true);
+                    strjoin({exper_plotname, ': Relative Bias', diagns_name{d}, title_qs{iq}}), methods_names_plot, true);
+                if iq==2
+                    same_ylim(ylim_bias,gca);
+                end
+                ylim_bias = gca;
 
                 % Conditional std dev
                 figure(f_std);
                 subplot(1,2,iq);
                 plot_loss(horzs(2:end)-1, squeeze(median(the_std_rel_cond(2:end,:,:), 2)), [], ...
-                    strjoin({exper_plotname, ': Relative Std', title_qs{iq}}), methods_names_plot, true);
+                    strjoin({exper_plotname, ': Relative Std', diagns_name{d}, title_qs{iq}}), methods_names_plot, true);
+                if iq==2
+                    same_ylim(ylim_std,gca);
+                end
+                ylim_std = gca;
+                
 
             end
             
@@ -99,4 +110,13 @@ for nf=1:length(lags_folders) % For each folder...
         
     end
     
+end
+
+function same_ylim(ax1, ax2)
+    % Enforce same ylim
+    ylim1 = get(ax1, 'YLim');
+    ylim2 = get(ax2, 'YLim');
+    ylim_new = [min(ylim1(1),ylim2(1)) max(ylim1(2),ylim2(2))];
+    set(ax1, 'YLim', ylim_new);
+    set(ax2, 'YLim', ylim_new);
 end
