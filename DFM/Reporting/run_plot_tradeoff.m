@@ -185,7 +185,7 @@ for nf=1:length(lags_folders) % For each folder...
         end
         
         plot_choice(choice(:,2:end), cmap_inv, horzs(2:end)-1, weight_grid, methods_select{ne}, ...
-                strjoin({exper_plotname, ': Method Choice'}), methods_names_plot(trade_off_aux), 0);
+                strjoin({exper_plotname, ': Method Choice'}), methods_iv_names(trade_off_aux), 0);
         plot_save(fullfile(output_folder, 'method_choice'), output_suffix);
         
     end

@@ -11,7 +11,9 @@ set(gca,'XTick',horzs(mod(horzs,2) == 0));
 set(gca,'YTick',[0:0.2:1]);
 set(gca,'ydir','normal')
 set(gca,'TickLength',[0 0])
-title(plot_name, 'interpreter', 'latex','FontSize',20);
+title(plot_name, 'interpreter', 'latex','FontSize',18);
+xlabel('Horizon','interpreter','latex','FontSize',16);
+ylabel('Bias Weight','interpreter','latex','FontSize',16);
 
 if legend_type==0
     
