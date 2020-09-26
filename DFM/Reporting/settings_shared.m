@@ -35,5 +35,6 @@ methods_names = methods_names(exper_select);
 % Figure Output
 %----------------------------------------------------------------
 
+font_size = 12;         % Font size of method labels (titles and tick labels will be scaled accordingly)
 output_dir = 'fig';     % Folder
 output_suffix = 'png';  % File suffix

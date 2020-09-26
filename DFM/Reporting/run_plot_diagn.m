@@ -82,7 +82,7 @@ for nf=1:length(lags_folders) % For each folder...
                 figure(f_bias);
                 subplot(1,2,iq);
                 plot_loss(horzs(2:end)-1, squeeze(median(the_bias_rel_cond(2:end,:,:), 2)), [], ...
-                    strjoin({exper_plotname, ': Relative Bias', diagns_name{d}, title_qs{iq}}), methods_names_plot, true);
+                    strjoin({exper_plotname, ': Relative Bias', diagns_name{d}, title_qs{iq}}), methods_names_plot, font_size, true);
                 same_ylim(ax_bias,gca); % Enforce same ylim
                 ax_bias = gca;
 
@@ -90,7 +90,7 @@ for nf=1:length(lags_folders) % For each folder...
                 figure(f_std);
                 subplot(1,2,iq);
                 plot_loss(horzs(2:end)-1, squeeze(median(the_std_rel_cond(2:end,:,:), 2)), [], ...
-                    strjoin({exper_plotname, ': Relative Std', diagns_name{d}, title_qs{iq}}), methods_names_plot, true);
+                    strjoin({exper_plotname, ': Relative Std', diagns_name{d}, title_qs{iq}}), methods_names_plot, font_size, true);
                 same_ylim(ax_std,gca); % Enforce same ylim
                 ax_std = gca;
                 

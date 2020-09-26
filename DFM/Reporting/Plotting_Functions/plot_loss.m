@@ -1,4 +1,4 @@
-function plot_loss(horzs, results, add_line, plot_name, plot_legend, varargin)
+function plot_loss(horzs, results, add_line, plot_name, plot_legend, font_size, varargin)
 
     % Function for plotting results across estimation methods
 
@@ -9,7 +9,7 @@ function plot_loss(horzs, results, add_line, plot_name, plot_legend, varargin)
     if isempty(varargin)
         figure;
     end
-    set(gca,'FontSize',14)
+    set(gca,'FontSize',7/8*font_size)
     set(gca,'TickLabelInterpreter','latex')
     grid on
     
@@ -27,10 +27,10 @@ function plot_loss(horzs, results, add_line, plot_name, plot_legend, varargin)
         hold off;
         xlim(the_xlim);
     end
-    title(plot_name,'interpreter','latex','FontSize',18);
-    xlabel('Horizon','interpreter','latex','FontSize',16);
+    title(plot_name,'interpreter','latex','FontSize',9/8*font_size);
+    xlabel('Horizon','interpreter','latex','FontSize',font_size);
     if isempty(varargin)
-        legend(plot_legend, 'Location', 'southoutside', 'NumColumns', 3, 'interpreter', 'latex','FontSize',16);
+        legend(plot_legend, 'Location', 'southoutside', 'NumColumns', 3, 'interpreter', 'latex','FontSize',font_size);
     end
 
 end

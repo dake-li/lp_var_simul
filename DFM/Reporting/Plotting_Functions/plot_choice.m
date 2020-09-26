@@ -1,19 +1,19 @@
-function plot_choice(choice, cmap, horzs, weight_grid, methods_select, plot_name, plot_legend, legend_type)
+function plot_choice(choice, cmap, horzs, weight_grid, methods_select, plot_name, plot_legend, legend_type, font_size)
 
 figure
 imagesc(horzs,weight_grid,choice)
 colormap(cmap)
 set(gca,'TickLabelInterpreter','latex')
-set(gca,'FontSize',14)
+set(gca,'FontSize',7/8*font_size)
 xlim([min(horzs) max(horzs)])
 ylim([0 1])
 set(gca,'XTick',horzs(mod(horzs,2) == 0));
 set(gca,'YTick',[0:0.2:1]);
 set(gca,'ydir','normal')
 set(gca,'TickLength',[0 0])
-title(plot_name, 'interpreter', 'latex','FontSize',18);
-xlabel('Horizon','interpreter','latex','FontSize',16);
-ylabel('Bias Weight','interpreter','latex','FontSize',16);
+title(plot_name, 'interpreter', 'latex','FontSize',9/8*font_size);
+xlabel('Horizon','interpreter','latex','FontSize',font_size);
+ylabel('Bias Weight','interpreter','latex','FontSize',font_size);
 
 if legend_type==0
     
@@ -35,7 +35,7 @@ else
     hold off;
     colormap(cmap(1:length(plot_legend),:));
     uistack(hidden_h, 'bottom');
-    legend(hidden_h, plot_legend, 'Location', 'southoutside', 'NumColumns', 3, 'interpreter', 'latex','FontSize',16);
+    legend(hidden_h, plot_legend, 'Location', 'southoutside', 'NumColumns', 3, 'interpreter', 'latex','FontSize',font_size);
 
 end
 

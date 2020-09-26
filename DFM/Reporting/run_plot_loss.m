@@ -53,13 +53,13 @@ for nf=1:length(lags_folders) % For each folder...
 
             % Loss
             plot_loss(horzs(2:end)-1, squeeze(median(the_result(2:end,:,:)./the_rms_irf, 2)), [], ...
-                strjoin({exper_plotname, ': Relative', the_titles{j}}), methods_names_plot);
-            plot_save(fullfile(output_folder, strcat(lower(the_titles{j}), '_reltruth')), output_suffix);
+                strjoin({exper_plotname, ': Relative', the_titles{j}}), methods_names_plot, font_size);
+            plot_save(fullfile(output_folder, strcat('loss_', lower(the_titles{j}), '_reltruth')), output_suffix);
             
             % Average rank
             plot_loss(horzs(2:end)-1, squeeze(mean(the_ranks(2:end,:,:), 2)), [], ...
-                strjoin({exper_plotname, ': Average rank of', the_titles{j}}), methods_names_plot);
-            plot_save(fullfile(output_folder, strcat(lower(the_titles{j}), '_avgrank')), output_suffix);
+                strjoin({exper_plotname, ': Average rank of', the_titles{j}}), methods_names_plot, font_size);
+            plot_save(fullfile(output_folder, strcat('loss_', lower(the_titles{j}), '_avgrank')), output_suffix);
 
         end
         

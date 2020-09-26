@@ -42,11 +42,8 @@ base_names = {'SVAR'};
 
 % bias-variance ordering
 
-if ~isempty(find(methods_select{1}==6,1)) % If var-avg. is included in methods
-    trade_off_pos = [4 3 6 1 2 5 7];
-else
-    trade_off_pos = [4 3 5 1 2];
-end
+trade_off_pos_iv = [4 3 6 1 2 5 7];   % IV DGP
+trade_off_pos_noniv = [4 3 6 1 2 5];  % Other DGPs
 
 % construction of choice plots: average over specifications?
 
@@ -87,8 +84,6 @@ for ne=1:length(exper_files)
         end
     end
 end
-
-[~,trade_off_aux] = sort(trade_off_pos);
 
 for nf=1:length(lags_folders) % For each folder...
 
@@ -136,8 +131,8 @@ for nf=1:length(lags_folders) % For each folder...
             pref_base = mean(pref_base,3);
 
             plot_tradeoff(pref_base(:,2:end), cmap_inv, horzs(2:end)-1, weight_grid, ...
-                strjoin({exper_plotname, ':', the_titles{j}, 'Preferred Over', base_method_name}))
-            plot_save(fullfile(output_folder, strcat(lower(the_titles{j}), '_vs_', lower(base_method_name))), output_suffix);
+                strjoin({exper_plotname, ':', the_titles{j}, 'Preferred Over', base_method_name}), font_size)
+            plot_save(fullfile(output_folder, strcat('tradeoff_', removeChars(the_titles{j}), '_vs_', removeChars(base_method_name))), output_suffix);
 
         end
         
@@ -155,12 +150,19 @@ for nf=1:length(lags_folders) % For each folder...
         end
         
         plot_choice(choice_raw(:,2:end), lines, horzs(2:end)-1, weight_grid, methods_select{ne}, ...
-                strjoin({exper_plotname, ': Best Procedure'}), methods_names_plot, 1);
-        plot_save(fullfile(output_folder, 'method_best'), output_suffix);    
+                strjoin({exper_plotname, ': Best Procedure'}), methods_names_plot, 1, font_size);
+        plot_save(fullfile(output_folder, 'tradeoff_best'), output_suffix);    
         
         %----------------------------------------------------------------
         % Compute Choice Results
         %----------------------------------------------------------------
+        
+        if isempty(strfind(exper_names{ne}, 'IV'))
+            trade_off_pos = trade_off_pos_noniv;
+        else
+            trade_off_pos = trade_off_pos_iv;
+        end
+        [~,trade_off_aux] = sort(trade_off_pos);
         
         if choice_averaging == 0
             
@@ -185,9 +187,16 @@ for nf=1:length(lags_folders) % For each folder...
         end
         
         plot_choice(choice(:,2:end), cmap_inv, horzs(2:end)-1, weight_grid, methods_select{ne}, ...
-                strjoin({exper_plotname, ': Method Choice'}), methods_iv_names(trade_off_aux), 0);
-        plot_save(fullfile(output_folder, 'method_choice'), output_suffix);
+                strjoin({exper_plotname, ': Method Choice'}), methods_iv_names(trade_off_aux), 0, font_size);
+        plot_save(fullfile(output_folder, 'tradeoff_choice'), output_suffix);
         
     end
     
+end
+
+
+%% Auxiliary function
+
+function str_out = removeChars(str_in)
+    str_out = lower(regexprep(str_in,'\W',''));
 end

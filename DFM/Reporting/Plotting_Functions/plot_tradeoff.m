@@ -1,19 +1,19 @@
-function plot_tradeoff(pref_base, cmap, horzs, weight_grid, plot_name)
+function plot_tradeoff(pref_base, cmap, horzs, weight_grid, plot_name, font_size)
 
 figure
 imagesc(horzs,weight_grid,pref_base)
 colormap(cmap)
 set(gca,'TickLabelInterpreter','latex')
-set(gca,'FontSize',14)
+set(gca,'FontSize',7/8*font_size)
 xlim([min(horzs) max(horzs)])
 ylim([0 1])
 set(gca,'XTick',horzs(mod(horzs,2) == 0));
 set(gca,'YTick',[0:0.2:1]);
 set(gca,'ydir','normal')
 set(gca,'TickLength',[0 0])
-title(plot_name, 'interpreter', 'latex','FontSize',18);
-xlabel('Horizon','interpreter','latex','FontSize',16);
-ylabel('Bias Weight','interpreter','latex','FontSize',16);
+title(plot_name, 'interpreter', 'latex','FontSize',9/8*font_size);
+xlabel('Horizon','interpreter','latex','FontSize',font_size);
+ylabel('Bias Weight','interpreter','latex','FontSize',font_size);
 
 cbh = colorbar();
 caxis([0,1])

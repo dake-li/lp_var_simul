@@ -37,30 +37,30 @@ for nf=1:length(lags_folders) % For each folder...
         figure;
         histogram(res.DF_model.R0_sq, 'Normalization', 'probability');
         title(strjoin({exper_plotname, ': degree of invertibility'}), 'Interpreter', 'none');
-        plot_save(fullfile(output_folder, 'R0sq'), output_suffix);
+        plot_save(fullfile(output_folder, 'dgp_R0sq'), output_suffix);
         
         % Persistence
         figure;
         histogram(res.DF_model.LRV_Cov_tr_ratio, 'Normalization', 'probability');
         title(strjoin({exper_plotname, ': LRV to Var ratio'}), 'Interpreter', 'none');
-        plot_save(fullfile(output_folder, 'LRVVar'), output_suffix);
+        plot_save(fullfile(output_folder, 'dgp_LRVVar'), output_suffix);
         
         figure;
         histogram(res.DF_model.VAR_largest_root, 'Normalization', 'probability');
         title(strjoin({exper_plotname, ': largest VAR root'}), 'Interpreter', 'none');
-        plot_save(fullfile(output_folder, 'largroot'), output_suffix);
+        plot_save(fullfile(output_folder, 'dgp_largroot'), output_suffix);
         
         figure;
         histogram(res.DF_model.frac_coef_for_large_lags, 'Normalization', 'probability');
         title(strjoin({exper_plotname, ': fraction of long-lag VAR coefs'}), 'Interpreter', 'none');
-        plot_save(fullfile(output_folder, 'longlag'), output_suffix);
+        plot_save(fullfile(output_folder, 'dgp_longlag'), output_suffix);
         
         % IV strength
         if isfield(res.DF_model, 'IV_strength')
             figure;
             histogram(res.DF_model.IV_strength, 'Normalization', 'probability');
             title(strjoin({exper_plotname, ': IV strength'}), 'Interpreter', 'none');
-            plot_save(fullfile(output_folder, 'IVstrength'), output_suffix);
+            plot_save(fullfile(output_folder, 'dgp_IVstrength'), output_suffix);
         end
         
         
@@ -71,12 +71,12 @@ for nf=1:length(lags_folders) % For each folder...
         figure;
         histogram(the_nlags(:), 'Normalization', 'probability');
         title(strjoin({exper_plotname, ': number of lags (across specs+sims)'}), 'Interpreter', 'none');
-        plot_save(fullfile(output_folder, 'nlags'), output_suffix);
+        plot_save(fullfile(output_folder, 'dgp_nlags'), output_suffix);
         
         figure;
         histogram(std(the_nlags), 'Normalization', 'probability');
         title(strjoin({exper_plotname, ': std (across sims) of number of lags'}), 'Interpreter', 'none');
-        plot_save(fullfile(output_folder, 'nlags_std'), output_suffix);
+        plot_save(fullfile(output_folder, 'dgp_nlags_std'), output_suffix);
 
         % Shrinkage penalty
         the_lambda = res.results.lambda.lp_penalize;
@@ -85,12 +85,12 @@ for nf=1:length(lags_folders) % For each folder...
         histogram(the_lambda,10.^the_edges);
         set(gca, 'xscale','log'); % Log scale for x axis
         title(strjoin({exper_plotname, ': shrinkage penalty (across specs+sims)'}), 'Interpreter', 'none');
-        plot_save(fullfile(output_folder, 'lambda'), output_suffix);
+        plot_save(fullfile(output_folder, 'dgp_lambda'), output_suffix);
         
         figure;
         histogram(std(log(the_lambda)), 'Normalization', 'probability');
         title(strjoin({exper_plotname, ': std (across sims) of log shrinkage penalty'}), 'Interpreter', 'none');
-        plot_save(fullfile(output_folder, 'lambda_logstd'), output_suffix);
+        plot_save(fullfile(output_folder, 'dgp_lambda_logstd'), output_suffix);
         
         % Model-averaging weights
         if isfield(res.results, 'weight')
@@ -110,7 +110,7 @@ for nf=1:length(lags_folders) % For each folder...
                 legend('AR', 'VAR', 'Location', 'NorthEast');
             end
             sgtitle(strjoin({exper_plotname, ': average model-avg weight (across specs+sims)'}), 'FontSize', 11, 'FontWeight', 'bold', 'Interpreter', 'none');
-            plot_save(fullfile(output_folder, 'weight'), output_suffix);
+            plot_save(fullfile(output_folder, 'dgp_weight'), output_suffix);
             
         end
         
@@ -125,7 +125,7 @@ for nf=1:length(lags_folders) % For each folder...
             figure;
             histogram(the_Fstats(:), 'Normalization', 'probability');
             title(strjoin({exper_plotname, ': F stat (across specs+sims)'}), 'Interpreter', 'none');
-            plot_save(fullfile(output_folder, 'F'), output_suffix);
+            plot_save(fullfile(output_folder, 'dgp_F'), output_suffix);
             
         end
 
