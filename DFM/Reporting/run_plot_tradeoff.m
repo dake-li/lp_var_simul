@@ -130,7 +130,7 @@ for nf=1:length(lags_folders) % For each folder...
             end
             pref_base = mean(pref_base,3);
 
-            plot_tradeoff(pref_base(:,2:end), cmap_inv, horzs(2:end)-1, weight_grid, ...
+            plot_tradeoff(1-pref_base(:,2:end), cmap, horzs(2:end)-1, weight_grid, ...
                 strjoin({exper_plotname, ':', the_titles{j}, 'Preferred Over', base_method_name}), font_size)
             plot_save(fullfile(output_folder, strcat('tradeoff_', removeChars(the_titles{j}), '_vs_', removeChars(base_method_name))), output_suffix);
 
@@ -192,11 +192,4 @@ for nf=1:length(lags_folders) % For each folder...
         
     end
     
-end
-
-
-%% Auxiliary function
-
-function str_out = removeChars(str_in)
-    str_out = lower(regexprep(str_in,'\W',''));
 end
