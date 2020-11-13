@@ -39,7 +39,6 @@ Bt = Bt(sel,:);
 x = x(:,sel);
 Q = Q(sel,sel);
 B = Bt';
-theta = Bt(:);
 H = chol(sigma,'lower');
 
 % Asymptotic variance
@@ -75,43 +74,43 @@ end
 
 % Auxiliary matrices in loss function
 V_G0 = V*G0;
-WI_G0 = reshape(Q\reshape(G0, [k m*hmax]), [k*m hmax]); % Acklam section 10.1.8
+WI_G0 = reshape(Q\reshape(G0, [k m*hmax]), [k*m hmax]); % Peter J. Acklam, "MATLAB array manipulation tips and tricks", section 10.1.8
 
 % Loop over submodels
-ir_diff = zeros(M,hmax);
 Kr = zeros(M,hmax);
 
 for r = 1:M-1
     
     % Identify constrained parameters and estimate constrained model
     B_sel = [false(m,m*p) true(m,1)]; % Default: only intercepts are unconstrained
+    Br = zeros(k,m);
     if r<=p % AR(1) to AR(p)
         B_sel(:,1:m*r) = repmat(eye(m)==1,1,r);
+        for i=1:m
+            [~,~,~,~,~,the_Bt_i] = VAR(dat(p+1-r:end,i),r);
+            Br([1 1+i+m*(0:r-1)],i) = the_Bt_i;
+        end
     else % VAR(1) to VAR(p-1)
         r1 = r-p;
         B_sel(:,1:m*r1) = true;
+        [~,~,~,~,~,Br(1:1+r1*m,:)] = VAR(dat(p+1-r1:end,:),r1);
     end
     B_sel_t = B_sel';
     sel_vec = ~B_sel_t(:); % Constrained indices in theta=vec(B')
-    WI_sel = WI(sel_vec,sel_vec);
     
-    thetar = theta - WI(:,sel_vec)*(WI_sel\theta(sel_vec));
-    Br = (reshape(thetar,k,m))';
-    er = y - x*Br';
+    % IRF
+    Br = Br(sel,:);
+    er = y - x*Br;
     sigmar = (er'*er) / (n-k+sum(sel_vec)/m);
     Hr = chol(sigmar,'lower');
-    Pr = [Br(:,1:(m*p)), zeros(m,1); J];
-    Ph = [Hr; zeros(k-m,m)];
-    submodel_irf(1,r) = Hr(respV, recurShock);
+    Byr = reshape(Br(1:end-1,:),[m,p,m]);
+    Byr = permute(Byr,[3,1,2]);
+    irfr = IRF_SVAR(Byr,Hr(:,recurShock),hmax);
+    submodel_irf(:,r) = irfr(respV,:);
     
     % Loss
-    WI_sel_inv_V_G0 = WI_sel\V_G0(sel_vec,:);
+    WI_sel_inv_V_G0 = WI(sel_vec,sel_vec)\V_G0(sel_vec,:);
     for h = 1:hmax
-        Ph = Pr*Ph;
-        Phm = Ph(respV, recurShock);
-        diff = Phm - var_ir(1,h);
-        ir_diff(r,h) = diff;
-        submodel_irf(h+1,r) = Phm;
         Kr(r,h) = WI_G0(sel_vec,h)'*WI_sel_inv_V_G0(:,h);
     end
     
@@ -120,6 +119,7 @@ end
 
 %% Compute weights for each horizon
 
+ir_diff = submodel_irf(2:end,:)'-var_ir;
 weights = zeros(M, hmax);
 ub = ones(M,1);
 lb = zeros(M,1);
