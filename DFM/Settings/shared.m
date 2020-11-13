@@ -92,3 +92,4 @@ settings.est.CV_folds      = 5; % Number of folds used for cross validation
 
 settings.est.average_store_weight = [2, 11, 20]; % store model weights at which horizon
 settings.est.average_max_lags     = 1; % include lags up to n_lags_max? otherwise up to estimated lags
+settings.est.average_options      = optimoptions('quadprog','Display','off');

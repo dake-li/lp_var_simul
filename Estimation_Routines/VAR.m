@@ -1,4 +1,4 @@
-function [Bc,By,Sigma,Sxx,Res] = VAR(Y,nlags)
+function [Bc,By,Sigma,Sxx,Res,Beta,Y,X] = VAR(Y,nlags)
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
 nv = size(Y,2); % order (r,x,y,q)

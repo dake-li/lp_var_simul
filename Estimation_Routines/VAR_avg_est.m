@@ -19,7 +19,7 @@ end
 
 % estimate VAR
 
-[combination_irf,weights,G] = VAR_ModelAverage(Y,recursiveShock,responseV,n_lags_average_over,IRF_hor - 1);
+[combination_irf,weights,G] = VAR_ModelAverage(Y,recursiveShock,responseV,n_lags_average_over,IRF_hor - 1,settings.est.average_options);
 IRF = combination_irf / G(normalizeV, recursiveShock);
 
 % store weights
