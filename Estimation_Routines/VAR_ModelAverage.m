@@ -34,11 +34,6 @@ combination_irf = zeros(hmax+1, 1);
 
 % Least squares
 [~,By,sigma,Q,e,Bt,y,x] = VAR(dat,p);
-sel = [2:k 1]; % Swap constant and slope parameters
-Bt = Bt(sel,:);
-x = x(:,sel);
-Q = Q(sel,sel);
-B = Bt';
 H = chol(sigma,'lower');
 
 % Asymptotic variance
@@ -54,19 +49,16 @@ submodel_irf(:,M) = irf(respV,:);
 combination_irf(1,1) = irf(respV,1);
 
 % Jacobian
-J = [eye(m*(p-1)), zeros(m*(p-1),m+1); zeros(1,m*p), 1];
-P = [B(:,1:m*p), zeros(m,1); J];
-Ph0 = [H; zeros(k-m,m)];
+jacobs_p = zeros(m*p,k*m);
 G0 = zeros(k*m,hmax);
 for h = 1:hmax
-    Gh = zeros(k*m,m^2);
-    T2 = Ph0;
-    for i = 1:h
-      T1 = (P^(h-i))';
-      Gh = Gh + kron(T1(1:m,1:m),T2);
-      T2 = P*T2;
-    end
-    G0(:,h) = Gh(:, (respV - 1) * m + recurShock); % keep only response of interest
+    lmax = min(h,p);
+    the_irf_p = zeros(m,p);
+    the_irf_p(:,1:lmax) = irf(:,h:-1:h-lmax+1);
+    the_jacob = kron(eye(m), [0 the_irf_p(:)']) ...
+                + Bt' * [zeros(1,k*m); jacobs_p];
+    G0(:,h) = the_jacob(respV,:); % keep only response of interest
+    jacobs_p = [the_jacob; jacobs_p(1:end-m,:)];
 end
 
 
@@ -82,28 +74,27 @@ Kr = zeros(M,hmax);
 for r = 1:M-1
     
     % Identify constrained parameters and estimate constrained model
-    B_sel = [false(m,m*p) true(m,1)]; % Default: only intercepts are unconstrained
-    Br = zeros(k,m);
+    B_sel = [true(m,1) false(m,m*p)]; % Default: only intercepts are unconstrained
+    Btr = zeros(k,m);
     if r<=p % AR(1) to AR(p)
-        B_sel(:,1:m*r) = repmat(eye(m)==1,1,r);
+        B_sel(:,2:1+m*r) = repmat(eye(m)==1,1,r);
         for i=1:m
             [~,~,~,~,~,the_Bt_i] = VAR(dat(p+1-r:end,i),r);
-            Br([1 1+i+m*(0:r-1)],i) = the_Bt_i;
+            Btr([1 1+i+m*(0:r-1)],i) = the_Bt_i;
         end
     else % VAR(1) to VAR(p-1)
         r1 = r-p;
-        B_sel(:,1:m*r1) = true;
-        [~,~,~,~,~,Br(1:1+r1*m,:)] = VAR(dat(p+1-r1:end,:),r1);
+        B_sel(:,2:1+m*r1) = true;
+        [~,~,~,~,~,Btr(1:1+r1*m,:)] = VAR(dat(p+1-r1:end,:),r1);
     end
     B_sel_t = B_sel';
     sel_vec = ~B_sel_t(:); % Constrained indices in theta=vec(B')
     
     % IRF
-    Br = Br(sel,:);
-    er = y - x*Br;
+    er = y - x*Btr;
     sigmar = (er'*er) / (n-k+sum(sel_vec)/m);
     Hr = chol(sigmar,'lower');
-    Byr = reshape(Br(1:end-1,:),[m,p,m]);
+    Byr = reshape(Btr(2:end,:),[m,p,m]);
     Byr = permute(Byr,[3,1,2]);
     irfr = IRF_SVAR(Byr,Hr(:,recurShock),hmax);
     submodel_irf(:,r) = irfr(respV,:);
