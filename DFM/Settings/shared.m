@@ -61,7 +61,7 @@ settings.est.methods_name    = {'svar','svar_corrbias','bvar','lp','lp_penalize'
 
 % lag specification
 
-settings.est.est_n_lag      = isempty(lag_type); % estimate number of lags?
+settings.est.est_n_lag      = isnan(lag_type); % estimate number of lags?
 settings.est.est_n_lag_BIC  = 0; % use BIC? otherwise use AIC
 settings.est.n_lags_fix     = lag_type; % default number of lags if not estimated
 settings.est.n_lags_max     = 20; % maximal lag length for info criteria
