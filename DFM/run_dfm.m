@@ -27,7 +27,7 @@ tic;
 %% DECIDE WHICH EXPERIMENT TO RUN
 
 dgp_type = 'G'; % 'MP'; % Either 'G' or 'MP'
-estimand_type = 'IV'; % 'Recursive'; 'IV'; % Either 'ObsShock', 'Recursive', or 'IV'
+estimand_type = 'ObsShock'; % 'Recursive'; 'IV'; % Either 'ObsShock', 'Recursive', or 'IV'
 lag_type = 4; % No. of lags to impose in estimation, or [] (meaning AIC)
 
 
@@ -85,12 +85,14 @@ clear external_shock_data;
 DFM_estimate.calibrate_out       = calibrateIV(DFM_estimate);
 DF_model.calibrated_shock_weight = DFM_estimate.calibrate_out.weight;
 
-if DF_model.IV.IV_strength_calibrate==1
-    DF_model.IV.alpha = DFM_estimate.calibrate_out.alpha;
-    DF_model.IV.sigma_v = DFM_estimate.calibrate_out.sigma_v;
-else
-    DF_model.IV.alpha = DF_model.IV.manual_alpha;
-    DF_model.IV.sigma_v = DF_model.IV.manual_sigma_v;
+if strcmp(estimand_type, 'IV')
+    if DF_model.IV.IV_strength_calibrate==1
+        DF_model.IV.alpha = DFM_estimate.calibrate_out.alpha;
+        DF_model.IV.sigma_v = DFM_estimate.calibrate_out.sigma_v;
+    else
+        DF_model.IV.alpha = DF_model.IV.manual_alpha;
+        DF_model.IV.sigma_v = DF_model.IV.manual_sigma_v;
+    end
 end
 
 %----------------------------------------------------------------

@@ -18,9 +18,17 @@ n_y   = model.n_y;
 n_w   = model.n_w;
 n_e   = model.n_e;
 
-rho     = model.IV.rho;
-alpha   = model.IV.alpha;
-sigma_v = model.IV.sigma_v;
+with_IV = settings.est.with_IV;
+
+if with_IV == 1
+    rho     = model.IV.rho;
+    alpha   = model.IV.alpha;
+    sigma_v = model.IV.sigma_v;
+else % meaningless placeholders
+    rho = 0.1;
+    alpha = 1;
+    sigma_v = 1;
+end
 
 shock_weight = settings.est.shock_weight;
 
