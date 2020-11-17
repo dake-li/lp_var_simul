@@ -8,15 +8,6 @@ DF_model.n_fac      = 6; % number of factor
 DF_model.n_lags_fac = 2; % lag order of factor
 DF_model.n_lags_uar = 2; % lag order of measurement error
 
-% IV (may be overwritten later)
-
-DF_model.IV.rho     = 0.1; % IV persistence
-DF_model.IV.manual_alpha   = 1; % IV shock coefficient
-DF_model.IV.manual_sigma_v = 1; % IV noise
-
-DF_model.IV.IV_strength_calibrate = 0; % use calibrated IV strength
-
-
 %% Experiment Specification
 
 % variable selection
