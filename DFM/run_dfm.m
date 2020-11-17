@@ -27,7 +27,7 @@ tic;
 %% DECIDE WHICH EXPERIMENT TO RUN
 
 dgp_type = 'G'; % 'MP'; % Either 'G' or 'MP'
-estimand_type = 'ObsShock'; % 'Recursive'; 'IV'; % Either 'ObsShock', 'Recursive', or 'IV'
+estimand_type = 'IV'; % 'Recursive'; 'IV'; % Either 'ObsShock', 'Recursive', or 'IV'
 lag_type = 4; % No. of lags to impose in estimation, or [] (meaning AIC)
 
 

@@ -7,7 +7,7 @@ DF_model.IV.rho     = 0.1; % IV persistence
 DF_model.IV.manual_alpha   = 1; % manually set up IV shock coefficient
 DF_model.IV.manual_sigma_v = 1; % manually set up IV noise
 
-DF_model.IV.IV_strength_calibrate = 0; % use calibrated IV strength
+DF_model.IV.IV_strength_calibrate = 1; % use calibrated IV strength (alpha = 1, sigma_v will be changed)
 
 
 %% Estimation

@@ -28,29 +28,49 @@ external_shock_index = [NaN, NaN];
 external_shock_index(1) = (overlap_time_range(1) - external_shock_time_range(1)) * external_shock_time_range(3) + 1;
 external_shock_index(2) = (overlap_time_range(2) - external_shock_time_range(1)) * external_shock_time_range(3) + 1;
 
-% construct regressors
-Y = external_shock(external_shock_index(1):external_shock_index(2),1);
-X = [lagmatrix(Y,1), factor_shock(factor_shock_index(1):factor_shock_index(2),:)];
-X = [ones(size(X,1),1),X];
-Y = Y(2:end,1);
-X = X(2:end,:);
+% iterate thru different number of leads and lags
+max_num = 10; % max number of leads and lags
+BIC_list = NaN(1, max_num+1);
+Sigma_list = NaN(1, max_num+1);
 
-% regress external shock on factor shocks
-[Beta,Sigma,~,~] = LS(Y,X);
-R2 = 1 - Sigma / var(Y); % adjusted R2
-weight = Beta(3:end);
-alpha = sqrt(sum(weight.^2)); % IV shock coefficient
-weight = weight / sqrt(sum(weight.^2)); % weight on factor shock
-sigma_v = sqrt(Sigma); % IV noise
-nobs = size(Y,1); % number of observation
+for i_num = 0:max_num
+
+    % construct regressors
+    Y = external_shock(external_shock_index(1):external_shock_index(2),1);
+    nobs = size(Y,1); % number of observations
+    X = factor_shock(factor_shock_index(1):factor_shock_index(2),:);
+    X = lagmatrix(X, (-i_num):i_num);
+    X = [ones(size(X,1),1),X];
+    Y = Y((max_num+1):(nobs-max_num),1);
+    X = X((max_num+1):(nobs-max_num),:);
+
+
+    % regress external shock on factor shocks
+    [~,Sigma,~,~] = LS(Y,X);
+    
+    % BIC
+    BIC = (nobs- 2 * max_num) * log(Sigma) + (2 * max_num + 1 + 1) * log(nobs- 2 * max_num);
+    BIC_list(i_num+1) = BIC;
+    Sigma_list(i_num+1) = Sigma;
+
+end
+
+% BIC chooses the optimal number of leads and lags
+[~,optimal_num] = min(BIC_list);
+optimal_Sigma = Sigma_list(optimal_num);
+optimal_num = optimal_num - 1;
+R2 = 1 - optimal_Sigma / var(Y); % adjusted R2
+alpha = 1; % IV shock coefficient
+sigma_v = sqrt((1-R2)/R2) * alpha; % IV noise
 
 % pack up result
-out.rho = Beta(2);
-out.weight = weight;
+out.rho = []; % placeholders for calibrated rho
+out.weight = []; % placeholders for calibrated weight
 out.alpha = alpha;
 out.sigma_v = sigma_v;
 out.R2 = R2;
 out.nobs = nobs;
+out.optimal_num_lead_lag = optimal_num;
 
 end
 
