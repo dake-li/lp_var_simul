@@ -1,9 +1,9 @@
-function [Bc,ByCorrect,Sigma,Sxx,Res] = VAR_CorrectBias(Y,nlags)
+function [Bc,ByCorrect,Sigma,Sxx] = VAR_CorrectBias(Y,nlags)
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
 nv = size(Y,2); % order (r,x,y,q)
 nT = size(Y,1);
-[Bc,By,Sigma,Sxx,Res] = VAR(Y,nlags);
+[Bc,By,Sigma,Sxx] = VAR(Y,nlags);
 
 VAR_companion_form = zeros(nv * nlags);
 VAR_companion_form(1:nv,:) = reshape(-By(:,:,:), [nv, nv*nlags]);

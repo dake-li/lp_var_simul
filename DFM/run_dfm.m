@@ -27,7 +27,7 @@ clear num_workers;
 %% DECIDE WHICH EXPERIMENT TO RUN
 
 dgp_type = 'G'; % 'MP'; % Either 'G' or 'MP'
-estimand_type = 'ObsShock'; % 'Recursive'; 'IV'; % Either 'ObsShock', 'Recursive', or 'IV'
+estimand_type = 'IV'; % 'Recursive'; 'IV'; % Either 'ObsShock', 'Recursive', or 'IV'
 lag_type = 4; % No. of lags to impose in estimation, or [] (meaning AIC)
 
 
@@ -125,6 +125,7 @@ results_n_lags = NaN(settings.est.n_methods,settings.simul.n_MC,settings.specifi
 
 results_largest_root_svar = NaN(settings.simul.n_MC,settings.specifications.n_spec); % n_MC*n_spec
 results_LM_stat_svar = NaN(settings.simul.n_MC,settings.specifications.n_spec); % n_MC*n_spec
+results_Granger_stat_svar = NaN(settings.simul.n_MC,settings.specifications.n_spec); % n_MC*n_spec
 results_lambda_lp_penalize = NaN(settings.simul.n_MC,settings.specifications.n_spec); % n_MC*n_spec
 results_weight_var_avg = NaN(2*settings.est.n_lags_max,length(settings.est.average_store_weight),...
     settings.simul.n_MC,settings.specifications.n_spec); % n_models*n_horizon*n_MC*n_spec
@@ -208,6 +209,7 @@ parfor i_MC = 1:settings.simul.n_MC
     
     temp_largest_root_svar = NaN(1,settings.specifications.n_spec);
     temp_LM_stat_svar = NaN(1,settings.specifications.n_spec);
+    temp_Granger_stat_svar = NaN(1,settings.specifications.n_spec);
     temp_lambda_lp_penalize = NaN(1,settings.specifications.n_spec);
     temp_weight_var_avg = NaN(2*settings.est.n_lags_max,...
         length(settings.est.average_store_weight),settings.specifications.n_spec);
@@ -230,7 +232,7 @@ parfor i_MC = 1:settings.simul.n_MC
             switch settings.est.methods_name{i_method}
 
                 case 'svar' % VAR
-                    [temp_irf(i_method,:,i_spec),temp_n_lags(i_method,i_spec),temp_largest_root_svar(i_spec),temp_LM_stat_svar(i_spec)]...
+                    [temp_irf(i_method,:,i_spec),temp_n_lags(i_method,i_spec),temp_largest_root_svar(i_spec),temp_LM_stat_svar(i_spec),temp_Granger_stat_svar(i_spec)]...
                         = SVAR_est(data_sim_select,settings,0);
 
                 case 'svar_corrbias' % bias-corrected VAR
@@ -272,6 +274,7 @@ parfor i_MC = 1:settings.simul.n_MC
     
     results_largest_root_svar(i_MC,:) = temp_largest_root_svar;
     results_LM_stat_svar(i_MC,:) = temp_LM_stat_svar;
+    results_Granger_stat_svar(i_MC,:) = temp_Granger_stat_svar;
     results_lambda_lp_penalize(i_MC,:) = temp_lambda_lp_penalize;
     results_weight_var_avg(:,:,i_MC,:) = temp_weight_var_avg;
     results_F_stat_svar_iv(i_MC,:) = temp_F_stat_svar_iv;
@@ -301,6 +304,9 @@ end
 if any(strcmp(settings.est.methods_name, 'svar'))    
     results.largest_root.svar = results_largest_root_svar;
     results.LM_stat.svar = results_LM_stat_svar;
+    if strcmp(estimand_type, 'IV')
+        results.Granger_stat.svar = results_Granger_stat_svar;
+    end
 end
 
 if any(strcmp(settings.est.methods_name, 'lp_penalize'))    
@@ -345,7 +351,7 @@ mkdir(save_folder);
 save(fullfile(save_folder, strcat('DFM_', dgp_type, '_', estimand_type)),'DFM_estimate','DF_model','settings','results','-v7.3');
 
 delete(poolobj);
-clear save_folder
+clear save_folder save_suff
 toc;
 
 

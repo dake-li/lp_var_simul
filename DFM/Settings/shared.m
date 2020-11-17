@@ -23,7 +23,7 @@ DF_model.IV.IV_strength_calibrate = 0; % use calibrated IV strength
 
 settings.specifications.manual_var_select     = [1 142; 1 97]; % manually select specifications
 settings.specifications.random_select         = 1; % randomly select?
-settings.specifications.random_n_spec         = 700; % number of random specifications
+settings.specifications.random_n_spec         = 2; % number of random specifications
 settings.specifications.random_n_var          = 5; % number of variables in each random specification
 settings.specifications.random_category_range = [1 20; 21 31; 32 76; 77 86; 87 94; 95 131; 132 141;...
                                                  142 159; 160 171; 172 180; 181 207];
@@ -52,7 +52,7 @@ settings.est.VAR_infinity_truncate = 50;
 
 % number of Monte Carlo draws
 
-settings.simul.n_MC    = 5000; % number of Monte Carlo reps
+settings.simul.n_MC    = 5; % number of Monte Carlo reps
 settings.simul.seed    = (1:settings.simul.n_MC)*10 + randi([0,9],1,settings.simul.n_MC); % random seed
 
 % simulation details
