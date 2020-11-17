@@ -8,6 +8,7 @@ DF_model.n_fac      = 6; % number of factor
 DF_model.n_lags_fac = 2; % lag order of factor
 DF_model.n_lags_uar = 2; % lag order of measurement error
 
+
 %% Experiment Specification
 
 % variable selection

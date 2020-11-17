@@ -14,14 +14,14 @@ addpath(genpath('Subroutines'))
 rng(1, 'twister');
 tic;
 
-% Parallel computing object
-num_workers = str2num(getenv('SLURM_CPUS_PER_TASK'));
-if ~isempty(num_workers)
-    poolobj = parpool('local', num_workers);
-else
-    poolobj = parpool('local');
-end
-clear num_workers;
+% % Parallel computing object
+% num_workers = str2num(getenv('SLURM_CPUS_PER_TASK'));
+% if ~isempty(num_workers)
+%     poolobj = parpool('local', num_workers);
+% else
+%     poolobj = parpool('local');
+% end
+% clear num_workers;
 
 
 %% DECIDE WHICH EXPERIMENT TO RUN
@@ -125,11 +125,14 @@ results_n_lags = NaN(settings.est.n_methods,settings.simul.n_MC,settings.specifi
 
 results_largest_root_svar = NaN(settings.simul.n_MC,settings.specifications.n_spec); % n_MC*n_spec
 results_LM_stat_svar = NaN(settings.simul.n_MC,settings.specifications.n_spec); % n_MC*n_spec
+results_LM_pvalue_svar = NaN(settings.simul.n_MC,settings.specifications.n_spec); % n_MC*n_spec
 results_Granger_stat_svar = NaN(settings.simul.n_MC,settings.specifications.n_spec); % n_MC*n_spec
+results_Granger_pvalue_svar = NaN(settings.simul.n_MC,settings.specifications.n_spec); % n_MC*n_spec
 results_lambda_lp_penalize = NaN(settings.simul.n_MC,settings.specifications.n_spec); % n_MC*n_spec
 results_weight_var_avg = NaN(2*settings.est.n_lags_max,length(settings.est.average_store_weight),...
     settings.simul.n_MC,settings.specifications.n_spec); % n_models*n_horizon*n_MC*n_spec
 results_F_stat_svar_iv = NaN(settings.simul.n_MC,settings.specifications.n_spec); %n_MC*n_spec
+results_F_pvalue_svar_iv = NaN(settings.simul.n_MC,settings.specifications.n_spec); %n_MC*n_spec
 
 
 %% PRELIMINARY COMPUTATIONS: ESTIMANDS
@@ -184,8 +187,8 @@ end
 
 %% MONTE CARLO ANALYSIS
 
-parfor i_MC = 1:settings.simul.n_MC
-% for i_MC = 1:settings.simul.n_MC
+% parfor i_MC = 1:settings.simul.n_MC
+for i_MC = 1:settings.simul.n_MC
 
     if mod(i_MC, 10) == 0
         disp("Monte Carlo:")
@@ -209,11 +212,14 @@ parfor i_MC = 1:settings.simul.n_MC
     
     temp_largest_root_svar = NaN(1,settings.specifications.n_spec);
     temp_LM_stat_svar = NaN(1,settings.specifications.n_spec);
+    temp_LM_pvalue_svar = NaN(1,settings.specifications.n_spec);
     temp_Granger_stat_svar = NaN(1,settings.specifications.n_spec);
+    temp_Granger_pvalue_svar = NaN(1,settings.specifications.n_spec);
     temp_lambda_lp_penalize = NaN(1,settings.specifications.n_spec);
     temp_weight_var_avg = NaN(2*settings.est.n_lags_max,...
         length(settings.est.average_store_weight),settings.specifications.n_spec);
     temp_F_stat_svar_iv = NaN(1,settings.specifications.n_spec);
+    temp_F_pvalue_svar_iv = NaN(1,settings.specifications.n_spec);
     
     %----------------------------------------------------------------
     % Selecting Data
@@ -232,7 +238,9 @@ parfor i_MC = 1:settings.simul.n_MC
             switch settings.est.methods_name{i_method}
 
                 case 'svar' % VAR
-                    [temp_irf(i_method,:,i_spec),temp_n_lags(i_method,i_spec),temp_largest_root_svar(i_spec),temp_LM_stat_svar(i_spec),temp_Granger_stat_svar(i_spec)]...
+                    [temp_irf(i_method,:,i_spec),temp_n_lags(i_method,i_spec),...
+                        temp_largest_root_svar(i_spec),temp_LM_stat_svar(i_spec),temp_LM_pvalue_svar(i_spec),...
+                        temp_Granger_stat_svar(i_spec),temp_Granger_pvalue_svar(i_spec)]...
                         = SVAR_est(data_sim_select,settings,0);
 
                 case 'svar_corrbias' % bias-corrected VAR
@@ -256,7 +264,8 @@ parfor i_MC = 1:settings.simul.n_MC
                         = VAR_avg_est(data_sim_select,settings);
 
                 case 'svar_iv' % SVAR-IV       
-                    [temp_irf(i_method,:,i_spec),temp_n_lags(i_method,i_spec),temp_F_stat_svar_iv(i_spec)]...
+                    [temp_irf(i_method,:,i_spec),temp_n_lags(i_method,i_spec),...
+                        temp_F_stat_svar_iv(i_spec),temp_F_pvalue_svar_iv(i_spec)]...
                         = SVAR_IV_est(data_sim_select,settings);
                 
             end
@@ -274,10 +283,13 @@ parfor i_MC = 1:settings.simul.n_MC
     
     results_largest_root_svar(i_MC,:) = temp_largest_root_svar;
     results_LM_stat_svar(i_MC,:) = temp_LM_stat_svar;
+    results_LM_pvalue_svar(i_MC,:) = temp_LM_pvalue_svar;
     results_Granger_stat_svar(i_MC,:) = temp_Granger_stat_svar;
+    results_Granger_pvalue_svar(i_MC,:) = temp_Granger_pvalue_svar;
     results_lambda_lp_penalize(i_MC,:) = temp_lambda_lp_penalize;
     results_weight_var_avg(:,:,i_MC,:) = temp_weight_var_avg;
     results_F_stat_svar_iv(i_MC,:) = temp_F_stat_svar_iv;
+    results_F_pvalue_svar_iv(i_MC,:) = temp_F_pvalue_svar_iv;
 
 end
 
@@ -304,8 +316,10 @@ end
 if any(strcmp(settings.est.methods_name, 'svar'))    
     results.largest_root.svar = results_largest_root_svar;
     results.LM_stat.svar = results_LM_stat_svar;
+    results.LM_pvalue.svar = results_LM_pvalue_svar;
     if strcmp(estimand_type, 'IV')
         results.Granger_stat.svar = results_Granger_stat_svar;
+        results.Granger_pvalue.svar = results_Granger_pvalue_svar;
     end
 end
 
@@ -319,6 +333,7 @@ end
 
 if any(strcmp(settings.est.methods_name, 'svar_iv'))
     results.F_stat.svar_iv = results_F_stat_svar_iv;
+    results.F_pvalue.svar_iv = results_F_pvalue_svar_iv;
 end
 
 clear results_* i_method thisMethod
@@ -350,7 +365,7 @@ clear i_method thisMethod
 mkdir(save_folder);
 save(fullfile(save_folder, strcat('DFM_', dgp_type, '_', estimand_type)),'DFM_estimate','DF_model','settings','results','-v7.3');
 
-delete(poolobj);
+% delete(poolobj);
 clear save_folder save_suff
 toc;
 

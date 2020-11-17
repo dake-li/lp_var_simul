@@ -1,4 +1,4 @@
-function [IRF,nlags,Fstat] = SVAR_IV_est(data_sim,settings);
+function [IRF,nlags,F_stat,F_pvalue] = SVAR_IV_est(data_sim,settings);
 
 % residualize IV (reg Z on lagged Z and Y)
 
@@ -14,6 +14,7 @@ run('Estimation_Setup');
 ShockVector = IVout.gamma;
 IRF = IRF_SVAR(VARout.By,ShockVector,IRF_hor - 1);
 IRF = IRF(response_pos,:)';
-Fstat = IVout.Fstat_z;
+F_stat = IVout.Fstat_z; % Wald stat
+F_pvalue = chi2cdf(F_stat, 1, 'upper');
 
 end

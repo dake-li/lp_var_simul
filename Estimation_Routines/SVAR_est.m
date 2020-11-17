@@ -1,4 +1,4 @@
-function [IRF,nlags,largest_root,LM_stat,Granger_stat] = SVAR_est(data_sim,settings,bias_corrected);
+function [IRF,nlags,largest_root,LM_stat,LM_pvalue,Granger_stat,Granger_pvalue] = SVAR_est(data_sim,settings,bias_corrected);
 
 % preparations
 
@@ -22,7 +22,7 @@ IRF = IRF_SVAR(By,ShockVector,IRF_hor - 1);
 IRF = IRF(responseV,:) / IRF(normalizeV,1);
 IRF = IRF';
 
-% when largest_root and LM_stat are computed
+% when largest_root, LM_stat, Granger_stat are computed
 
 if nargout > 2
     
@@ -30,9 +30,11 @@ if nargout > 2
         
         largest_root = NaN;
         LM_stat = NaN;
+        LM_pvalue = NaN;
         Granger_stat = NaN;
+        Granger_pvalue = NaN;
         
-    else % compute diagonosis for simple VAR        
+    else % compute diagonosis for simple VAR
         
         % estimate largest root in VAR
 
@@ -55,6 +57,7 @@ if nargout > 2
         Sigma_auxiliary = cov(Res_aux,1);
         LM_stat = (nT-nlags-res_autocorr_nlags - nv*nlags - 1 - nv*res_autocorr_nlags - 0.5) *...
             log(det(Sigma_original) / det(Sigma_auxiliary));
+        LM_pvalue = chi2cdf(LM_stat, nv^2 * res_autocorr_nlags, 'upper');
 
         % test if IV granger-causes endogenous variables
         
@@ -63,6 +66,7 @@ if nargout > 2
             % return NaN if there is no IV
             
             Granger_stat = NaN;
+            Granger_pvalue = NaN;
             
         else
             
@@ -77,7 +81,8 @@ if nargout > 2
             beta_IV = beta(beta_IV_loc);
             Omega = kron(inv(Sxx), Sigma);
             Omega_IV = Omega(beta_IV_loc(:), beta_IV_loc(:));
-            Granger_stat = (nT-nlags)* beta_IV' / Omega_IV * beta_IV;
+            Granger_stat = (nT-nlags)* beta_IV' / Omega_IV * beta_IV; % Wald stat
+            Granger_pvalue = chi2cdf(Granger_stat, (nv-1) * nlags, 'upper');
         end
     
     end
