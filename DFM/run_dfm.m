@@ -142,19 +142,23 @@ settings.specifications = pick_var_fn(DF_model, settings);
 
 settings.est.n_methods = length(settings.est.methods_name);
 
-results_irf = NaN(settings.est.n_methods,settings.est.IRF_hor,settings.simul.n_MC,settings.specifications.n_spec); % IRF_hor*n_MC*n_spec
-results_n_lags = NaN(settings.est.n_methods,settings.simul.n_MC,settings.specifications.n_spec); %n_MC*n_spec
+partition_width = ceil(settings.simul.n_MC/num_partition); % number of MC in one partition
+start_MC = (idx_partition - 1) * partition_width + 1; % start index of MC
+end_MC = min(idx_partition * partition_width, settings.simul.n_MC); % end index of MC
 
-results_largest_root_svar = NaN(settings.simul.n_MC,settings.specifications.n_spec); % n_MC*n_spec
-results_LM_stat_svar = NaN(settings.simul.n_MC,settings.specifications.n_spec); % n_MC*n_spec
-results_LM_pvalue_svar = NaN(settings.simul.n_MC,settings.specifications.n_spec); % n_MC*n_spec
-results_Granger_stat_svar = NaN(settings.simul.n_MC,settings.specifications.n_spec); % n_MC*n_spec
-results_Granger_pvalue_svar = NaN(settings.simul.n_MC,settings.specifications.n_spec); % n_MC*n_spec
-results_lambda_lp_penalize = NaN(settings.simul.n_MC,settings.specifications.n_spec); % n_MC*n_spec
+results_irf = NaN(settings.est.n_methods,settings.est.IRF_hor,end_MC - start_MC + 1,settings.specifications.n_spec); % IRF_hor*n_MC*n_spec
+results_n_lags = NaN(settings.est.n_methods,end_MC - start_MC + 1,settings.specifications.n_spec); %n_MC*n_spec
+
+results_largest_root_svar = NaN(end_MC - start_MC + 1,settings.specifications.n_spec); % n_MC*n_spec
+results_LM_stat_svar = NaN(end_MC - start_MC + 1,settings.specifications.n_spec); % n_MC*n_spec
+results_LM_pvalue_svar = NaN(end_MC - start_MC + 1,settings.specifications.n_spec); % n_MC*n_spec
+results_Granger_stat_svar = NaN(end_MC - start_MC + 1,settings.specifications.n_spec); % n_MC*n_spec
+results_Granger_pvalue_svar = NaN(end_MC - start_MC + 1,settings.specifications.n_spec); % n_MC*n_spec
+results_lambda_lp_penalize = NaN(end_MC - start_MC + 1,settings.specifications.n_spec); % n_MC*n_spec
 results_weight_var_avg = NaN(2*settings.est.n_lags_max,length(settings.est.average_store_weight),...
-    settings.simul.n_MC,settings.specifications.n_spec); % n_models*n_horizon*n_MC*n_spec
-results_F_stat_svar_iv = NaN(settings.simul.n_MC,settings.specifications.n_spec); %n_MC*n_spec
-results_F_pvalue_svar_iv = NaN(settings.simul.n_MC,settings.specifications.n_spec); %n_MC*n_spec
+    end_MC - start_MC + 1,settings.specifications.n_spec); % n_models*n_horizon*n_MC*n_spec
+results_F_stat_svar_iv = NaN(end_MC - start_MC + 1,settings.specifications.n_spec); %n_MC*n_spec
+results_F_pvalue_svar_iv = NaN(end_MC - start_MC + 1,settings.specifications.n_spec); %n_MC*n_spec
 
 
 %% PRELIMINARY COMPUTATIONS: ESTIMANDS
@@ -214,15 +218,11 @@ disp(['dgp type: ', dgp_type]);
 disp(['estimand type: ', estimand_type]);
 disp(['lag type: ', num2str(lag_type)]);
 
-partition_width = ceil(settings.simul.n_MC/num_partition);
-start_MC = (idx_partition - 1) * partition_width + 1;
-end_MC = min(idx_partition * partition_width, settings.simul.n_MC);
-
-parfor i_MC = start_MC:end_MC
+parfor i_MC = 1:(end_MC - start_MC + 1)
 % for i_MC = 1:settings.simul.n_MC
 
     if mod(i_MC, 100) == 0
-        disp("Monte Carlo index:")
+        disp("Monte Carlo repetitions:")
         disp(i_MC)
     end
 
@@ -230,7 +230,7 @@ parfor i_MC = start_MC:end_MC
     % Generate Data
     %----------------------------------------------------------------
     
-    rng(settings.simul.seed(i_MC));
+    rng(settings.simul.seed(i_MC + start_MC - 1));
 
     data_sim_all = generate_data(DF_model,settings);
 
@@ -376,38 +376,55 @@ clear results_* i_method thisMethod
 
 % compute MSE, Bias2, VCE for each horizon and each specification
 
-for i_method = 1:settings.est.n_methods
-    
-    thisMethod = settings.est.methods_name{i_method};
-    
-    results.MSE.(thisMethod) = squeeze(mean((results.irf.(thisMethod) ...
-        - permute(DF_model.target_irf,[1 3 2])).^2, 2));
-    
-    results.BIAS2.(thisMethod) = (squeeze(mean(results.irf.(thisMethod) ...
-        , 2)) - DF_model.target_irf).^2;
-    
-    results.VCE.(thisMethod) = squeeze(var(results.irf.(thisMethod), 0, 2));
-    
-end
+[results.MSE, results.BIAS2, results.VCE] = irf_perform_summary(results.irf, DF_model.target_irf, settings);
 
-clear i_method thisMethod
+%----------------------------------------------------------------
+% Export Results
+%----------------------------------------------------------------
 
-% export results
+% save results or one partition of results
 
 mkdir(save_folder); 
 if num_partition == 1
     save(fullfile(save_folder, strcat('DFM_', dgp_type, '_', estimand_type)), ...
-    'DFM_estimate','DF_model','settings','results','-v7.3');
+    'DFM_estimate','DF_model','settings','results','-v7.3'); % save results
 else
     save(fullfile(save_folder, strcat('DFM_', dgp_type, '_', estimand_type, '_', num2str(idx_partition))), ...
-    'DFM_estimate','DF_model','settings','results','-v7.3');
+    'DFM_estimate','DF_model','settings','results','-v7.3'); % save one partition of results
     partition_log_file = fopen(fullfile(save_folder, 'partition_log.txt'),'a+'); % report idx_partition in log file once finish exporting
     fprintf(partition_log_file, '%d\n', idx_partition);
     fclose(partition_log_file);
 end
+clear idx_partition
+
+% combine results for multiple partitions
+
+if num_partition > 1
     
+    % detect if all the partitions have finished
+    
+    partition_log_file = fopen(fullfile(save_folder, 'partition_log.txt'),'r');
+    partition_finished_list = fscanf(partition_log_file, '%d'); % read in all the indices for finished partitions
+    fclose(partition_log_file);
+    
+    % start to combine when all the partitions have finished
+    
+    if length(partition_finished_list) == num_partition       
+        clear results
+        results = combine_results(save_folder, strcat('DFM_', dgp_type, '_', estimand_type), num_partition);
+        
+        % recompute MSE, Bias2, VCE
+        [results.MSE, results.BIAS2, results.VCE] = irf_perform_summary(results.irf, DF_model.target_irf, settings);
+        
+        % save combined results
+        save(fullfile(save_folder, strcat('DFM_', dgp_type, '_', estimand_type)), ...
+            'DFM_estimate','DF_model','settings','results','-v7.3');
+    end
+    
+end
+
 delete(poolobj);
-clear save_folder save_suff
+clear save_folder save_suff num_partition partition_* poolobj
 toc;
 
 

@@ -4,7 +4,7 @@
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=2
 #SBATCH --mem-per-cpu=4G
-#SBATCH --time=00:20:00
+#SBATCH --time=00:50:00
 #SBATCH --array=1-2
 #SBATCH --mail-type=end
 #SBATCH --mail-user=dakel@princeton.edu
