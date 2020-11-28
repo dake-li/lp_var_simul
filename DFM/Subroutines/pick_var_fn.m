@@ -1,6 +1,8 @@
-function specifications = pick_var_fn(model, settings)
+function specifications = pick_var_fn(model, settings, spec_id)
 
     % prepare
+    
+    rng(spec_id, 'twister');
 
     specifications = settings.specifications;
     
