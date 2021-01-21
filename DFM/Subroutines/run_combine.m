@@ -1,15 +1,14 @@
 %% COMBINE RESULTS FOR MULTIPLE SPECIFICATION CHOICE SETS
-
+clear all;
 
 %% SET UP DESTINATION FOLDER AND FILES
 
-save_pre = fullfile('..', 'Results');
-
 spec_id_array = 1:2; % specification choice set id array
-dgp_type = 'G'; % 'MP'; % Either 'G' or 'MP'
-estimand_type = 'ObsShock'; % 'Recursive'; 'IV'; % Either 'ObsShock', 'Recursive', or 'IV'
+dgp_type = 'G'; % Either 'G' or 'MP'
+estimand_type = 'ObsShock'; % Either 'ObsShock', 'Recursive', or 'IV'
 lag_type = 4; % No. of lags to impose in estimation, or NaN (meaning AIC)
 
+save_pre = fullfile('..', 'Results');
 if isnan(lag_type)
     save_suff = '_aic';
 else

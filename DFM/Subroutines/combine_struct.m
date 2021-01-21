@@ -23,9 +23,9 @@ for id = spec_id_array
     for i = 1:length(first_tier)
         
         % decide which dim to concatenate
-        if any(strcmp(first_tier{i},{'R0_sq','LRV_Cov_tr_ratio','VAR_largest_root','frac_coef_for_large_lags'}))
+        if any(strcmp(first_tier{i},{'R0_sq','LRV_Cov_tr_ratio','VAR_largest_root','frac_coef_for_large_lags','IV_strength'}))
             concatenate_dim = 1;
-        elseif any(strcmp(first_tier{i},{'target_irf'}))
+        elseif any(strcmp(first_tier{i},{'VAR_irf','IV_irf','target_irf'}))
             concatenate_dim = 2;
         else
             concatenate_dim = NaN;
@@ -89,7 +89,7 @@ for id = spec_id_array
                 concatenate_dim = 3;
             elseif any(strcmp(first_tier{i},{'weight'}))
                 concatenate_dim = 4;
-            elseif any(strcmp(first_tier{i},{'n_lags','largest_root','LM_stat','LM_pvalue','lambda','MSE','BIAS2','VCE'}))
+            elseif any(strcmp(first_tier{i},{'n_lags','largest_root','LM_stat','LM_pvalue','Granger_stat','Granger_pvalue','F_stat','F_pvalue','lambda','MSE','BIAS2','VCE'}))
                 concatenate_dim = 2;
             else
                 concatenate_dim = NaN;
