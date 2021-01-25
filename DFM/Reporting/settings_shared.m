@@ -4,7 +4,7 @@ rootfolder = fullfile('..', 'Results'); % Root folder with files
 
 % select lag length specifications
 
-lags_list      = {'lag4','lag8','lag_aic'}; % Folders with files
+lags_list      = {'lag_aic', 'lag4', 'lag8'}; % Folders with files
 lags_folders   = lags_list(lags_select);
 
 % select experiments

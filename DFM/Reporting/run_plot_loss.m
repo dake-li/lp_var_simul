@@ -12,10 +12,10 @@ addpath('Plotting_Functions')
 %% SETTINGS
 
 % select lag length specifications
-lags_select    = [1 2];
+lags_select    = 1;
 
 % select experiments
-exper_select = [2 6];
+exper_select = 1:3;
 
 % select estimation methods for each experiment
 methods_iv_select        = [1 2 3 4 5 7];

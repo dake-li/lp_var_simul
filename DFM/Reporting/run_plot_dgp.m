@@ -7,10 +7,10 @@ addpath('Plotting_Functions');
 %% Settings
 
 % select lag length specifications
-lags_select    = [1 2];
+lags_select    = 1;
 
 % select experiments
-exper_select = [2 6];
+exper_select = 1:3;
 
 % select estimation methods for each experiment
 methods_iv_select        = [1 2 3 4 5 7];
@@ -29,6 +29,9 @@ for nf=1:length(lags_folders) % For each folder...
         
         % Load results
         load_results;
+        
+        % write down the index of median across MCs
+        median_idx = 2 + find(res.settings.simul.quantiles==0.5); % index of median number in the quantile list (including mean and std)
 
 
         %% Report features of DGP
@@ -69,28 +72,28 @@ for nf=1:length(lags_folders) % For each folder...
         % Number of lags
         the_nlags = res.results.n_lags.svar;
         figure;
-        histogram(the_nlags(:), 'Normalization', 'probability');
-        title(strjoin({exper_plotname, ': number of lags (across specs+sims)'}), 'Interpreter', 'none');
+        histogram(the_nlags(median_idx,:), 'Normalization', 'probability');
+        title(strjoin({exper_plotname, ': median number of lags (across specs)'}), 'Interpreter', 'none');
         plot_save(fullfile(output_folder, 'dgp_nlags'), output_suffix);
         
         figure;
-        histogram(std(the_nlags), 'Normalization', 'probability');
+        histogram(the_nlags(2,:), 'Normalization', 'probability');
         title(strjoin({exper_plotname, ': std (across sims) of number of lags'}), 'Interpreter', 'none');
         plot_save(fullfile(output_folder, 'dgp_nlags_std'), output_suffix);
 
         % Shrinkage penalty
         the_lambda = res.results.lambda.lp_penalize;
         figure;
-        [~,the_edges] = histcounts(log10(the_lambda));
-        histogram(the_lambda,10.^the_edges);
+        [~,the_edges] = histcounts(log10(the_lambda(median_idx,:)));
+        histogram(the_lambda(median_idx,:),10.^the_edges);
         set(gca, 'xscale','log'); % Log scale for x axis
-        title(strjoin({exper_plotname, ': shrinkage penalty (across specs+sims)'}), 'Interpreter', 'none');
+        title(strjoin({exper_plotname, ': median shrinkage penalty (across specs)'}), 'Interpreter', 'none');
         plot_save(fullfile(output_folder, 'dgp_lambda'), output_suffix);
         
-        figure;
-        histogram(std(log(the_lambda)), 'Normalization', 'probability');
-        title(strjoin({exper_plotname, ': std (across sims) of log shrinkage penalty'}), 'Interpreter', 'none');
-        plot_save(fullfile(output_folder, 'dgp_lambda_logstd'), output_suffix);
+%         figure;
+%         histogram(std(log(the_lambda)), 'Normalization', 'probability');
+%         title(strjoin({exper_plotname, ': std (across sims) of log shrinkage penalty'}), 'Interpreter', 'none');
+%         plot_save(fullfile(output_folder, 'dgp_lambda_logstd'), output_suffix);
         
         % Model-averaging weights
         if isfield(res.results, 'weight')
@@ -101,9 +104,9 @@ for nf=1:length(lags_folders) % For each folder...
             figure;
             for j=1:length(the_store_weights) % For each horizon where weights are stored...
                 subplot(1,length(the_store_weights),j);
-                plot(1:the_maxlag, mean(reshape(the_weights(1:the_maxlag,j,:,:), the_maxlag, []), 2)); % AR weights
+                plot(1:the_maxlag, mean(reshape(the_weights(1:the_maxlag,j,1,:), the_maxlag, []), 2)); % AR weights
                 hold on;
-                plot(1:the_maxlag, mean(reshape(the_weights(the_maxlag+1:end,j,:,:), the_maxlag, []), 2)); % VAR weights
+                plot(1:the_maxlag, mean(reshape(the_weights(the_maxlag+1:end,j,1,:), the_maxlag, []), 2)); % VAR weights
                 hold off;
                 title(sprintf('%s%d', 'h = ', the_store_weights(j)));
                 xlabel('no. of lags');
@@ -115,7 +118,7 @@ for nf=1:length(lags_folders) % For each folder...
         end
         
         
-        %% IV F-stat
+        %% IV F-stat and Granger Causality Wald-stat
         
         if isfield(res.results, 'F_stat')
             
@@ -123,9 +126,21 @@ for nf=1:length(lags_folders) % For each folder...
             
             % Average F stat
             figure;
-            histogram(the_Fstats(:), 'Normalization', 'probability');
-            title(strjoin({exper_plotname, ': F stat (across specs+sims)'}), 'Interpreter', 'none');
+            histogram(the_Fstats(1,:), 'Normalization', 'probability');
+            title(strjoin({exper_plotname, ': average F stat (across specs)'}), 'Interpreter', 'none');
             plot_save(fullfile(output_folder, 'dgp_F'), output_suffix);
+            
+        end
+        
+        if isfield(res.results, 'Granger_stat')
+            
+            the_Grangerstats = res.results.Granger_stat.svar;
+            
+            % Average Granger causality Wald-stat
+            figure;
+            histogram(the_Grangerstats(1,:), 'Normalization', 'probability');
+            title(strjoin({exper_plotname, ': average Granger causality Wald stat (across specs)'}), 'Interpreter', 'none');
+            plot_save(fullfile(output_folder, 'dgp_Granger'), output_suffix);
             
         end
 

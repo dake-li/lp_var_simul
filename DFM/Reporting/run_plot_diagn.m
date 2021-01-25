@@ -1,3 +1,4 @@
+%%TO DO: REWRITE THE ENTIRE STRUCTURE
 clear all;
 addpath('Plotting_Functions');
 
@@ -7,10 +8,10 @@ addpath('Plotting_Functions');
 %% Settings
 
 % select lag length specifications
-lags_select    = [1 2];
+lags_select    = 1;
 
 % select experiments
-exper_select = [1 2 6];
+exper_select = 2;
 
 % select estimation methods for each experiment
 methods_iv_select        = [1 2 3 4 5 7];
@@ -23,8 +24,9 @@ settings_shared;
 % Diagnostics
 diagns = {'largest_root', 'svar';
           'LM_stat', 'svar';
-          'F_stat', 'svar_iv'}; % Names of diagnostics and their sub-fields
-diagns_name = {'largroot', 'lm', 'F'}; % Names of diagnostics for file names
+          'F_stat', 'svar_iv';
+          'Granger_stat', 'svar'}; % Names of diagnostics and their sub-fields
+diagns_name = {'largroot', 'lm', 'F', 'Granger'}; % Names of diagnostics for file names
 diag_qs = [0.25 0.75]; % Lower and upper quantile for conditioning
 title_qs = {'$<$Q1', '$>$Q3'}; % Title of lower and upper quantiles in plot
 
@@ -38,6 +40,10 @@ for nf=1:length(lags_folders) % For each folder...
         % Load results
         load_results;
         
+        % write down the index of quantiles across MCs
+        qs_idx = 2 + find(ismember(res.settings.simul.quantiles,diag_qs)); % index of median number in the quantile list (including mean and std)
+
+        
         %----------------------------------------------------------------
         % Compute Reporting Results
         %----------------------------------------------------------------
@@ -45,7 +51,9 @@ for nf=1:length(lags_folders) % For each folder...
         the_true_irf = res.DF_model.target_irf; % True IRF
         the_rms_irf  = sqrt(mean(the_true_irf.^2)); % Root average squared true IRF across horizons
         
-        the_irf_err = extract_struct(res.results.irf) - permute(the_true_irf,[1 3 2]);
+        the_irf = extract_struct(res.results.irf);
+        the_irf = the_irf(:,:,:,methods_select{ne});
+        the_irf_err = the_irf - permute(the_true_irf,[1 3 2]);
         the_irf_err_rel = the_irf_err./permute(the_rms_irf, [1 3 2]);
         
         for d=1:length(diagns)
