@@ -1,4 +1,4 @@
-function [DFM_estimate_combined, DF_model_combined, settings_combined, results_combined] = combine_struct(save_folder, file_prefix, spec_id_array)
+function [DFM_estimate_combined, DF_model_combined, settings_combined, results_combined] = combine_struct(save_folder, file_prefix, spec_id_array, quantiles)
 %UNTITLED2 Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -84,7 +84,28 @@ for id = spec_id_array
         % iterate thru the second tier of the struct
         for j = 1:length(second_tier)
             
-            % decide which dim to concatenate
+            % decide which dim to summarize (MC)
+            if any(strcmp(first_tier{i},{'irf'}))
+                summarize_dim = 2;
+            elseif any(strcmp(first_tier{i},{'weight'}))
+                summarize_dim = 3;
+            elseif any(strcmp(first_tier{i},{'n_lags','largest_root','LM_stat','LM_pvalue','Granger_stat','Granger_pvalue','F_stat','F_pvalue','lambda'}))
+                summarize_dim = 1;
+            else
+                summarize_dim = NaN;
+            end
+            
+            % summarize (MC)
+            if isnan(summarize_dim)
+                results_summarized.(first_tier{i}).(second_tier{j}) = results.(first_tier{i}).(second_tier{j});
+            elseif ~isnan(summarize_dim)
+                this_mean = mean(results.(first_tier{i}).(second_tier{j}), summarize_dim);
+                this_std = std(results.(first_tier{i}).(second_tier{j}), 0, summarize_dim);
+                this_quantile = quantile(results.(first_tier{i}).(second_tier{j}), quantiles, summarize_dim);
+                results_summarized.(first_tier{i}).(second_tier{j}) = cat(summarize_dim, this_mean, this_std, this_quantile);
+            end
+            
+            % decide which dim to concatenate (spec)
             if any(strcmp(first_tier{i},{'irf'}))
                 concatenate_dim = 3;
             elseif any(strcmp(first_tier{i},{'weight'}))
@@ -95,11 +116,11 @@ for id = spec_id_array
                 concatenate_dim = NaN;
             end
             
-            % concatenate
+            % concatenate (spec)
             if id == 1
-                results_combined.(first_tier{i}).(second_tier{j}) = results.(first_tier{i}).(second_tier{j});
+                results_combined.(first_tier{i}).(second_tier{j}) = results_summarized.(first_tier{i}).(second_tier{j});
             elseif ~isnan(concatenate_dim)
-                results_combined.(first_tier{i}).(second_tier{j}) = cat(concatenate_dim, results_combined.(first_tier{i}).(second_tier{j}), results.(first_tier{i}).(second_tier{j})); 
+                results_combined.(first_tier{i}).(second_tier{j}) = cat(concatenate_dim, results_combined.(first_tier{i}).(second_tier{j}), results_summarized.(first_tier{i}).(second_tier{j})); 
             end
            
         end
@@ -111,6 +132,10 @@ end
 % update count of specifications
 settings_combined.specifications.random_n_spec = settings_combined.specifications.random_n_spec * length(spec_id_array);
 settings_combined.specifications.n_spec = settings_combined.specifications.n_spec * length(spec_id_array);
+
+% update settings
+settings_combined.specifications.spec_id_array = spec_id_array;
+settings_combined.simul.quantiles = quantiles;
 
 end
 
