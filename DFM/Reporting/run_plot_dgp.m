@@ -1,16 +1,16 @@
 clear all;
 addpath('Plotting_Functions');
 
-% Plot features of GDP and estimated tuning parameters
+% Table and plots of features of GDP and estimated tuning parameters
 
 
 %% Settings
 
 % select lag length specifications
-lags_select    = 1;
+lags_select    = 1:3;
 
 % select experiments
-exper_select = 1:3;
+exper_select = 1:6;
 
 % select estimation methods for each experiment
 methods_iv_select        = [1 2 3 4 5 7];
@@ -20,8 +20,12 @@ methods_recursive_select = [1 2 3 4 5 6];
 % Apply shared settings
 settings_shared;
 
+% Summary statistics for table
+tab_stat = {'R0_sq', 'LRV_Cov_tr_ratio', 'VAR_largest_root', 'frac_coef_for_large_lags'}; % Summary stats to copy (in addition to IRF stats defined below)
+tab_quants = [0.1 0.25 0.5 0.75 0.95]; % Quantiles to report across specifications
 
-%% Create plots for each experiment
+
+%% Create tables and plots for each experiment
 
 for nf=1:length(lags_folders) % For each folder...
 
@@ -30,8 +34,28 @@ for nf=1:length(lags_folders) % For each folder...
         % Load results
         load_results;
         
-        % write down the index of median across MCs
+        % Record the index of median across MCs
         median_idx = 2 + find(res.settings.simul.quantiles==0.5); % index of median number in the quantile list (including mean and std)
+        
+        
+        %% Table of summary statistics
+        
+        tab = table;
+        for is=1:length(tab_stat)
+            tab.(tab_stat{is}) = res.DF_model.(tab_stat{is});
+        end
+        tab.irf_num_local_extrema = sum(diff(sign(diff(res.DF_model.target_irf',1,2)),1,2)~=0,2);
+        [~,I] = max(abs(res.DF_model.target_irf)',[],2);
+        tab.irf_maxabs_h = I;
+        tab.irf_mean_max_ratio = mean(res.DF_model.target_irf',2)./max(abs(res.DF_model.target_irf)',[],2);
+        tab_summ = varfun(@(x) [min(x) quantile(x,tab_quants) max(x)]', tab);
+        tab_summ.Properties.VariableNames=regexprep(tab_summ.Properties.VariableNames, 'Fun_', '');
+        tab_summ2 = table;
+        tab_summ2.quantile = [0; tab_quants(:); 1];
+        tab_summ = [tab_summ2 tab_summ];
+        writetable(tab_summ, fullfile(output_folder, 'summ.csv'));
+        
+        clearvars I tab tab_summ tab_summ2;
 
 
         %% Report features of DGP
