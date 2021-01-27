@@ -41,21 +41,35 @@ for nf=1:length(lags_folders) % For each folder...
         %% Table of summary statistics
         
         tab = table;
+        
+        % Basic DGP summary statistics
         for is=1:length(tab_stat)
             tab.(tab_stat{is}) = res.DF_model.(tab_stat{is});
         end
+        
+        % IRF summary statistics
         tab.irf_num_local_extrema = sum(diff(sign(diff(res.DF_model.target_irf',1,2)),1,2)~=0,2);
         [~,I] = max(abs(res.DF_model.target_irf)',[],2);
         tab.irf_maxabs_h = I;
         tab.irf_mean_max_ratio = mean(res.DF_model.target_irf',2)./max(abs(res.DF_model.target_irf)',[],2);
+        
+        % R-squared from regressing IRFs on quadratic
+        X = [ones(res.settings.est.IRF_hor,1) (res.settings.est.IRF_select').^(1:2)];
+        betas = X\res.DF_model.target_irf;
+        resid = res.DF_model.target_irf-X*betas;
+        tab.irf_R2s = 1-(var(resid)./var(res.DF_model.target_irf))';
+        
+        % Create table of quantiles
         tab_summ = varfun(@(x) [min(x) quantile(x,tab_quants) max(x)]', tab);
         tab_summ.Properties.VariableNames=regexprep(tab_summ.Properties.VariableNames, 'Fun_', '');
         tab_summ2 = table;
         tab_summ2.quantile = [0; tab_quants(:); 1];
         tab_summ = [tab_summ2 tab_summ];
+        
+        % Write to file
         writetable(tab_summ, fullfile(output_folder, 'summ.csv'));
         
-        clearvars I tab tab_summ tab_summ2;
+        clearvars I X betas resid tab tab_summ tab_summ2;
 
 
         %% Report features of DGP
