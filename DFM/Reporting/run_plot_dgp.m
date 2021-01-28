@@ -47,6 +47,11 @@ for nf=1:length(lags_folders) % For each folder...
             tab.(tab_stat{is}) = res.DF_model.(tab_stat{is});
         end
         
+        % IV F-stat
+        if isfield(res.DF_model, 'IV_strength')
+            tab.iv_F = res.settings.simul.T./(1./res.DF_model.IV_strength-1);
+        end
+        
         % IRF summary statistics
         tab.irf_num_local_extrema = sum(diff(sign(diff(res.DF_model.target_irf',1,2)),1,2)~=0,2);
         [~,I] = max(abs(res.DF_model.target_irf)',[],2);
