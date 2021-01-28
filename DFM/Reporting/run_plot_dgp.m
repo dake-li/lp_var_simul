@@ -22,7 +22,7 @@ settings_shared;
 
 % Summary statistics for table
 tab_stat = {'R0_sq', 'LRV_Cov_tr_ratio', 'VAR_largest_root', 'frac_coef_for_large_lags'}; % Summary stats to copy (in addition to IRF stats defined below)
-tab_quants = [0.1 0.25 0.5 0.75 0.95]; % Quantiles to report across specifications
+tab_quants = [0.1 0.25 0.5 0.75 0.9]; % Quantiles to report across specifications
 
 
 %% Create tables and plots for each experiment
