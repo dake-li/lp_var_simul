@@ -109,6 +109,33 @@ for nf=1:length(lags_folders) % For each folder...
             plot_save(fullfile(output_folder, 'dgp_IVstrength'), output_suffix);
         end
         
+        % some IRFs
+        
+        spec_select = [1 2 3];
+        
+        figure
+        pos = get(gca, 'Position');
+        set(gca,'Position', pos)
+        set(gca,'FontSize',16)
+        set(gca,'TickLabelInterpreter','latex')
+        hold on
+        for i_spec_indx = 1:length(spec_select)
+            i_spec = spec_select(i_spec_indx);
+            plot(res.settings.est.IRF_select, res.DF_model.target_irf(:,i_spec) ./ max(abs(res.DF_model.target_irf(:,i_spec))),'Linewidth',3.5)
+            hold on
+        end
+        hold off
+        set(gcf,'color','w')
+        title(exper_plotname,'interpreter','latex','fontsize',20)
+        xlabel('Horizon','interpreter','latex','FontSize',20)
+        % ylabel('\% deviation','interpreter','latex','FontSize',20)
+        xlim([1 20])
+        grid on
+        hold off
+        pos = get(gcf, 'Position');
+        set(gcf, 'Position', [pos(1) pos(2) 1*pos(3) 1*pos(4)]);
+        set(gcf, 'PaperPositionMode', 'auto');
+        plot_save(fullfile(output_folder, 'dgp_irfs'), output_suffix);
         
         %% Estimated tuning parameters
 
