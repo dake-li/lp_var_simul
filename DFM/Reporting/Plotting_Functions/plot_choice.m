@@ -1,6 +1,6 @@
 function plot_choice(choice, cmap, horzs, weight_grid, methods_select, plot_name, plot_legend, legend_type, font_size)
 
-figure
+% figure
 imagesc(horzs,weight_grid,choice)
 colormap(cmap)
 set(gca,'TickLabelInterpreter','latex')
