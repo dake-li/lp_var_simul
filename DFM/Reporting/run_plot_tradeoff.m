@@ -13,10 +13,13 @@ warning('off','MATLAB:structOnObject')
 %% SETTINGS
 
 % select lag length specifications
-lags_select    = 1;
+lags_select    = 2;
 
 % select experiments
-exper_select = 1;
+exper_select = [2,5];
+
+% number of adjacent experiments to combine
+n_exper_combine = 2;
 
 % select estimation methods for each experiment
 methods_iv_select        = [1 2 3 4 5 7];
@@ -75,7 +78,7 @@ cmap_inv = interp2(X([1,25,50],:),Y([1,25,50],:),cmap_inv,X,Y);
 % Find index of reference method
 base_indic = NaN(length(exper_files),length(base_names));
 
-for ne=1:length(exper_files)
+for ne=1:length(exper_files)    
     for nb=1:length(base_names)
         if sum(strcmp(methods_names{ne}, base_names(nb))) == 0
             error('The base method is not included!')
@@ -88,6 +91,13 @@ end
 for nf=1:length(lags_folders) % For each folder...
 
     for ne=1:length(exper_files) % For each experiment in folder...
+        
+        % index in the combined figure panel
+        if mod(ne, n_exper_combine) == 0
+            i_exper_combine = n_exper_combine;
+        else
+            i_exper_combine = mod(ne, n_exper_combine);
+        end
         
         % Load results
         load_results;
@@ -110,31 +120,39 @@ for nf=1:length(lags_folders) % For each folder...
         
         for nb = 1:length(base_names)
         
-        base_method_name = methods_names_plot{base_indic(ne,nb)};
-        
-        the_objects = methods_names_plot; % Objects to plot
-        the_titles =  methods_names_plot; % Plot titles/file names
+            base_method_name = methods_names_plot{base_indic(ne,nb)};
 
-        for j=1:length(the_objects)
-            
-            if j == base_indic(ne,nb)
-                continue
+            the_objects = methods_names_plot; % Objects to plot
+            the_titles =  methods_names_plot; % Plot titles/file names
+
+            for j=1:length(the_objects)
+
+                if j == base_indic(ne,nb)
+                    continue
+                end
+                
+                if i_exper_combine == 1 % initialize the combined figure panel
+                    fig_vs(j,nb) = figure('Position', [100 100 500*n_exper_combine 400]);
+                end
+
+                pref_base = zeros(n_weight,max(res.settings.est.IRF_select),size(the_BIAS2rel,2));
+                for i_weight = 1:n_weight
+                    loss_base   = weight_grid(i_weight) * the_BIAS2rel(:,:,base_indic(ne,nb)) + (1-weight_grid(i_weight)) * the_VCErel(:,:,base_indic(ne,nb));
+                    loss_method = weight_grid(i_weight) * the_BIAS2rel(:,:,j) + (1-weight_grid(i_weight)) * the_VCErel(:,:,j);
+
+                    pref_base(i_weight,:,:) = (loss_base <= loss_method);
+                end
+                pref_base = mean(pref_base,3);
+                
+                figure(fig_vs(j,nb));
+                subplot(1, n_exper_combine, i_exper_combine);
+                plot_tradeoff(1-pref_base(:,2:end), cmap, horzs(2:end)-1, weight_grid, ...
+                    strjoin({exper_plotname, ':', the_titles{j}, 'Preferred Over', base_method_name}), font_size)
+                if i_exper_combine == n_exper_combine
+                    plot_save(fullfile(output_folder, strcat('tradeoff_', removeChars(the_titles{j}), '_vs_', removeChars(base_method_name))), output_suffix);
+                end
+
             end
-            
-            pref_base = zeros(n_weight,max(res.settings.est.IRF_select),size(the_BIAS2rel,2));
-            for i_weight = 1:n_weight
-                loss_base   = weight_grid(i_weight) * the_BIAS2rel(:,:,base_indic(ne,nb)) + (1-weight_grid(i_weight)) * the_VCErel(:,:,base_indic(ne,nb));
-                loss_method = weight_grid(i_weight) * the_BIAS2rel(:,:,j) + (1-weight_grid(i_weight)) * the_VCErel(:,:,j);
-
-                pref_base(i_weight,:,:) = (loss_base <= loss_method);
-            end
-            pref_base = mean(pref_base,3);
-
-            plot_tradeoff(1-pref_base(:,2:end), cmap, horzs(2:end)-1, weight_grid, ...
-                strjoin({exper_plotname, ':', the_titles{j}, 'Preferred Over', base_method_name}), font_size)
-            plot_save(fullfile(output_folder, strcat('tradeoff_', removeChars(the_titles{j}), '_vs_', removeChars(base_method_name))), output_suffix);
-
-        end
         
         end
         
@@ -149,9 +167,16 @@ for nf=1:length(lags_folders) % For each folder...
             [~,choice_raw(i_weight,:)] = min(loss_all,[],2);
         end
         
+        if i_exper_combine == 1 % initialize the combined figure panel
+            fig_best = figure('Position', [100 100 500*n_exper_combine 400]);
+        end
+        figure(fig_best);
+        subplot(1, n_exper_combine, i_exper_combine);
         plot_choice(choice_raw(:,2:end), lines, horzs(2:end)-1, weight_grid, methods_select{ne}, ...
                 strjoin({exper_plotname, ': Best Procedure'}), methods_names_plot, 1, font_size);
-        plot_save(fullfile(output_folder, 'tradeoff_best'), output_suffix);    
+        if i_exper_combine == n_exper_combine
+            plot_save(fullfile(output_folder, 'tradeoff_best'), output_suffix);  
+        end
         
         %----------------------------------------------------------------
         % Compute Choice Results
@@ -186,9 +211,16 @@ for nf=1:length(lags_folders) % For each folder...
         
         end
         
+        if i_exper_combine == 1 % initialize the combined figure panel
+            fig_choice = figure('Position', [100 100 500*n_exper_combine 400]);
+        end
+        figure(fig_choice);
+        subplot(1, n_exper_combine, i_exper_combine);
         plot_choice(choice(:,2:end), cmap_inv, horzs(2:end)-1, weight_grid, methods_select{ne}, ...
                 strjoin({exper_plotname, ': Method Choice'}), methods_iv_names(trade_off_aux), 0, font_size);
-        plot_save(fullfile(output_folder, 'tradeoff_choice'), output_suffix);
+        if i_exper_combine == n_exper_combine
+            plot_save(fullfile(output_folder, 'tradeoff_choice'), output_suffix);
+        end
         
     end
     

@@ -1,6 +1,6 @@
 function plot_tradeoff(pref_base, cmap, horzs, weight_grid, plot_name, font_size)
 
-figure
+% figure
 imagesc(horzs,weight_grid,pref_base)
 colormap(cmap)
 set(gca,'TickLabelInterpreter','latex')

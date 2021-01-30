@@ -91,23 +91,22 @@ for nf=1:length(lags_folders) % For each folder...
                 subplot(1,2,iq);
                 plot_loss(horzs(2:end)-1, squeeze(nanmedian(the_bias_rel_cond(2:end,:,:), 2)), [], ...
                     strjoin({exper_plotname, ': Relative Bias', diagns_name{d}, title_qs{iq}}), methods_names_plot, font_size, true);
-                same_ylim(ax_bias,gca); % Enforce same ylim
-                ax_bias = gca;
-
+                ax_bias(iq) = gca;              
+                
                 % Conditional std dev
                 figure(f_std);
                 subplot(1,2,iq);
                 plot_loss(horzs(2:end)-1, squeeze(nanmedian(the_std_rel_cond(2:end,:,:), 2)), [], ...
                     strjoin({exper_plotname, ': Relative Std', diagns_name{d}, title_qs{iq}}), methods_names_plot, font_size, true);
-                same_ylim(ax_std,gca); % Enforce same ylim
-                ax_std = gca;
+                ax_std(iq) = gca;
                 
-
             end
             
             figure(f_bias);
+            same_ylim(ax_bias); % Enforce same ylim
             plot_save(fullfile(output_folder, strcat('diagn_', diagns_name{d}, '_bias_reltruth')), output_suffix);
             figure(f_std);
+            same_ylim(ax_std); % Enforce same ylim
             plot_save(fullfile(output_folder, strcat('diagn_', diagns_name{d}, '_std_reltruth')), output_suffix);
 
         end
