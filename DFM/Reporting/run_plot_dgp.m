@@ -24,6 +24,11 @@ settings_shared;
 tab_stat = {'R0_sq', 'LRV_Cov_tr_ratio', 'VAR_largest_root', 'frac_coef_for_large_lags'}; % Summary stats to copy (in addition to IRF stats defined below)
 tab_quants = [0.1 0.25 0.5 0.75 0.9]; % Quantiles to report across specifications
 
+% IRF examples to plot
+spec_select = 10:10:70;
+linestyles = {'-', '--', ':', '-o', '--o', ':o', '-s'};
+colors = lines(7);
+
 
 %% Create tables and plots for each experiment
 
@@ -109,33 +114,26 @@ for nf=1:length(lags_folders) % For each folder...
             plot_save(fullfile(output_folder, 'dgp_IVstrength'), output_suffix);
         end
         
-        % some IRFs
-        
-        spec_select = [1 2 3];
-        
-        figure
-        pos = get(gca, 'Position');
-        set(gca,'Position', pos)
-        set(gca,'FontSize',16)
-        set(gca,'TickLabelInterpreter','latex')
-        hold on
+        % Some IRFs
+        figure('Units', 'inches', 'Position', [0 0 8 4]);
+        hold on;
+        norm_irf = @(x) x/max(abs(x));
         for i_spec_indx = 1:length(spec_select)
             i_spec = spec_select(i_spec_indx);
-            plot(res.settings.est.IRF_select, res.DF_model.target_irf(:,i_spec) ./ max(abs(res.DF_model.target_irf(:,i_spec))),'Linewidth',3.5)
-            hold on
+            plot(res.settings.est.IRF_select, norm_irf(res.DF_model.target_irf(:,i_spec)), ...
+                 linestyles{i_spec_indx}, 'Color', colors(i_spec_indx,:), 'Linewidth', 2, ...
+                 'MarkerSize', 4, 'MarkerFaceColor', colors(i_spec_indx,:));
         end
-        hold off
-        set(gcf,'color','w')
-        title(exper_plotname,'interpreter','latex','fontsize',20)
-        xlabel('Horizon','interpreter','latex','FontSize',20)
-        % ylabel('\% deviation','interpreter','latex','FontSize',20)
-        xlim([1 20])
-        grid on
-        hold off
-        pos = get(gcf, 'Position');
-        set(gcf, 'Position', [pos(1) pos(2) 1*pos(3) 1*pos(4)]);
-        set(gcf, 'PaperPositionMode', 'auto');
+        hold off;
+%         title(exper_plotname,'interpreter','latex','fontsize',20);
+        xlabel('Horizon','interpreter','latex','FontSize',12);
+        set(gca,'XTick',[min(res.settings.est.IRF_select) 5:5:max(res.settings.est.IRF_select)]);
+        xlim([min(res.settings.est.IRF_select) max(res.settings.est.IRF_select)]);
+        grid on;
+        set(gca,'TickLabelInterpreter','latex');
+        set(gca,'FontSize',12);
         plot_save(fullfile(output_folder, 'dgp_irfs'), output_suffix);
+        
         
         %% Estimated tuning parameters
 
