@@ -3,8 +3,12 @@ function plot_loss(horzs, results, add_line, plot_name, plot_legend, font_size, 
     % Function for plotting results across estimation methods
 
     line_colors = repmat(lines(7),2,1);
-    line_styles = repmat({'-'},14,1);
-    line_width  = repmat(3.5,14,1);
+    colors_indx = [3 4 1 2 5 6 7];
+    line_colors = line_colors(colors_indx,:);
+    line_styles = {'-', '--', '-x', '-', '-.', '-o', ':'};
+    line_width  = repmat(2,14,1);
+    line_width(1) = 5;
+    line_width(4) = 5;
     
     if isempty(varargin)
         figure;
@@ -15,7 +19,7 @@ function plot_loss(horzs, results, add_line, plot_name, plot_legend, font_size, 
     
     hold on;
     for i=1:size(results,2)
-        plot(horzs, results(:,i)', 'Color', line_colors(i,:), 'LineStyle', line_styles{i}, 'LineWidth', line_width(i));
+        plot(horzs, results(:,i)', line_styles{i}, 'Color', line_colors(i,:), 'LineWidth', line_width(i));
         xlim([min(horzs) max(horzs)])
     end
     hold off;
