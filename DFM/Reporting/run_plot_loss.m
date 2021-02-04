@@ -14,8 +14,8 @@ addpath('Plotting_Functions')
 % select lag length specifications
 lags_select    = 2;
 
-% select experiments
-exper_select = 2;
+% select and group experiments
+exper_select_group = {[2,5], 1};
 
 % select estimation methods for each experiment
 methods_iv_select        = [1 2 3 4 5 7];
@@ -34,6 +34,11 @@ for nf=1:length(lags_folders) % For each folder...
                
         % Load results
         load_results;
+        
+        % see if ready to plot for this group of experiments
+        if exper_group_end(ne) == 0
+            continue;
+        end
         
         %----------------------------------------------------------------
         % Compute Reporting Results
