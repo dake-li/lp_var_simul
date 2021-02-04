@@ -10,10 +10,7 @@ addpath('Plotting_Functions');
 lags_select    = 2;
 
 % select experiments
-exper_select = [2,5];
-
-% number of adjacent experiments to combine
-n_exper_combine = 2;
+exper_select = 2;
 
 % select estimation methods for each experiment
 methods_iv_select        = [1 2 3 4 5 7];
@@ -38,14 +35,7 @@ colors = lines(7);
 for nf=1:length(lags_folders) % For each folder...
 
     for ne=1:length(exper_files) % For each experiment in folder...
-        
-        % index in the combined figure panel
-        if mod(ne, n_exper_combine) == 0
-            i_exper_combine = n_exper_combine;
-        else
-            i_exper_combine = mod(ne, n_exper_combine);
-        end
-        
+               
         % Load results
         load_results;
         
@@ -95,71 +85,37 @@ for nf=1:length(lags_folders) % For each folder...
         %% Report features of DGP
                 
         % Degree of invertibility
-        if i_exper_combine == 1
-            fig_R0sq = figure('Position', [100 100 500*n_exper_combine 400]);
-        end
-        figure(fig_R0sq);
-        subplot(1,n_exper_combine,i_exper_combine);
+        figure;
         histogram(res.DF_model.R0_sq, 'Normalization', 'probability');
         title(strjoin({exper_plotname, ': degree of invertibility'}), 'Interpreter', 'none');
-        if i_exper_combine == n_exper_combine
-            plot_save(fullfile(output_folder, 'dgp_R0sq'), output_suffix);
-        end
+        plot_save(fullfile(output_folder, 'dgp_R0sq'), output_suffix);
         
         % Persistence
-        if i_exper_combine == 1
-            fig_LRVVar = figure('Position', [100 100 500*n_exper_combine 400]);
-        end
-        figure(fig_LRVVar);
-        subplot(1,n_exper_combine,i_exper_combine);
+        figure;
         histogram(res.DF_model.LRV_Cov_tr_ratio, 'Normalization', 'probability');
         title(strjoin({exper_plotname, ': LRV to Var ratio'}), 'Interpreter', 'none');
-        if i_exper_combine == n_exper_combine     
-            plot_save(fullfile(output_folder, 'dgp_LRVVar'), output_suffix);
-        end
+        plot_save(fullfile(output_folder, 'dgp_LRVVar'), output_suffix);
         
-        if i_exper_combine == 1
-            fig_largroot = figure('Position', [100 100 500*n_exper_combine 400]);
-        end
-        figure(fig_largroot);
-        subplot(1,n_exper_combine,i_exper_combine);
+        figure;
         histogram(res.DF_model.VAR_largest_root, 'Normalization', 'probability');
         title(strjoin({exper_plotname, ': largest VAR root'}), 'Interpreter', 'none');
-        if i_exper_combine == n_exper_combine
-            plot_save(fullfile(output_folder, 'dgp_largroot'), output_suffix);
-        end
+        plot_save(fullfile(output_folder, 'dgp_largroot'), output_suffix);
         
-        if i_exper_combine == 1
-            fig_longlag = figure('Position', [100 100 500*n_exper_combine 400]);
-        end
-        figure(fig_longlag);
-        subplot(1,n_exper_combine,i_exper_combine);
+        figure;
         histogram(res.DF_model.frac_coef_for_large_lags, 'Normalization', 'probability');
         title(strjoin({exper_plotname, ': fraction of long-lag VAR coefs'}), 'Interpreter', 'none');
-        if i_exper_combine == n_exper_combine
-            plot_save(fullfile(output_folder, 'dgp_longlag'), output_suffix);
-        end
+        plot_save(fullfile(output_folder, 'dgp_longlag'), output_suffix);
         
         % IV strength
         if isfield(res.DF_model, 'IV_strength')
-            if i_exper_combine == 1
-                fig_IVstrength = figure('Position', [100 100 500*n_exper_combine 400]);
-            end
-            figure(fig_IVstrength);
-            subplot(1,n_exper_combine,i_exper_combine);
+            figure;
             histogram(res.DF_model.IV_strength, 'Normalization', 'probability');
             title(strjoin({exper_plotname, ': IV strength'}), 'Interpreter', 'none');
-            if i_exper_combine == n_exper_combine
-                plot_save(fullfile(output_folder, 'dgp_IVstrength'), output_suffix);
-            end
+            plot_save(fullfile(output_folder, 'dgp_IVstrength'), output_suffix);
         end
         
         % Some IRFs
-        if i_exper_combine == 1
-            fig_irfs = figure('Units', 'inches', 'Position', [0 0 8 4]);
-        end
-        figure(fig_irfs);
-        subplot(1,n_exper_combine,i_exper_combine);
+        figure('Units', 'inches', 'Position', [0 0 8 4]);
         hold on;
         norm_irf = @(x) x/max(abs(x));
         for i_spec_indx = 1:length(spec_select)
@@ -176,51 +132,31 @@ for nf=1:length(lags_folders) % For each folder...
         grid on;
         set(gca,'TickLabelInterpreter','latex');
         set(gca,'FontSize',12);
-        if i_exper_combine == n_exper_combine
-            plot_save(fullfile(output_folder, 'dgp_irfs'), output_suffix);
-        end
+        plot_save(fullfile(output_folder, 'dgp_irfs'), output_suffix);
         
         
         %% Estimated tuning parameters
         
         % Number of lags
-        if i_exper_combine == 1
-            fig_nlags = figure('Position', [100 100 500*n_exper_combine 400]);
-        end
-        figure(fig_nlags);
-        subplot(1,n_exper_combine,i_exper_combine);
         the_nlags = res.results.n_lags.svar;
+        figure;
         histogram(the_nlags(median_idx,:), 'Normalization', 'probability');
         title(strjoin({exper_plotname, ': median number of lags (across specs)'}), 'Interpreter', 'none');
-        if i_exper_combine == n_exper_combine
-            plot_save(fullfile(output_folder, 'dgp_nlags'), output_suffix);
-        end
+        plot_save(fullfile(output_folder, 'dgp_nlags'), output_suffix);
         
-        if i_exper_combine == 1
-            fig_nlags_std = figure('Position', [100 100 500*n_exper_combine 400]);
-        end
-        figure(fig_nlags_std);
-        subplot(1,n_exper_combine,i_exper_combine);
+        figure;
         histogram(the_nlags(2,:), 'Normalization', 'probability');
         title(strjoin({exper_plotname, ': std (across sims) of number of lags'}), 'Interpreter', 'none');
-        if i_exper_combine == n_exper_combine
-            plot_save(fullfile(output_folder, 'dgp_nlags_std'), output_suffix);
-        end
+        plot_save(fullfile(output_folder, 'dgp_nlags_std'), output_suffix);
 
         % Shrinkage penalty
-        if i_exper_combine == 1
-            fig_lambda = figure('Position', [100 100 500*n_exper_combine 400]);
-        end
-        figure(fig_lambda);
-        subplot(1,n_exper_combine,i_exper_combine);
         the_lambda = res.results.lambda.lp_penalize;
+        figure;
         [~,the_edges] = histcounts(log10(the_lambda(median_idx,:)));
         histogram(the_lambda(median_idx,:),10.^the_edges);
         set(gca, 'xscale','log'); % Log scale for x axis
         title(strjoin({exper_plotname, ': median shrinkage penalty (across specs)'}), 'Interpreter', 'none');
-        if i_exper_combine == n_exper_combine
-            plot_save(fullfile(output_folder, 'dgp_lambda'), output_suffix);
-        end
+        plot_save(fullfile(output_folder, 'dgp_lambda'), output_suffix);
         
 %         figure;
 %         histogram(std(log(the_lambda)), 'Normalization', 'probability');
@@ -234,25 +170,20 @@ for nf=1:length(lags_folders) % For each folder...
             the_store_weights = res.settings.est.average_store_weight;
             the_maxlag = res.settings.est.n_lags_max;
             
-            if i_exper_combine == 1
-                fig_weight = figure('Position', [100 100 300*n_exper_combine 700]);
-            end
-            figure(fig_weight);
+            figure;
             
             for j=1:length(the_store_weights) % For each horizon where weights are stored...
-                subplot(length(the_store_weights), n_exper_combine, (j-1)*n_exper_combine + i_exper_combine);
+                subplot(1,length(the_store_weights),j);
                 plot(1:the_maxlag, mean(reshape(the_weights(1:the_maxlag,j,1,:), the_maxlag, []), 2)); % AR weights
                 hold on;
                 plot(1:the_maxlag, mean(reshape(the_weights(the_maxlag+1:end,j,1,:), the_maxlag, []), 2)); % VAR weights
                 hold off;
-                title(strjoin({exper_plotname, ': ', sprintf('%s%d', 'h = ', the_store_weights(j))}));
+                title(sprintf('%s%d', 'h = ', the_store_weights(j)));
                 xlabel('no. of lags');
                 legend('AR', 'VAR', 'Location', 'NorthEast');
             end
-            sgtitle('average model-avg weight (across specs+sims)', 'FontSize', 11, 'FontWeight', 'bold', 'Interpreter', 'none');
-            if i_exper_combine == n_exper_combine
-                plot_save(fullfile(output_folder, 'dgp_weight'), output_suffix);
-            end
+            sgtitle(strjoin({exper_plotname, ': average model-avg weight (across specs+sims)'}), 'FontSize', 11, 'FontWeight', 'bold', 'Interpreter', 'none');
+            plot_save(fullfile(output_folder, 'dgp_weight'), output_suffix);
             
         end
         
@@ -261,35 +192,25 @@ for nf=1:length(lags_folders) % For each folder...
         
         if isfield(res.results, 'F_stat')
                        
-            % Average F stat
-            if i_exper_combine == 1
-                fig_F = figure('Position', [100 100 500*n_exper_combine 400]);
-            end
-            figure(fig_F);
-            subplot(1,n_exper_combine,i_exper_combine);
             the_Fstats = res.results.F_stat.svar_iv;
+            
+            % Average F stat
+            figure;
             histogram(the_Fstats(1,:), 'Normalization', 'probability');
             title(strjoin({exper_plotname, ': average F stat (across specs)'}), 'Interpreter', 'none');
-            if i_exper_combine == n_exper_combine
-                plot_save(fullfile(output_folder, 'dgp_F'), output_suffix);
-            end
+            plot_save(fullfile(output_folder, 'dgp_F'), output_suffix);
             
         end
         
         if isfield(res.results, 'Granger_stat')
             
-            % Average Granger causality Wald-stat
-            if i_exper_combine == 1
-                fig_Granger = figure('Position', [100 100 500*n_exper_combine 400]);
-            end
-            figure(fig_Granger);
-            subplot(1,n_exper_combine,i_exper_combine);
             the_Grangerstats = res.results.Granger_stat.svar;
+            
+            % Average Granger causality Wald-stat
+            figure;
             histogram(the_Grangerstats(1,:), 'Normalization', 'probability');
             title(strjoin({exper_plotname, ': average Granger causality Wald stat (across specs)'}), 'Interpreter', 'none');
-            if i_exper_combine == n_exper_combine
-                plot_save(fullfile(output_folder, 'dgp_Granger'), output_suffix);
-            end
+            plot_save(fullfile(output_folder, 'dgp_Granger'), output_suffix);
             
         end
 
