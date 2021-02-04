@@ -12,15 +12,18 @@ addpath('Plotting_Functions')
 %% SETTINGS
 
 % select lag length specifications
-lags_select    = 2;
+lags_select    = 2:3;
 
 % select and group experiments
-exper_select_group = {[2,5], 1};
+exper_select_group = {[2,5], [3,6], [1,4]};
 
 % select estimation methods for each experiment
 methods_iv_select        = [1 2 3 4 5 7];
 methods_obsshock_select  = [1 2 3 4 5 6];
 methods_recursive_select = [1 2 3 4 5 6];
+
+% robust statistics?
+robust_stat = true;
 
 % Apply shared settings
 settings_shared;
@@ -47,8 +50,19 @@ for nf=1:length(lags_folders) % For each folder...
         the_true_irf = res.DF_model.target_irf; % True IRF
         the_rms_irf  = sqrt(mean(the_true_irf.^2)); % Root average squared true IRF across horizons
         
-        the_objects = {'MSE',   'BIAS2',    'VCE'}; % Objects to plot
-        the_titles =  {'RMSE',  'Bias',     'Std'}; % Plot titles/file names
+        if robust_stat
+            q1_idx = 2 + find(res.settings.simul.quantiles==0.25);
+            med_idx = 2 + find(res.settings.simul.quantiles==0.5);
+            q3_idx = 2 + find(res.settings.simul.quantiles==0.75);
+            the_fields = fieldnames(res.results.irf);
+            for ii=1:length(the_fields)
+                res.results.BIAS2.(the_fields{ii}) = (squeeze(res.results.irf.(the_fields{ii})(:,med_idx,:))-the_true_irf).^2;
+                res.results.VCE.(the_fields{ii}) = squeeze(res.results.irf.(the_fields{ii})(:,q3_idx,:)-res.results.irf.(the_fields{ii})(:,q1_idx,:)).^2;
+            end
+        end
+        
+        the_objects = {'BIAS2',    'VCE'}; % Objects to plot
+        the_titles =  {'Bias',     'Std'}; % Plot titles/file names
 
         for j=1:length(the_objects)
             
