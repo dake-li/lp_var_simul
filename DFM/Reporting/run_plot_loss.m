@@ -22,9 +22,6 @@ methods_iv_select        = [1 2 3 4 5 7];
 methods_obsshock_select  = [1 2 3 4 5 6];
 methods_recursive_select = [1 2 3 4 5 6];
 
-% robust statistics?
-robust_stat = true;
-
 % Apply shared settings
 settings_shared;
 
@@ -50,19 +47,18 @@ for nf=1:length(lags_folders) % For each folder...
         the_true_irf = res.DF_model.target_irf; % True IRF
         the_rms_irf  = sqrt(mean(the_true_irf.^2)); % Root average squared true IRF across horizons
         
-        if robust_stat
-            q1_idx = 2 + find(res.settings.simul.quantiles==0.25);
-            med_idx = 2 + find(res.settings.simul.quantiles==0.5);
-            q3_idx = 2 + find(res.settings.simul.quantiles==0.75);
-            the_fields = fieldnames(res.results.irf);
-            for ii=1:length(the_fields)
-                res.results.BIAS2.(the_fields{ii}) = (squeeze(res.results.irf.(the_fields{ii})(:,med_idx,:))-the_true_irf).^2;
-                res.results.VCE.(the_fields{ii}) = squeeze(res.results.irf.(the_fields{ii})(:,q3_idx,:)-res.results.irf.(the_fields{ii})(:,q1_idx,:)).^2;
-            end
+        % Compute robust statistics
+        q1_idx = 2 + find(res.settings.simul.quantiles==0.25); % Index of first quartile
+        med_idx = 2 + find(res.settings.simul.quantiles==0.5); % Index of median
+        q3_idx = 2 + find(res.settings.simul.quantiles==0.75); % Index of third quartile
+        the_fields = fieldnames(res.results.irf);
+        for ii=1:length(the_fields)
+            res.results.medBIAS2.(the_fields{ii}) = (squeeze(res.results.irf.(the_fields{ii})(:,med_idx,:))-the_true_irf).^2; % Median bias squared
+            res.results.IQR2.(the_fields{ii}) = squeeze(res.results.irf.(the_fields{ii})(:,q3_idx,:)-res.results.irf.(the_fields{ii})(:,q1_idx,:)).^2; % IQR squared
         end
         
-        the_objects = {'BIAS2',    'VCE'}; % Objects to plot
-        the_titles =  {'Bias',     'Std'}; % Plot titles/file names
+        the_objects = {'BIAS2',    'VCE',   'medBIAS2',     'IQR2'}; % Objects to plot
+        the_titles =  {'Bias',     'Std',   'MedBias',      'IQR'};  % Plot titles/file names
 
         for j=1:length(the_objects)
             
