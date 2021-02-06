@@ -11,7 +11,7 @@ set(gca,'XTick',horzs(mod(horzs,2) == 0));
 set(gca,'YTick',[0:0.2:1]);
 set(gca,'ydir','normal')
 set(gca,'TickLength',[0 0])
-title(plot_name, 'interpreter', 'latex','FontSize',9/8*font_size);
+% title(plot_name, 'interpreter', 'latex','FontSize',9/8*font_size);
 xlabel('Horizon','interpreter','latex','FontSize',font_size);
 ylabel('Bias Weight','interpreter','latex','FontSize',font_size);
 
@@ -35,8 +35,12 @@ else
     hold off;
     colormap(cmap(1:length(plot_legend),:));
     uistack(hidden_h, 'bottom');
-    legend(hidden_h, plot_legend, 'Location', 'southoutside', 'NumColumns', 3, 'interpreter', 'latex','FontSize',font_size);
+    legend(hidden_h, plot_legend, 'Location', 'eastoutside', 'NumColumns', 1, 'interpreter', 'latex','FontSize',font_size);
 
 end
+
+pos = get(gcf, 'Position');
+set(gcf, 'Position', [pos(1) pos(2) 1.4*pos(3) 1*pos(4)]);
+set(gcf, 'PaperPositionMode', 'auto');
 
 end

@@ -12,13 +12,13 @@ addpath('Plotting_Functions')
 %% SETTINGS
 
 % select lag length specifications
-lags_select    = 2:3;
+lags_select    = 2;
 
 % select and group experiments
 exper_select_group = {[2,5], [3,6], [1,4]};
 
 % select estimation methods for each experiment
-methods_iv_select        = [1 2 3 4 5 7];
+methods_iv_select        = [1 2 3 4 5 6 7];
 methods_obsshock_select  = [1 2 3 4 5 6];
 methods_recursive_select = [1 2 3 4 5 6];
 
@@ -69,12 +69,12 @@ for nf=1:length(lags_folders) % For each folder...
             % Loss
             plot_loss(horzs(2:end)-1, squeeze(median(the_result(2:end,:,:)./the_rms_irf, 2)), [], ...
                 strjoin({exper_plotname, ': Relative', the_titles{j}}), methods_names_plot, font_size);
-            plot_save(fullfile(output_folder, strcat('loss_', lower(the_titles{j}), '_reltruth')), output_suffix);
+            plot_save(fullfile(output_folder, strcat(exper_names{ne}, '_loss_', lower(the_titles{j}), '_reltruth')), output_suffix);
             
             % Average rank
             plot_loss(horzs(2:end)-1, squeeze(mean(the_ranks(2:end,:,:), 2)), [], ...
                 strjoin({exper_plotname, ': Average rank of', the_titles{j}}), methods_names_plot, font_size);
-            plot_save(fullfile(output_folder, strcat('loss_', lower(the_titles{j}), '_avgrank')), output_suffix);
+            plot_save(fullfile(output_folder, strcat(exper_names{ne}, '_loss_', lower(the_titles{j}), '_avgrank')), output_suffix);
             
         end
         

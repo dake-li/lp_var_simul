@@ -16,10 +16,10 @@ warning('off','MATLAB:structOnObject')
 lags_select    = 2;
 
 % select and group experiments
-exper_select_group = {[2,5], 1};
+exper_select_group = {[2,5], [1,4], [3,6]};
 
 % select estimation methods for each experiment
-methods_iv_select        = [1 2 3 4 5 7];
+methods_iv_select        = [1 2 3 4 5 6 7];
 methods_obsshock_select  = [1 2 3 4 5 6];
 methods_recursive_select = [1 2 3 4 5 6];
 
@@ -32,13 +32,13 @@ settings_shared;
 
 % bias weight grid
 
-n_weight    = 10001;
+n_weight    = 1001;
 weight_grid = linspace(1,0,n_weight)';
 
 % reference method (should have something here on this being LP...)
 
-% base_names = {'SVAR','LP'};
-base_names = {'SVAR'};
+base_names = {'SVAR','LP'};
+% base_names = {'SVAR'};
 
 % bias-variance ordering
 
@@ -48,6 +48,12 @@ trade_off_pos_noniv = [4 3 6 1 2 5];  % Other DGPs
 % construction of choice plots: average over specifications?
 
 choice_averaging = 1;
+
+% lines
+
+lines_plot = lines;
+lines_plot = lines_plot(1:7,:);
+lines_plot = lines_plot([3 4 1 2 5 6 7],:);
 
 %----------------------------------------------------------------
 % Colors
@@ -135,9 +141,9 @@ for nf=1:length(lags_folders) % For each folder...
                 end
                 pref_base = mean(pref_base,3);
 
-                plot_tradeoff(1-pref_base(:,2:end), cmap, horzs(2:end)-1, weight_grid, ...
-                    strjoin({exper_plotname, ':', the_titles{j}, 'Preferred Over', base_method_name}), font_size)
-                plot_save(fullfile(output_folder, strcat('tradeoff_', removeChars(the_titles{j}), '_vs_', removeChars(base_method_name))), output_suffix);
+                plot_tradeoff(pref_base(:,2:end), cmap, horzs(2:end)-1, weight_grid, ...
+                    strjoin({exper_plotname, ':', base_method_name, 'Preferred Over', the_titles{j}}), font_size)
+                plot_save(fullfile(output_folder, strcat(exper_names{ne}, '_tradeoff_', removeChars(base_method_name), '_vs_', removeChars(the_titles{j}))), output_suffix);
 
             end
         
@@ -154,9 +160,9 @@ for nf=1:length(lags_folders) % For each folder...
             [~,choice_raw(i_weight,:)] = min(loss_all,[],2);
         end
         
-        plot_choice(choice_raw, lines, horzs, weight_grid, methods_select{ne}, ...
+        plot_choice(choice_raw, lines_plot, horzs, weight_grid, methods_select{ne}, ...
                 strjoin({exper_plotname, ': Best Procedure'}), methods_names_plot, 1, font_size);
-        plot_save(fullfile(output_folder, 'tradeoff_best'), output_suffix); 
+        plot_save(fullfile(output_folder, strcat(exper_names{ne}, '_tradeoff_best')), output_suffix);  
         
         %----------------------------------------------------------------
         % Compute Choice Results
@@ -193,7 +199,7 @@ for nf=1:length(lags_folders) % For each folder...
         
         plot_choice(choice(:,2:end), cmap_inv, horzs(2:end)-1, weight_grid, methods_select{ne}, ...
                 strjoin({exper_plotname, ': Method Choice'}), methods_iv_names(trade_off_aux), 0, font_size);
-        plot_save(fullfile(output_folder, 'tradeoff_choice'), output_suffix);
+        plot_save(fullfile(output_folder, strcat(exper_names{ne}, '_tradeoff_choice')), output_suffix);
         
     end
     

@@ -2,7 +2,11 @@ function plot_save(filename, suffix)
 
     % Function for saving figures
     
-    saveas(gcf, strcat(filename, '.', suffix));
+    if suffix == 'eps'
+        saveas(gcf, strcat(filename, '.', suffix), 'epsc');
+    else
+        saveas(gcf, strcat(filename, '.', suffix));
+    end
     close(gcf);
 
 end
