@@ -157,8 +157,11 @@ for nf=1:length(lags_folders) % For each folder...
         for i_weight = 1:n_weight
             loss_all = weight_grid(i_weight) * the_BIAS2rel + (1-weight_grid(i_weight)) * the_VCErel;
             loss_all = squeeze(mean(loss_all,2));
+            loss_all(:,2:end) = loss_all(:,2:end) + sqrt(eps);
             [~,choice_raw(i_weight,:)] = min(loss_all,[],2);
         end
+        
+        writematrix([0 horzs; weight_grid(:) choice_raw], fullfile(output_folder, 'tradeoff_best.csv')); % Save to file
         
         plot_choice(choice_raw, lines_plot, horzs, weight_grid, methods_select{ne}, ...
                 strjoin({exper_plotname, ': Best Procedure'}), methods_names_plot, 1, font_size);
