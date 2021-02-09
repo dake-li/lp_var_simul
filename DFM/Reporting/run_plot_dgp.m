@@ -10,10 +10,10 @@ addpath('Plotting_Functions');
 lags_select    = 2;
 
 % select and group experiments
-exper_select_group = {[2,5], 1};
+exper_select_group = {[2,5], [3,6], [1,4]};
 
 % select estimation methods for each experiment
-methods_iv_select        = [1 2 3 4 5 7];
+methods_iv_select        = [1 2 3 4 5 6 7];
 methods_obsshock_select  = [1 2 3 4 5 6];
 methods_recursive_select = [1 2 3 4 5 6];
 
@@ -82,7 +82,7 @@ for nf=1:length(lags_folders) % For each folder...
         tab_summ = [tab_summ2 tab_summ];
         
         % Write to file
-        writetable(tab_summ, fullfile(output_folder, 'summ.csv'));
+        writetable(tab_summ, fullfile(output_folder, 'dgp_summ.csv'));
         
         clearvars I X betas resid tab tab_summ tab_summ2;
         
@@ -132,7 +132,7 @@ for nf=1:length(lags_folders) % For each folder...
         hold off;
 %         title(exper_plotname,'interpreter','latex','fontsize',20);
         xlabel('Horizon','interpreter','latex','FontSize',12);
-        set(gca,'XTick',[min(res.settings.est.IRF_select) 5:5:max(res.settings.est.IRF_select)]);
+        set(gca,'XTick',[min(res.settings.est.IRF_select) 2:2:max(res.settings.est.IRF_select)]);
         xlim([min(res.settings.est.IRF_select) max(res.settings.est.IRF_select)]);
         grid on;
         set(gca,'TickLabelInterpreter','latex');
