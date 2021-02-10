@@ -7,6 +7,7 @@ spec_id_array = 1:2; % specification choice set id array
 dgp_type = 'G'; % Either 'G' or 'MP'
 estimand_type = 'IV'; % Either 'ObsShock', 'Recursive', or 'IV'
 lag_type = NaN; % No. of lags to impose in estimation, or NaN (meaning AIC)
+winsor_percent = 0.025; % winsorize each tail with this percentage to compute winsorized mean and std
 quantiles = [0.1,0.25,0.5,0.75,0.9]; % summarize MCs in the order of mean, var, and these quantiles
 
 save_pre = fullfile('..', 'Results');
@@ -22,7 +23,7 @@ save_folder = fullfile(save_pre, strcat('lag', save_suff));
 
 % combine results across all spec_ids
 
-[DFM_estimate, DF_model, settings, results] = combine_struct(save_folder, strcat('DFM_', dgp_type, '_', estimand_type), spec_id_array, quantiles);
+[DFM_estimate, DF_model, settings, results] = combine_struct(save_folder, strcat('DFM_', dgp_type, '_', estimand_type), spec_id_array, winsor_percent, quantiles);
 
 % save combined results
 
