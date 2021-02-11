@@ -8,10 +8,15 @@ x_vector = squeeze(x_vector); % n_MC by 1 vector
 
 this_mean = mean(x_vector);
 this_std = std(x_vector);
-this_winsorized_x_vector = rmoutliers(x_vector, 'percent', [100*winsor_percent, 100*(1-winsor_percent)]);
+
+this_quantiles = quantile(x_vector, quantiles);
+
+lower_bound = quantile(x_vector, winsor_percent);
+upper_bound = quantile(x_vector, 1 - winsor_percent);
+this_winsorized_x_vector = max(min(x_vector, upper_bound), lower_bound);
 this_winsorized_mean = mean(this_winsorized_x_vector);
 this_winsorized_std = std(this_winsorized_x_vector);
-this_quantiles = quantile(x_vector, quantiles);
+
 
 stat_vector = [this_mean, this_std, this_winsorized_mean, this_winsorized_std, this_quantiles];
 size_vector(size_vector==n_MC) = length(stat_vector);
