@@ -27,19 +27,19 @@ bias_lp = 0 * bias_var;
 
 % settings
 
-line_colors = repmat(lines(7),2,1);
-colors_indx = [2 3 4 1 5 6 7];
-line_colors = line_colors(colors_indx,:);
-linespecs = {'-', '-x'};
-line_width = 3.5;
+line_colors = lines(7);
+lp_indx  = 2; % LP color
+var_indx = 4; % VAR color
+linespecs = {'-', '-o'};
+line_width = 3;
+marker_size = 3.5;
 
 plotwidth = 0.33;
 gapsize = 0.05;
 gapsize_edges = (1-2*plotwidth-1*gapsize)/2;
 left_pos = [gapsize_edges, gapsize_edges + gapsize + plotwidth];
 
-lp_indx  = 1;
-var_indx = 2;
+
 
 % figure
 
@@ -53,9 +53,9 @@ set(gca,'Position', pos)
 set(gca,'TickLabelInterpreter','latex')
 for i_rho = 1:length(rhos)
     hold on
-    plot(hs,bias_lp(i_rho,:), linespecs{i_rho}, 'Color', line_colors(lp_indx,:), 'LineWidth', line_width);
+    plot(hs,bias_lp(i_rho,:), linespecs{i_rho}, 'Color', line_colors(lp_indx,:), 'LineWidth', line_width, 'MarkerSize', marker_size);
     hold on
-    plot(hs,bias_var(i_rho,:), linespecs{i_rho}, 'Color', line_colors(var_indx,:), 'LineWidth', line_width);
+    plot(hs,bias_var(i_rho,:), linespecs{i_rho}, 'Color', line_colors(var_indx,:), 'LineWidth', line_width, 'MarkerSize', marker_size);
 end
 set(gcf,'color','w')
 xlim([min(hs) max(hs)]);
@@ -65,8 +65,8 @@ xlabel('Horizon','interpreter','latex')
 % legend({'LP, $\{ \rho = 0.6, \alpha = 1\}$','VAR', ...
 %     'LP, $\{ \rho = 0.9, \alpha = 5\}$', 'VAR'},'Location','Northwest','interpreter','latex')
 % legend({'LP','VAR'},'Location','Northwest','interpreter','latex')
-legend({'LP','VAR $\; \{ \rho = 0.6, \alpha = 1\}$', ...
-    'LP', 'VAR $\; \{ \rho = 0.9, \alpha = 5\}$'},'Location','Northwest','interpreter','latex')
+legend({'LP','VAR $\,\{ \rho = 0.6,\, \alpha = 1\}$', ...
+    'LP', 'VAR $\,\{ \rho = 0.9,\, \alpha = 5\}$'},'Location','Northwest','interpreter','latex')
 grid on
 hold off
 set(gca, 'FontSize', 12);
@@ -80,9 +80,9 @@ set(gca,'Position', pos)
 set(gca,'TickLabelInterpreter','latex')
 for i_rho = 1:length(rhos)
     hold on
-    plot(hs,sqrt(var_lp(i_rho,:)), linespecs{i_rho}, 'Color', line_colors(lp_indx,:), 'LineWidth', line_width);
+    plot(hs,sqrt(var_lp(i_rho,:)), linespecs{i_rho}, 'Color', line_colors(lp_indx,:), 'LineWidth', line_width, 'MarkerSize', marker_size);
     hold on
-    plot(hs,sqrt(var_var(i_rho,:)), linespecs{i_rho}, 'Color', line_colors(var_indx,:), 'LineWidth', line_width);
+    plot(hs,sqrt(var_var(i_rho,:)), linespecs{i_rho}, 'Color', line_colors(var_indx,:), 'LineWidth', line_width, 'MarkerSize', marker_size);
 end
 set(gcf,'color','w')
 xlim([min(hs) max(hs)]);
