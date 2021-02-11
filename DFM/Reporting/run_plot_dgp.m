@@ -25,9 +25,9 @@ tab_stat = {'LRV_Cov_tr_ratio', 'VAR_largest_root', 'frac_coef_for_large_lags', 
 tab_quants = [0.1 0.25 0.5 0.75 0.9]; % Quantiles to report across specifications
 
 % IRF examples to plot
-spec_select = 10:10:70;
-linestyles = {'-', '--', ':', '-o', '--o', ':o', '-s'};
-colors = lines(7);
+spec_select = [10 20 30 3010 3020 3030];
+linestyles = {'-', '--', ':', '-o', '--o', ':o'};
+colors = lines(6);
 
 
 %% Create tables and plots for each experiment
