@@ -1,4 +1,4 @@
-function [DFM_estimate_combined, DF_model_combined, settings_combined, results_combined] = combine_struct(save_folder, file_prefix, spec_id_array, quantiles)
+function [DFM_estimate_combined, DF_model_combined, settings_combined, results_combined] = combine_struct(save_folder, file_prefix, spec_id_array, winsor_percent, quantiles)
 %UNTITLED2 Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -99,10 +99,9 @@ for id = spec_id_array
             if isnan(summarize_dim)
                 results_summarized.(first_tier{i}).(second_tier{j}) = results.(first_tier{i}).(second_tier{j});
             elseif ~isnan(summarize_dim)
-                this_mean = mean(results.(first_tier{i}).(second_tier{j}), summarize_dim);
-                this_std = std(results.(first_tier{i}).(second_tier{j}), 0, summarize_dim);
-                this_quantile = quantile(results.(first_tier{i}).(second_tier{j}), quantiles, summarize_dim);
-                results_summarized.(first_tier{i}).(second_tier{j}) = cat(summarize_dim, this_mean, this_std, this_quantile);
+                this_cell_object = num2cell(results.(first_tier{i}).(second_tier{j}), summarize_dim);
+                this_cell_summarized = cellfun(@(x) summ_stat(x, winsor_percent, quantiles), this_cell_object, 'UniformOutput', false);
+                results_summarized.(first_tier{i}).(second_tier{j}) = cell2mat(this_cell_summarized);
             end
             
             % decide which dim to concatenate (spec)
@@ -135,7 +134,9 @@ settings_combined.specifications.n_spec = settings_combined.specifications.n_spe
 
 % update settings
 settings_combined.specifications.spec_id_array = spec_id_array;
+settings_combined.simul.winsor_percent = winsor_percent;
 settings_combined.simul.quantiles = quantiles;
+settings_combined.simul.summ_stat_name = [{'mean','std','winsorized_mean','winsorized_std'},strcat('quant_', strsplit(num2str(quantiles)))];
 
 end
 
