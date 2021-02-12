@@ -1,19 +1,16 @@
-function specifications = pick_var_fn(model, settings)
+function specifications = pick_var_fn(model, settings, spec_id)
 
     % prepare
+    
+    rng(spec_id, 'twister');
 
     specifications = settings.specifications;
     
     n_y = model.n_y;
     
     manual_var_select = specifications.manual_var_select;
-    
     random_select = specifications.random_select;
-    
-    % category information
-    
-    random_category_range = [1 20; 21 31; 32 76; 77 86; 87 94; 95 131; 132 141;...
-        142 159; 160 171; 172 180; 181 207];
+    random_category_range = specifications.random_category_range;
 
     % randomly choose
     

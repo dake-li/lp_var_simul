@@ -18,9 +18,17 @@ n_y   = model.n_y;
 n_w   = model.n_w;
 n_e   = model.n_e;
 
-rho     = model.IV.rho;
-alpha   = model.IV.alpha;
-sigma_v = model.IV.sigma_v;
+with_IV = settings.est.with_IV;
+
+if with_IV == 1
+    rho     = model.IV.rho;
+    alpha   = model.IV.alpha;
+    sigma_v = model.IV.sigma_v;
+else % meaningless placeholders
+    rho = 0.1;
+    alpha = 1;
+    sigma_v = 1;
+end
 
 shock_weight = settings.est.shock_weight;
 
@@ -51,17 +59,8 @@ end
 
 % simulate IV
 
-z = 0;
-for t = 1:T_burn
-    z = rho * z + alpha * data_eps(t,:) * shock_weight +...
-        sigma_v * randn(1);
-end
-data_z = NaN(T, 1);
-for t = 1:T
-    z = rho * z + alpha * data_eps(t + T_burn,:) * shock_weight +...
-        sigma_v * randn(1);
-    data_z(t,1) = z;
-end
+z = filter(1, [1 -rho], alpha * data_eps * shock_weight + sigma_v * randn(T+T_burn,1));
+data_z = z(T_burn+1:end);
 
 % collect results and shift timing
 

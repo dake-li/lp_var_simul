@@ -1,131 +1,122 @@
-function [combination_irf,weights,H] = VAR_ModelAverage(dat,recurShock,respV,p,hmax)
+function [combination_irf,weights,H] = VAR_ModelAverage(dat,recurShock,respV,p,hmax,options)
 % Creates h-step impulse response functions from estimated VAR(p) model with intercept
-% (modified based on Hansen's "cvar_ir.m" code)
+% (modified based on Bruce Hansen's "cvar_ir.m" code)
+% https://www.ssc.wisc.edu/~bhansen/progs/var.html
+
 % Inputs:
 %	dat 			nxm data matrix
 %	p			VAR order p >= 1
 %	hmax			horizon, hmax >= 1
 %   recurShock  which shock?
 %   respV       which respones?
+%   options     numerical options for quadprog
 
 % Outputs:
 %	combination_irf		(hmax+1) orthogonalized impulse responses, horizon 0 to hmax
 %	weights			M x hmax 	model weights, by horizon (1 to hmax) and response variable
 %   H               m x m       choleskey decomp. of residual cov-var matrix
 
-% prepare
+
+%% Prepare
+
+% Dimensions
 n = size(dat,1)-p;
 m = size(dat,2);
 k = m*p+1;
-y = dat(1+p:n+p,:);
-x = ones(n,k);
-for i = 1:p
-    x(:,(i-1)*m+1:i*m) = dat(1+p-i:n+p-i,:);
-end
 
-% Full Model Estimation
-Bt = (x'*x)\(x'*y);
-B = Bt';
-theta = Bt(:);
-Q = (x'*x) / n;
-C = inv(chol(Q));
-Qinv = C*(C');
-e = y - x*B';
-sigma = (e'*e) / (n-k);
-H = chol(sigma,'lower');
-xe = zeros(n,k*m);
-for i = 1:m
-  xe(:,(i-1)*k+1:i*k) = x .* (e(:,i)*ones(1,k));
-end
-omega = (xe'*xe) / (n-k);
-WI = kron(eye(m),Qinv);
-V = WI*omega*WI;
-J = [eye(m*(p-1)), zeros(m*(p-1),m+1); zeros(1,m*p), 1];
-P = [B(:,1:m*p), zeros(m,1); J];
-
+% Submodels
 M = 2*p;
 submodel_irf = zeros(hmax+1, M); 
-var_ir = zeros(1,hmax);
 combination_irf = zeros(hmax+1, 1); 
-weights = zeros(M, hmax);
-Kr = zeros(M,hmax);
-ir_diff = zeros(M,hmax);
 
-submodel_irf(1,M) = H(respV, recurShock);
-combination_irf(1,1) = H(respV, recurShock);
 
-Ph0 = [H; zeros(k-m,m)];
-Ph = Ph0;
-for h = 1:hmax
-  Ph = P*Ph;
-  var_ir(1,h) = Ph(respV, recurShock);
-  submodel_irf(h+1,M) = Ph(respV, recurShock);
-end
+%% Full model estimation
 
-% derivative and Avar
+% Least squares
+[~,By,sigma,Q,e,Bt,y,x] = VAR(dat,p);
+H = chol(sigma,'lower');
+
+% Asymptotic variance
+xe = repmat(x,1,m) .* e(:,kron(1:m,ones(1,k)));
+omega = (xe'*xe) / (n-k);
+WI = kron(eye(m),inv(Q));
+V = WI*omega*WI;
+
+% IRF
+irf = IRF_SVAR(By,H(:,recurShock),hmax);
+var_ir = irf(respV,2:end);
+submodel_irf(:,M) = irf(respV,:);
+combination_irf(1,1) = irf(respV,1);
+
+% Jacobian
+jacobs_p = zeros(m*p,k*m);
 G0 = zeros(k*m,hmax);
-VG = zeros(1,hmax);
 for h = 1:hmax
-    Gh = zeros(k*m,m^2);
-    T2 = Ph0;
-    for i = 1:h
-      T1 = (P^(h-i))';
-      Gh = Gh + kron(T1(1:m,1:m),T2);
-      T2 = P*T2;
-    end
-    G0(:,h) = Gh(:, (respV - 1) * m + recurShock); % keep only response of interest
-    % VG(:,:,h) = inv(Gh'*V*Gh); % asymp var as weighting matrix
-    % VG(:,:,h) = eye(m^2); % identity weighting matrix
-    VG(1,h) = 1; % trivial weighting matrix
+    lmax = min(h,p);
+    the_irf_p = zeros(m,p);
+    the_irf_p(:,1:lmax) = irf(:,h:-1:h-lmax+1);
+    the_jacob = kron(eye(m), [0 the_irf_p(:)']) ...
+                + Bt' * [zeros(1,k*m); jacobs_p];
+    G0(:,h) = the_jacob(respV,:); % keep only response of interest
+    jacobs_p = [the_jacob; jacobs_p(1:end-m,:)];
 end
 
-for r = 1:M		% Submodels
-  if r<=p % AR(1) to AR(p)
-    R = zeros(0,0);
-    R2 = [zeros(m*r,m*(p-r));eye(m*(p-r));zeros(1,m*(p-r))];
-    for i = 1:m
-      Ci = eye(m);
-      Ci(:,i) = [];
-      R1 = [kron(eye(r),Ci); zeros(m*(p-r)+1,(m-1)*r)];
-      R = blkdiag(R,[R1,R2]);
+
+%% Estimate submodels and their loss
+
+% Auxiliary matrices in loss function
+V_G0 = V*G0;
+WI_G0 = reshape(Q\reshape(G0, [k m*hmax]), [k*m hmax]); % Peter J. Acklam, "MATLAB array manipulation tips and tricks", section 10.1.8
+
+% Loop over submodels
+Kr = zeros(M,hmax);
+
+for r = 1:M-1
+    
+    % Identify constrained parameters and estimate constrained model
+    B_sel = [true(m,1) false(m,m*p)]; % Default: only intercepts are unconstrained
+    Btr = zeros(k,m);
+    if r<=p % AR(1) to AR(p)
+        B_sel(:,2:1+m*r) = repmat(eye(m)==1,1,r);
+        for i=1:m
+            [~,~,~,~,~,the_Bt_i] = VAR(dat(p+1-r:end,i),r);
+            Btr([1 1+i+m*(0:r-1)],i) = the_Bt_i;
+        end
+    else % VAR(1) to VAR(p-1)
+        r1 = r-p;
+        B_sel(:,2:1+m*r1) = true;
+        [~,~,~,~,~,Btr(1:1+r1*m,:)] = VAR(dat(p+1-r1:end,:),r1);
     end
-    WR = (WI*R)*((R'*WI*R)\(R'));
-  elseif r<(2*p) % VAR(1) to VAR(p)
-    r1 = r-p;
-    R2 = [zeros(m*r1,m*(p-r1));eye(m*(p-r1));zeros(1,m*(p-r1))];
-    R = kron(eye(m),R2);
-    WR = (WI*R)*((R'*WI*R)\(R'));
-  elseif r==(2*p)
-    WR = zeros(k*m);
-  end
-  thetar = theta - WR*theta;
-  Br = (reshape(thetar,k,m))';
-  er = y - x*Br';
-  sigmar = (er'*er) / (n-k+size(R,2)/m);
-  Hr = chol(sigmar,'lower');
-  Pr = [Br(:,1:(m*p)), zeros(m,1); J];
-  Ph = [Hr; zeros(k-m,m)];
-  submodel_irf(1,r) = Hr(respV, recurShock);
-  for h = 1:hmax
-    Ph = Pr*Ph;
-    Phm = Ph(respV, recurShock);
-    diff = Phm - var_ir(1,h);
-    ir_diff(r,h) = diff;
-    submodel_irf(h+1,r) = Phm;
-    Gh = G0(:,h);
-    Vg = VG(1,h);
-    Kr(r,h) = trace(Vg*Gh'*WR*V*Gh);
-  end
+    B_sel_t = B_sel';
+    sel_vec = ~B_sel_t(:); % Constrained indices in theta=vec(B')
+    
+    % IRF
+    er = y - x*Btr;
+    sigmar = (er'*er) / (n-k+sum(sel_vec)/m);
+    Hr = chol(sigmar,'lower');
+    Byr = reshape(Btr(2:end,:),[m,p,m]);
+    Byr = permute(Byr,[3,1,2]);
+    irfr = IRF_SVAR(Byr,Hr(:,recurShock),hmax);
+    submodel_irf(:,r) = irfr(respV,:);
+    
+    % Loss
+    WI_sel_inv_V_G0 = WI(sel_vec,sel_vec)\V_G0(sel_vec,:);
+    for h = 1:hmax
+        Kr(r,h) = WI_G0(sel_vec,h)'*WI_sel_inv_V_G0(:,h);
+    end
+    
 end
 
+
+%% Compute weights for each horizon
+
+ir_diff = submodel_irf(2:end,:)'-var_ir;
+weights = zeros(M, hmax);
 ub = ones(M,1);
 lb = zeros(M,1);
-options = optimoptions('quadprog','Display','off');
 for h = 1:hmax
     ird = ir_diff(:,h);
-    Vg = VG(1,h);
-    J0 = n*ird*Vg*ird';
-    J0 = (J0+J0')/2;
+    J0 = n*(ird*ird');
     K = - Kr(:,h)';
     w = quadprog(J0,K,[],[],ub',1,lb,ub,[],options);
     weights(:,h) = w;

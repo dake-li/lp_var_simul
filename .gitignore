@@ -1,0 +1,9 @@
+*.asv
+*.log
+*.mat
+*.fig
+*.png
+*.eps
+*.DS_Store
+*.csv
+DFM/Reporting/.ipynb_checkpoints/*.*

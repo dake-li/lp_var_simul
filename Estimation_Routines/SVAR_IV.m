@@ -19,7 +19,7 @@ IVout.gamma = Theta / Theta(normlzV); % normalize
 IVout.Sigma = Sigma;
 IVout.Sxx = Sxx;
 Avar = Sigma(normlzV, normlzV) * inv(Sxx);
-IVout.Fstat_z = size(Y, 1) * Theta(normlzV)^2 / Avar(2, 2);
+IVout.Fstat_z = size(Y, 1) * Theta(normlzV)^2 / Avar(2, 2); % Wald stat
 
 % VAR
 Y = H(:,2:end);
