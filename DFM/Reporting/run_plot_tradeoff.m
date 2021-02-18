@@ -37,7 +37,7 @@ weight_grid = linspace(1,0,n_weight)';
 
 % reference method
 
-base_names = {'SVAR','LP'};
+base_names = {'VAR','LP'};
 % base_names = {'SVAR'};
 
 % construction of choice plots: average over specifications?
@@ -135,8 +135,13 @@ for nf=1:length(lags_folders) % For each folder...
                     pref_base(i_weight,:,:) = (loss_base <= loss_method);
                 end
                 pref_base = mean(pref_base,3);
-
-                plot_tradeoff(pref_base(:,2:end), cmap, horzs(2:end)-1, weight_grid, ...
+                
+                if strcmp(the_titles{j},'Pen LP')
+                    the_start_ind=1; % Include h=0 for penalized LP
+                else
+                    the_start_ind=2;
+                end
+                plot_tradeoff(pref_base(:,the_start_ind:end), cmap, horzs(the_start_ind:end)-1, weight_grid, ...
                     strjoin({exper_plotname, ':', base_method_name, 'Preferred Over', the_titles{j}}), font_size)
                 plot_save(fullfile(output_folder, strcat(exper_names{ne}, '_tradeoff_', removeChars(base_method_name), '_vs_', removeChars(the_titles{j}))), output_suffix);
 

@@ -47,8 +47,8 @@ for ir=1:num_rho
     set(gca, 'XTick', [min(hs) 5:5:max(hs)]);
     grid on;
     xlim([min(hs) max(hs)]);
-    xlabel('horizon','Interpreter','latex');
-    xticks([2 5 10 15])
+    xlabel('Horizon','Interpreter','latex');
+    xticks(min(hs):5:max(hs))
     ylim([0 1]);
     set(gca, 'FontSize', 12);
     set(gca, 'TitleFontSizeMultiplier', 1.2);

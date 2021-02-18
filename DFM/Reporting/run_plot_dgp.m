@@ -65,7 +65,7 @@ for nf=1:length(lags_folders) % For each folder...
         % IRF summary statistics
         tab.irf_num_local_extrema = sum(diff(sign(diff(res.DF_model.target_irf',1,2)),1,2)~=0,2);
         [~,I] = max(abs(res.DF_model.target_irf)',[],2);
-        tab.irf_maxabs_h = I;
+        tab.irf_maxabs_h = res.settings.est.IRF_select(I)'-1;
         tab.irf_mean_max_ratio = mean(res.DF_model.target_irf',2)./max(abs(res.DF_model.target_irf)',[],2);
         
         % R-squared from regressing IRFs on quadratic
