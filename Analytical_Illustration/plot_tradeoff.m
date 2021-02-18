@@ -11,7 +11,7 @@ close all
 rhos = [0.6 0.9];   % Values of rho to consider
 alphas = [1 5];   % Values of alpha to consider
 sigma_2 = 1; % Single fixed value for sigma_2
-hs = 1:20;   % Horizons to plot
+hs = 1:19;   % Horizons to plot
 
 %% COMPUTATIONS
 
@@ -22,6 +22,13 @@ for i_rho = 1:length(rhos)
 end
 
 bias_lp = 0 * bias_var;
+
+hs = [0,hs];
+
+bias_lp = [zeros(2,1),bias_lp];
+bias_var = [zeros(2,1),bias_var];
+var_lp = [ones(2,1)*sigma_2^2,var_lp];
+var_var = [ones(2,1)*sigma_2^2,var_var];
 
 %% PLOT
 
@@ -38,8 +45,6 @@ plotwidth = 0.33;
 gapsize = 0.05;
 gapsize_edges = (1-2*plotwidth-1*gapsize)/2;
 left_pos = [gapsize_edges, gapsize_edges + gapsize + plotwidth];
-
-
 
 % figure
 
@@ -59,6 +64,7 @@ for i_rho = 1:length(rhos)
 end
 set(gcf,'color','w')
 xlim([min(hs) max(hs)]);
+xticks([0 5 10 15])
 ylim([0 3.5])
 title('Bias','interpreter','latex')
 xlabel('Horizon','interpreter','latex')
@@ -86,6 +92,7 @@ for i_rho = 1:length(rhos)
 end
 set(gcf,'color','w')
 xlim([min(hs) max(hs)]);
+xticks([0 5 10 15])
 ylim([0 3.5])
 title('Standard Deviation','interpreter','latex')
 xlabel('Horizon','interpreter','latex')

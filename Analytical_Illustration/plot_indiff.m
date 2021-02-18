@@ -11,7 +11,7 @@ close all
 rhos = [0.2 0.6 0.9];   % Values of rho to consider
 alphas = [1 5 10];      % Values of alpha to consider
 sigma_2 = 1;            % Single fixed value for sigma_2
-hs = 2:20;              % Horizons to plot
+hs = 2:19;              % Horizons to plot
 
 linespecs = {'-', '-x', '-*'}; % Linespecs for different alpha values
 
@@ -22,7 +22,7 @@ num_rho = length(rhos);
 num_alpha = length(alphas);
 the_legend = cellfun(@(x) sprintf('%s%2d%s', '$\alpha=', x, '$'), num2cell(alphas), 'UniformOutput', false); % Figure legend
 
-line_colors = repmat([0.6 0.3 0]',1,3);
+line_colors = repmat([0 0.3 0.6]',1,3);
 
 figure('Units', 'inches', 'Position', [0 0 10 3]);
 for ir=1:num_rho
@@ -48,6 +48,7 @@ for ir=1:num_rho
     grid on;
     xlim([min(hs) max(hs)]);
     xlabel('horizon','Interpreter','latex');
+    xticks([2 5 10 15])
     ylim([0 1]);
     set(gca, 'FontSize', 12);
     set(gca, 'TitleFontSizeMultiplier', 1.2);

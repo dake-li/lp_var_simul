@@ -125,15 +125,15 @@ for nf=1:length(lags_folders) % For each folder...
         norm_irf = @(x) x/max(abs(x));
         for i_spec_indx = 1:length(spec_select)
             i_spec = spec_select(i_spec_indx);
-            plot(res.settings.est.IRF_select, norm_irf(res.DF_model.target_irf(:,i_spec)), ...
+            plot(res.settings.est.IRF_select-1, norm_irf(res.DF_model.target_irf(:,i_spec)), ...
                  linestyles{i_spec_indx}, 'Color', colors(i_spec_indx,:), 'Linewidth', 2, ...
                  'MarkerSize', 4, 'MarkerFaceColor', colors(i_spec_indx,:));
         end
         hold off;
 %         title(exper_plotname,'interpreter','latex','fontsize',20);
         xlabel('Horizon','interpreter','latex','FontSize',12);
-        set(gca,'XTick',[min(res.settings.est.IRF_select) 2:2:max(res.settings.est.IRF_select)]);
-        xlim([min(res.settings.est.IRF_select) max(res.settings.est.IRF_select)]);
+        set(gca,'XTick',[min(res.settings.est.IRF_select-1) 2:2:max(res.settings.est.IRF_select-1)]);
+        xlim([min(res.settings.est.IRF_select-1) max(res.settings.est.IRF_select-1)]);
         grid on;
         set(gca,'TickLabelInterpreter','latex');
         set(gca,'FontSize',12);
