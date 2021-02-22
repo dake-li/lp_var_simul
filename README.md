@@ -8,7 +8,7 @@ Li, Dake, Mikkel Plagborg-Møller, and Christian K. Wolf (2021), "Local Projecti
 Tested in: Matlab R2020a on Windows 10 PC (64-bit)
 
 **Acknowledgements:**
-We rely on penalized LP code by [https://github.com/ctbrownlees/MATLAB-package-lproj](Regis Barnichon & Christian Brownless), as well as VAR model averaging code by [https://www.ssc.wisc.edu/~bhansen/progs/var.html](Bruce Hansen). We have slightly modified both of these sets of codes to improve their run-time without affecting their numerical output.
+We rely on penalized LP code by [Regis Barnichon & Christian Brownless](https://github.com/ctbrownlees/MATLAB-package-lproj), as well as VAR model averaging code by [Bruce Hansen](https://www.ssc.wisc.edu/~bhansen/progs/var.html). We have slightly modified both of these sets of codes to improve their run-time without affecting their numerical output.
 
 ## Contents
 
@@ -19,10 +19,10 @@ We rely on penalized LP code by [https://github.com/ctbrownlees/MATLAB-package-l
 **[Estimation_Routines](Estimation_Routines):** General-purpose impulse response estimation functions
 - [BVAR_est.m](Estimation_Routines/BVAR_est.m): Bayesian VAR
 - [LP_est.m](Estimation_Routines/LP_est.m): Least-squares LP
-- [LP_shrink_est.m](Estimation_Routines/LP_shrink_est.m): Penalized LP ([https://www.mitpressjournals.org/doi/full/10.1162/rest_a_00778](Barnichon & Brownlees, 2019))
+- [LP_shrink_est.m](Estimation_Routines/LP_shrink_est.m): Penalized LP ([Barnichon & Brownlees, 2019](https://www.mitpressjournals.org/doi/full/10.1162/rest_a_00778))
 - [SVAR_est.m](Estimation_Routines/SVAR_est.m): Least-squares VAR (can also do bias correction)
 - [SVAR_IV_est.m](Estimation_Routines/SVAR_IV_est.m): Least-squares SVAR-IV
-- [VAR_avg_est.m](Estimation_Routines/VAR_avg_est.m): VAR model averaging ([https://www.ssc.wisc.edu/~bhansen/papers/var.html](Hansen, 2016))
+- [VAR_avg_est.m](Estimation_Routines/VAR_avg_est.m): VAR model averaging ([Hansen, 2016](https://www.ssc.wisc.edu/~bhansen/papers/var.html))
 
 **[DFM](DFM):** Simulation study based on encompassing Dynamic Factor Model (DFM)
 - [run_dfm.m](DFM/run_dfm.m): Main file for executing simulations
