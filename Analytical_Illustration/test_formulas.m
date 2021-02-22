@@ -1,7 +1,7 @@
 clear all;
+addpath('./Subroutines');
 
 % Test bias/variance formulas
-% MPM 2020-12-23
 
 
 %% Settings
