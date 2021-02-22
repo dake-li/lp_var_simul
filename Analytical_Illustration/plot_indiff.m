@@ -5,6 +5,7 @@
 clc
 clear all
 close all
+addpath('./Subroutines');
 
 %% SETTINGS
 
