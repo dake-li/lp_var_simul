@@ -1,10 +1,11 @@
 %% ANALYTICAL ILLUSTRATION: INDIFFERENCE WEIGHTS
 % Dake Li, Mikkel Plagborg-Møller and Christian Wolf
-% This version: 02/10/2021
+% This version: 02/23/2021
 
 clc
 clear all
 close all
+
 addpath('./Subroutines');
 
 %% SETTINGS
@@ -16,7 +17,9 @@ hs = 2:19;              % Horizons to plot
 
 linespecs = {'-', '-x', '-*'}; % Linespecs for different alpha values
 
-%% PLOT
+%% INDIFFERENCE WEIGHT PLOT
+
+% settings
 
 num_horz = length(hs);
 num_rho = length(rhos);
@@ -24,6 +27,8 @@ num_alpha = length(alphas);
 the_legend = cellfun(@(x) sprintf('%s%2d%s', '$\alpha=', x, '$'), num2cell(alphas), 'UniformOutput', false); % Figure legend
 
 line_colors = repmat([0 0.3 0.6]',1,3);
+
+% computations and figure constructions
 
 figure('Units', 'inches', 'Position', [0 0 10 3]);
 for ir=1:num_rho

@@ -1,5 +1,6 @@
-%% PLOT SIMULATION RESULTS: BIAS/VARIANCE TRADE-OFF
-% this version: 09/22/2020
+%% DFM SIMULATION STUDY: METHOD CHOICE
+% Dake Li, Mikkel Plagborg-Møller and Christian Wolf
+% This version: 02/23/2021
 
 %% HOUSEKEEPING
 
@@ -11,6 +12,10 @@ addpath('Plotting_Functions')
 warning('off','MATLAB:structOnObject')
 
 %% SETTINGS
+
+%----------------------------------------------------------------
+% Experiment Selection
+%----------------------------------------------------------------
 
 % select lag length specifications
 lags_select    = 2;
@@ -38,7 +43,7 @@ weight_grid = linspace(1,0,n_weight)';
 % reference method
 
 base_names = {'VAR','LP'};
-% base_names = {'SVAR'};
+base_indic = NaN(length(exper_files),length(base_names)); % find index of reference method(s)
 
 % construction of choice plots: average over specifications?
 
@@ -73,8 +78,9 @@ cmap_inv = interp2(X([1,25,50],:),Y([1,25,50],:),cmap_inv,X,Y);
 
 %% FIGURES
 
-% Find index of reference method
-base_indic = NaN(length(exper_files),length(base_names));
+%----------------------------------------------------------------
+% Results for Reference Method
+%----------------------------------------------------------------
 
 for ne=1:length(exper_files)    
     for nb=1:length(base_names)
@@ -86,11 +92,18 @@ for ne=1:length(exper_files)
     end
 end
 
+%----------------------------------------------------------------
+% Method Choice Results
+%----------------------------------------------------------------
+
 for nf=1:length(lags_folders) % For each folder...
 
     for ne=1:length(exper_files) % For each experiment in folder...
         
-        % Load results
+        %----------------------------------------------------------------
+        % Load Results
+        %----------------------------------------------------------------
+
         load_results;
         
         % see if ready to plot for this group of experiments
@@ -111,7 +124,7 @@ for nf=1:length(lags_folders) % For each folder...
         the_VCErel   = the_VCE./the_rms_irf.^2;
         
         %----------------------------------------------------------------
-        % Compute Comparison Results
+        % Compute Method Choice
         %----------------------------------------------------------------
         
         for nb = 1:length(base_names)
@@ -127,6 +140,8 @@ for nf=1:length(lags_folders) % For each folder...
                     continue
                 end
                 
+                % comparison with base method
+                
                 pref_base = zeros(n_weight,max(res.settings.est.IRF_select),size(the_BIAS2rel,2));
                 for i_weight = 1:n_weight
                     loss_base   = weight_grid(i_weight) * the_BIAS2rel(:,:,base_indic(ne,nb)) + (1-weight_grid(i_weight)) * the_VCErel(:,:,base_indic(ne,nb));
@@ -141,6 +156,8 @@ for nf=1:length(lags_folders) % For each folder...
                 else
                     the_start_ind=2;
                 end
+                
+                % plot final results
                 plot_tradeoff(pref_base(:,the_start_ind:end), cmap, horzs(the_start_ind:end)-1, weight_grid, ...
                     strjoin({exper_plotname, ':', base_method_name, 'Preferred Over', the_titles{j}}), font_size)
                 plot_save(fullfile(output_folder, strcat(exper_names{ne}, '_tradeoff_', removeChars(base_method_name), '_vs_', removeChars(the_titles{j}))), output_suffix);
@@ -150,7 +167,7 @@ for nf=1:length(lags_folders) % For each folder...
         end
         
         %----------------------------------------------------------------
-        % Compute Best Procedure
+        % Compute & Plot Best Overall Procedure
         %----------------------------------------------------------------
         
         choice_raw = zeros(n_weight,max(res.settings.est.IRF_select));

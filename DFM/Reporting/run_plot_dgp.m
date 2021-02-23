@@ -1,16 +1,19 @@
+%% DFM SIMULATION STUDY: TABLES AND PLOTS FOR DGP FEATURES
+% Dake Li, Mikkel Plagborg-Møller and Christian Wolf
+% This version: 02/23/2021
+
+clc
+close all
 clear all;
 addpath('Plotting_Functions');
 
-% Table and plots of features of GDP and estimated tuning parameters
-
-
-%% Settings
+%% SETTINGS
 
 % select lag length specifications
-lags_select    = 2;
+lags_select    = 2; % options: 1 (AIC), 2 (4 lags), 3 (8 lags)
 
 % select and group experiments
-exper_select_group = {[2,5], [3,6], [1,4]};
+exper_select_group = {[2,5], [3,6], [1,4]}; % combine G and MP for observed shock, recursive, and IV
 
 % select estimation methods for each experiment
 methods_iv_select        = [1 2 3 4 5 6 7];
@@ -29,14 +32,16 @@ spec_select = [10 20 30 3010 3020 3030];
 linestyles = {'-', '--', ':', '-o', '--o', ':o'};
 colors = lines(6);
 
-
-%% Create tables and plots for each experiment
+%% CREATE TABLES AND PLOTS
 
 for nf=1:length(lags_folders) % For each folder...
 
     for ne=1:length(exper_files) % For each experiment in folder...
         
-        % Load results
+        %----------------------------------------------------------------
+        % Load Results
+        %----------------------------------------------------------------
+
         load_results;
         
         % see if ready to plot for this group of experiments
@@ -45,10 +50,11 @@ for nf=1:length(lags_folders) % For each folder...
         end
         
         % Record the index of median across MCs
-        median_idx = 2 + find(res.settings.simul.quantiles==0.5); % index of median number in the quantile list (including mean and std)
+        median_idx = 2 + find(res.settings.simul.quantiles==0.5); % index of median number in the quantile list (including mean and std)        
         
-        
-        %% Table of summary statistics
+        %----------------------------------------------------------------
+        % Tables of Summary Statistics
+        %----------------------------------------------------------------
         
         tab = table;
         
@@ -84,10 +90,11 @@ for nf=1:length(lags_folders) % For each folder...
         % Write to file
         writetable(tab_summ, fullfile(output_folder, 'dgp_summ.csv'));
         
-        clearvars I X betas resid tab tab_summ tab_summ2;
+        clearvars I X betas resid tab tab_summ tab_summ2;        
         
-        
-        %% Report features of DGP
+        %----------------------------------------------------------------
+        % Plots to summarize DGP Features
+        %----------------------------------------------------------------
                 
         % Degree of invertibility
         figure;
@@ -130,17 +137,17 @@ for nf=1:length(lags_folders) % For each folder...
                  'MarkerSize', 4, 'MarkerFaceColor', colors(i_spec_indx,:));
         end
         hold off;
-%         title(exper_plotname,'interpreter','latex','fontsize',20);
         xlabel('Horizon','interpreter','latex','FontSize',12);
         set(gca,'XTick',[min(res.settings.est.IRF_select-1) 2:2:max(res.settings.est.IRF_select-1)]);
         xlim([min(res.settings.est.IRF_select-1) max(res.settings.est.IRF_select-1)]);
         grid on;
         set(gca,'TickLabelInterpreter','latex');
         set(gca,'FontSize',12);
-        plot_save(fullfile(output_folder, 'dgp_irfs'), output_suffix);
+        plot_save(fullfile(output_folder, 'dgp_irfs'), output_suffix);        
         
-        
-        %% Estimated tuning parameters
+        %----------------------------------------------------------------
+        % Tuning Parameters for Estimation Methods
+        %----------------------------------------------------------------
         
         % Number of lags
         the_nlags = res.results.n_lags.svar;
@@ -162,11 +169,6 @@ for nf=1:length(lags_folders) % For each folder...
         set(gca, 'xscale','log'); % Log scale for x axis
         title(strjoin({exper_plotname, ': median shrinkage penalty (across specs)'}), 'Interpreter', 'none');
         plot_save(fullfile(output_folder, 'dgp_lambda'), output_suffix);
-        
-%         figure;
-%         histogram(std(log(the_lambda)), 'Normalization', 'probability');
-%         title(strjoin({exper_plotname, ': std (across sims) of log shrinkage penalty'}), 'Interpreter', 'none');
-%         plot_save(fullfile(output_folder, 'dgp_lambda_logstd'), output_suffix);
         
         % Model-averaging weights
         if isfield(res.results, 'weight')
@@ -190,10 +192,11 @@ for nf=1:length(lags_folders) % For each folder...
             sgtitle(strjoin({exper_plotname, ': average model-avg weight (across specs+sims)'}), 'FontSize', 11, 'FontWeight', 'bold', 'Interpreter', 'none');
             plot_save(fullfile(output_folder, 'dgp_weight'), output_suffix);
             
-        end
+        end       
         
-        
-        %% IV F-stat and Granger Causality Wald-stat
+        %----------------------------------------------------------------
+        % IV F-Statistics
+        %----------------------------------------------------------------
         
         if isfield(res.results, 'F_stat')
                        
@@ -206,6 +209,10 @@ for nf=1:length(lags_folders) % For each folder...
             plot_save(fullfile(output_folder, 'dgp_F'), output_suffix);
             
         end
+        
+        %----------------------------------------------------------------
+        % Granger Causality
+        %----------------------------------------------------------------
         
         if isfield(res.results, 'Granger_stat')
             

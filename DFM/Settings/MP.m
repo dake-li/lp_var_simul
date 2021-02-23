@@ -1,14 +1,12 @@
-% Settings: dgp_type = MP
+%% SPECIFIC SETTINGS FOR DGPs WITH MP SHOCKS
 
+% DGP selection
 
-%% Specification
+settings.specifications.random_fixed_var      = 142; % always include this variable (= fed funds rate) when randomly selecting DGPs
+settings.specifications.random_fixed_pos      = settings.specifications.random_n_var; % position of fixed variable in each specification (= end)
 
-settings.specifications.random_fixed_var      = 142; % always include which variable when random select
-settings.specifications.random_fixed_pos      = 5; % position of fixed variable in each specification
+% structural estimands
 
-
-%% Estimation
-
-settings.est.shock_optimize_var_IRF    = 142; % if not use calibrated result, for which variable in full model to choose optimal linear combination of shocks 
+settings.est.shock_optimize_var_IRF    = 142; % if shock weight is estimated to maximize an IRF, then it is the IRF of this variable in the DFM
 settings.est.IRF_response_var_pos      = 1; % interested in IRF of which variable in each specification?
-settings.est.IV_est_normalize_var_pos  = 5; % choose IRF normalization variable in all IV methods
+settings.est.IV_est_normalize_var_pos  = 5; % choose IRF normalization variable for all IV methods

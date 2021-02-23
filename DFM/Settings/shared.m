@@ -1,70 +1,69 @@
-%% DGP
+%% ENCOMPASSING DFM
 
-% Stock-Watson DFM dimensions
+% take DFM dimensions from Stock-Watson (2016)
 
 DF_model.n_y        = 207; % number of observables
 
-DF_model.n_fac      = 6; % number of factor
-DF_model.n_lags_fac = 2; % lag order of factor
+DF_model.n_fac      = 6; % number of factors
+DF_model.n_lags_fac = 2; % lag order of factors
 DF_model.n_lags_uar = 2; % lag order of measurement error
 
+%% PREPARATIONS FOR STRUCTURAL ESTIMANDS
 
-%% Experiment Specification
+% selection of DGPs from encompassing model
 
-% variable selection
-
-settings.specifications.manual_var_select     = [1 142; 1 97]; % manually select specifications
-settings.specifications.random_select         = 1; % randomly select?
+settings.specifications.random_select         = 1; % randomly select variables from DFM list?
 settings.specifications.random_n_spec         = 7; % number of random specifications
 settings.specifications.random_n_var          = 5; % number of variables in each random specification
 settings.specifications.random_category_range = [1 20; 21 31; 32 76; 77 86; 87 94; 95 131; 132 141;...
-                                                 142 159; 160 171; 172 180; 181 207];
-                                                   % category ranges
+                                                 142 159; 160 171; 172 180; 181 207]; % ranges for Stock-Watson variable categories (see their Table 1)
 settings.specifications.random_category_setup = {[1,2,3], 6}; % at least draw one from certain categories
-settings.specifications.plot_indx             = 1; % plot the only specification
 
-% shock position
+settings.specifications.manual_var_select     = [1 142; 1 97]; % if manual selection, then these sets of variables will be selected
 
-settings.est.manual_shock_pos         = 1; % manually choose which shock to be our true structural shock?
-settings.est.estimate_shock_weight    = 1; % automatically estimate shock weights for true shock? 
-settings.est.shock_weight_calibrate = 0; % when estimate shock weight, use calibrated result? or optimize targeted IRF
+% preliminary structural shock settings for observed shock and IV
+
+settings.est.estimate_shock_weight    = 1; % do we estimate the loading of the structural shock on the reduced-form shocks?
+settings.est.shock_weight_calibrate   = 0; % if shock weight is estimated: 0 to maximize spending/rate IRF, 1 to calibrate to external shocks
+
+settings.est.manual_shock_pos         = 1; % if loading is not estimated, we just mechanically choose the xth shock in the factor VAR
 
 % IRFs of interest
 
 settings.est.IRF_hor              = 20; % maximal horizon (include contemporary)
-settings.est.IRF_select           = 1:20; % which IRFs to summarize
+settings.est.IRF_select           = 1:settings.est.IRF_hor; % which IRFs to study
 
 % compute R0_sq using VMA representation
 
-settings.est.VMA_nlags = 50;
+settings.est.VMA_nlags = 50; % number of lags in VMA representation
 
 % compute largest root and VAR(p) fit in population using truncated infinite-order VAR 
 
-settings.est.VAR_infinity_truncate = 50; 
+settings.est.VAR_infinity_truncate = 50; % truncation horizon for VAR(infty)
 
 % number of Monte Carlo draws
 
 settings.simul.n_MC    = 4; % number of Monte Carlo reps
 settings.simul.seed    = (1:settings.simul.n_MC)*10 + randi([0,9],1,settings.simul.n_MC); % random seed for each Monte Carlo
 
-% simulation details
+% sample settings
 
 settings.simul.T      = 200; % time periods for each simulation
 settings.simul.T_burn = 100; % burn-in
 
+%% ESTIMATION SETTINGS
 
-%% Estimation Settings
+% set of estimation methods
 
-% choose estimand
-
-settings.est.methods_name    = {'svar','svar_corrbias','bvar','lp','lp_penalize','var_avg'}; % choose estimands (may be expanded later)
+settings.est.methods_name    = {'svar','svar_corrbias','bvar','lp','lp_penalize','var_avg'};
 
 % lag specification
 
-settings.est.est_n_lag      = isnan(lag_type); % estimate number of lags?
-settings.est.est_n_lag_BIC  = 0; % use BIC? otherwise use AIC
+settings.est.est_n_lag      = isnan(lag_type); % do we estimate the number of lags, or just set it?
+settings.est.est_n_lag_BIC  = 0; % if estimate: use BIC? default is AIC
 settings.est.n_lags_fix     = lag_type; % default number of lags if not estimated
 settings.est.n_lags_max     = 20; % maximal lag length for info criteria
+
 settings.est.res_autocorr_nlags = 1; % check autocorr of VAR(p) residuals up to this order
 
 % BVAR prior

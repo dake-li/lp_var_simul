@@ -1,9 +1,10 @@
-% Settings: estimand_type = Recursive
+%% SPECIFIC SETTINGS FOR RECURSIVE SHOCK IDENTIFICATION
 
-
-%% Estimation
+% indicate position of recursive shock of interest
 
 settings.est.recursive_shock_pos = settings.specifications.random_fixed_pos; % which is recursively defined shock?
+
+% indicate estimand
 
 settings.est.with_shock      = 0; % shock is observed and ordered first in data?
 settings.est.recursive_shock = 1; % use recursive shock

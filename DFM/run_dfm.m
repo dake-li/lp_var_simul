@@ -1,9 +1,10 @@
-%% LP vs VAR: DFM SIMULATION STUDY
-% Dake Li and Christian Wolf
-
+%% DFM SIMULATION STUDY: MAIN FILE
+% Dake Li, Mikkel Plagborg-Møller and Christian Wolf
+% This version: 02/23/2021
 
 %% HOUSEKEEPING
 
+clc
 clear all
 close all
 
@@ -16,20 +17,16 @@ tic;
 
 % Parallel computing object
 
-num_workers = 1; % number of workers in a parellel pool
+num_workers = 1; % number of workers in a parallel pool
 poolobj = parpool('local', num_workers);
 clear num_workers;
 
+%% SET EXPERIMENT
 
-%% DECIDE WHICH EXPERIMENT TO RUN
-
-% manually set up experiment
-
-spec_id = 1; % specification choice set id (i.e. the seed for random draws of specifications)
-dgp_type = 'G'; % 'MP'; % Either 'G' or 'MP'
-estimand_type = 'ObsShock'; % 'Recursive'; 'IV'; % Either 'ObsShock', 'Recursive', or 'IV'
-lag_type = 4; % No. of lags to impose in estimation, or NaN (meaning AIC)
-
+spec_id = 1; % seed for random draws of specifications (= DGPs from encompassing model)
+dgp_type = 'G'; % structural shock: either 'G' or 'MP'
+estimand_type = 'ObsShock'; % structural estimand: either 'ObsShock', 'Recursive', or 'IV'
+lag_type = 4; % No. of lags to impose in estimation, or NaN (= AIC)
 
 %% SETTINGS
 
@@ -49,18 +46,17 @@ else
 end
 save_folder = fullfile(save_pre, strcat('lag', save_suff));
 
-
-%% DGP
+%% ENCOMPASSING DFM MODEL
 
 %----------------------------------------------------------------
-% Set up DGP
+% Set up Encompassing Model
 %----------------------------------------------------------------
 
 % estimate DFM from dataset
 
 DFM_estimate = DFM_est(DF_model.n_fac, DF_model.n_lags_fac, DF_model.n_lags_uar);
 
-% store estimated DFM parameters
+% extract and store estimated DFM parameters
 
 DF_model.Phi           = DFM_estimate.Phi;
 DF_model.Sigma_eta     = DFM_estimate.Sigma_eta;
@@ -72,18 +68,19 @@ DF_model.sigma_v       = DFM_estimate.sigma_v;
 DF_model.variable_name = DFM_estimate.bplabvec_long;
 
 %----------------------------------------------------------------
-% Calibrate IV strength and Shock Weight
+% Calibrate IV Strength
 %----------------------------------------------------------------
 
-% extract factor shock series and external shock series
+% extract reduced-form factor innovations and external structural shock series
 
 DFM_estimate.fac_shock                 = DFM_estimate.fac_res / chol(DFM_estimate.Sigma_eta);
 external_shock_data                    = readtable(strcat('external_shock_series_', dgp_type, '.csv'));
 DFM_estimate.external_shock            = external_shock_data{:,2};
 DFM_estimate.external_shock_time_range = [external_shock_data{1,1}, external_shock_data{end,1}, 4];
+
 clear external_shock_data;
 
-% regress external shock series on factor shock series to calibrate
+% regress external shock series on factor shock series to calibrate IV strength
 
 DFM_estimate.calibrate_out       = calibrateIV(DFM_estimate);
 DF_model.calibrated_shock_weight = DFM_estimate.calibrate_out.weight;
@@ -99,7 +96,7 @@ if strcmp(estimand_type, 'IV')
 end
 
 %----------------------------------------------------------------
-% Represent as ABCDEF Form
+% Represent as Model in ABCDEF Form
 %----------------------------------------------------------------
 
 DF_model.n_s   = size(DF_model.Phi,2);
@@ -110,59 +107,63 @@ DF_model.n_e   = DF_model.n_w * DF_model.n_lags_uar;
 
 DF_model.ABCD  = ABCD_fun_DFM(DF_model);
 
-
 %% PREPARATION
 
 %----------------------------------------------------------------
-% Select Specifications
+% Select Individual DGPs from Encompassing Model
 %----------------------------------------------------------------
 
 settings.specifications = pick_var_fn(DF_model, settings, spec_id);
 
 %----------------------------------------------------------------
-% Results Placeholder
+% Create Placeholders for Results
 %----------------------------------------------------------------
+
+% number of estimation methods
 
 settings.est.n_methods = length(settings.est.methods_name);
 
-results_irf = NaN(settings.est.n_methods,settings.est.IRF_hor,settings.simul.n_MC,settings.specifications.n_spec); % IRF_hor*n_MC*n_spec
-results_n_lags = NaN(settings.est.n_methods,settings.simul.n_MC,settings.specifications.n_spec); %n_MC*n_spec
+% impulse response estimates
 
-results_largest_root_svar = NaN(settings.simul.n_MC,settings.specifications.n_spec); % n_MC*n_spec
-results_LM_stat_svar = NaN(settings.simul.n_MC,settings.specifications.n_spec); % n_MC*n_spec
-results_LM_pvalue_svar = NaN(settings.simul.n_MC,settings.specifications.n_spec); % n_MC*n_spec
-results_Granger_stat_svar = NaN(settings.simul.n_MC,settings.specifications.n_spec); % n_MC*n_spec
-results_Granger_pvalue_svar = NaN(settings.simul.n_MC,settings.specifications.n_spec); % n_MC*n_spec
-results_lambda_lp_penalize = NaN(settings.simul.n_MC,settings.specifications.n_spec); % n_MC*n_spec
+results_irf = NaN(settings.est.n_methods,settings.est.IRF_hor,settings.simul.n_MC,settings.specifications.n_spec); % estimated IRFs for each method: size IRF_hor*n_MC*n_spec
+
+% several other features of each Monte Carlo estimation
+
+results_n_lags = NaN(settings.est.n_methods,settings.simul.n_MC,settings.specifications.n_spec); % estimated lags for each method: size n_MC*n_spec
+results_largest_root_svar = NaN(settings.simul.n_MC,settings.specifications.n_spec); % largest VAR root: size n_MC*n_spec
+results_LM_stat_svar = NaN(settings.simul.n_MC,settings.specifications.n_spec); % LM statistic: size n_MC*n_spec
+results_LM_pvalue_svar = NaN(settings.simul.n_MC,settings.specifications.n_spec); % LM p value: size n_MC*n_spec
+results_Granger_stat_svar = NaN(settings.simul.n_MC,settings.specifications.n_spec); % Granger statistic: size n_MC*n_spec
+results_Granger_pvalue_svar = NaN(settings.simul.n_MC,settings.specifications.n_spec); % Granger p value: size n_MC*n_spec
+results_lambda_lp_penalize = NaN(settings.simul.n_MC,settings.specifications.n_spec); % pen. LP lambda: size n_MC*n_spec
 results_weight_var_avg = NaN(2*settings.est.n_lags_max,length(settings.est.average_store_weight),...
-    settings.simul.n_MC,settings.specifications.n_spec); % n_models*n_horizon*n_MC*n_spec
-results_F_stat_svar_iv = NaN(settings.simul.n_MC,settings.specifications.n_spec); %n_MC*n_spec
-results_F_pvalue_svar_iv = NaN(settings.simul.n_MC,settings.specifications.n_spec); %n_MC*n_spec
+    settings.simul.n_MC,settings.specifications.n_spec); % weights in VAR averaging: size n_models*n_horizon*n_MC*n_spec
+results_F_stat_svar_iv = NaN(settings.simul.n_MC,settings.specifications.n_spec); % VAR-IV F statistic: size n_MC*n_spec
+results_F_pvalue_svar_iv = NaN(settings.simul.n_MC,settings.specifications.n_spec); % VAR-IV F p value: size n_MC*n_spec
 
-
-%% PRELIMINARY COMPUTATIONS: ESTIMANDS
+%% PRELIMINARY COMPUTATIONS: STRUCTURAL ESTIMANDS
 
 %----------------------------------------------------------------
-% Compute True IRFs in Complete Model
+% Compute True IRFs in Encompassing DFM
 %----------------------------------------------------------------
 
 [DF_model.irf, settings.est.shock_weight] = compute_irfs(DF_model,settings);
 
 %----------------------------------------------------------------
-% Compute Degree of Invertibility in Specifications
+% Compute Degree of Invertibility in Each DGP
 %----------------------------------------------------------------
 
 DF_model.R0_sq = compute_invert_DFM(DF_model,settings);
 
 %----------------------------------------------------------------
-% Compute Persistency of Observables in Specifications
+% Compute Persistence of Observables in Each DGP
 %----------------------------------------------------------------
 
 [DF_model.LRV_Cov_tr_ratio, DF_model.VAR_largest_root, DF_model.frac_coef_for_large_lags] =...
     compute_persist_DFM(DF_model,settings);
 
 %----------------------------------------------------------------
-% Compute Target IRF
+% Compute Structural Target IRFs
 %----------------------------------------------------------------
 
 switch estimand_type
@@ -189,7 +190,6 @@ if strcmp(estimand_type, 'IV')
     DF_model.IV_strength = compute_IVstrength_DFM(DF_model, settings);
 end
 
-
 %% MONTE CARLO ANALYSIS
 
 disp('Monte Carlo simulation starts.');
@@ -206,7 +206,7 @@ parfor i_MC = 1:settings.simul.n_MC
     end
 
     %----------------------------------------------------------------
-    % Generate Data
+    % Generate Data From Encompassing DFM
     %----------------------------------------------------------------
     
     rng(settings.simul.seed(i_MC), 'twister');
@@ -214,7 +214,7 @@ parfor i_MC = 1:settings.simul.n_MC
     data_sim_all = generate_data(DF_model,settings);
 
     %----------------------------------------------------------------
-    % List All Temporary Storage for i_MC in parfor
+    % Several Temporary Storage Folders (due to parfor)
     %----------------------------------------------------------------
     
     temp_irf = NaN(settings.est.n_methods,settings.est.IRF_hor,settings.specifications.n_spec);
@@ -232,16 +232,16 @@ parfor i_MC = 1:settings.simul.n_MC
     temp_F_pvalue_svar_iv = NaN(1,settings.specifications.n_spec);
     
     %----------------------------------------------------------------
-    % Selecting Data
+    % Estimation for each DGP
     %----------------------------------------------------------------
 
     for i_spec = 1:settings.specifications.n_spec
         
+        % select data
+        
         data_sim_select = select_data_fn(data_sim_all,settings,i_spec);
     
-        %----------------------------------------------------------------
-        % IRF Estimation
-        %----------------------------------------------------------------
+        % estimate IRFs
         
         for i_method = 1:settings.est.n_methods
             
@@ -304,16 +304,16 @@ parfor i_MC = 1:settings.simul.n_MC
 end
 
 % clear temporary storage
-clear temp_* i_MC i_spec data_sim_all data_sim_select i_method
 
+clear temp_* i_MC i_spec data_sim_all data_sim_select i_method
 
 %% SUMMARIZE RESULTS
 
 %----------------------------------------------------------------
-% Wrap up Results, Pick out Target IRF
+% Pick Out Main Results
 %----------------------------------------------------------------
 
-% wrap up results from parallel loop
+% extract IRF and lag results for all methods
 
 for i_method = 1:settings.est.n_methods
     
@@ -322,6 +322,8 @@ for i_method = 1:settings.est.n_methods
     results.n_lags.(thisMethod) = permute(results_n_lags(i_method,:,:), [2 3 1]);
     
 end
+
+% extract additional method-specific results
 
 if any(strcmp(settings.est.methods_name, 'svar'))    
     results.largest_root.svar = results_largest_root_svar;
@@ -352,15 +354,11 @@ clear results_* i_method thisMethod
 % Compute Mean-Squared Errors, Bias-Squared, Variance
 %----------------------------------------------------------------
 
-% compute MSE, Bias2, VCE for each horizon and each specification
-
 [results.MSE, results.BIAS2, results.VCE] = irf_perform_summary(results.irf, DF_model.target_irf, settings);
 
 %----------------------------------------------------------------
 % Export Results
 %----------------------------------------------------------------
-
-% save results
 
 mkdir(save_folder);
 save(fullfile(save_folder, strcat('DFM_', dgp_type, '_', estimand_type, '_', num2str(spec_id))), ...
@@ -369,28 +367,5 @@ save(fullfile(save_folder, strcat('DFM_', dgp_type, '_', estimand_type, '_', num
 
 delete(poolobj);
 clear save_folder save_pre save_suff poolobj
+
 toc;
-
-
-%% PLOT RESULTS
-
-%----------------------------------------------------------------
-% Plot IRFs for Checking
-%----------------------------------------------------------------
-
-% for i_method = 1:settings.est.n_methods
-%     
-%     thisMethod = settings.est.methods_name{i_method};
-%     figure(i_method)
-%     plot(settings.est.IRF_select, DF_model.target_irf(:,settings.specifications.plot_indx),'Linewidth',5)
-%     hold on
-%     for i = 1:settings.simul.n_MC
-%         eval(['plot(settings.est.IRF_select, results.irf.' thisMethod '(:,i,settings.specifications.plot_indx))']);
-%         hold on
-%     end
-%     title(replace(thisMethod,'_',' '))
-%     hold off
-% 
-% end
-% 
-% clear i_method thisMethod i

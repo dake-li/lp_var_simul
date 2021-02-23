@@ -1,20 +1,21 @@
 %% ANALYTICAL ILLUSTRATION: BIAS-VARIANCE TRADE-OFF
 % Dake Li, Mikkel Plagborg-Møller and Christian Wolf
-% This version: 02/10/2021
+% This version: 02/23/2021
 
 clc
 clear all
 close all
+
 addpath('./Subroutines');
 
 %% SETTINGS
 
 rhos = [0.6 0.9];   % Values of rho to consider
-alphas = [1 5];   % Values of alpha to consider
-sigma_2 = 1; % Single fixed value for sigma_2
-hs = 0:19;   % Horizons to plot
+alphas = [1 5];     % Values of alpha to consider
+sigma_2 = 1;        % Single fixed value for sigma_2
+hs = 0:19;          % Horizons to plot
 
-%% COMPUTATIONS
+%% COMPUTE BIAS AND VARIANCE FOR LP AND VAR
 
 for i_rho = 1:length(rhos)
     rho = rhos(i_rho);
@@ -24,8 +25,7 @@ end
 
 bias_lp = 0 * bias_var;
 
-
-%% PLOT
+%% PLOT RESULTS
 
 % settings
 
@@ -36,12 +36,12 @@ linespecs = {'-', '-o'};
 line_width = 3;
 marker_size = 3.5;
 
-plotwidth = 0.33;
+plotwidth = 0.4;
 gapsize = 0.05;
 gapsize_edges = (1-2*plotwidth-1*gapsize)/2;
 left_pos = [gapsize_edges, gapsize_edges + gapsize + plotwidth];
 
-% figure
+% bias/variance figure
 
 figure(1);
 
@@ -54,6 +54,8 @@ set(gca,'TickLabelInterpreter','latex')
 for i_rho = 1:length(rhos)
     hold on
     plot(hs,bias_lp(i_rho,:), linespecs{i_rho}, 'Color', line_colors(lp_indx,:), 'LineWidth', line_width, 'MarkerSize', marker_size);
+end
+for i_rho = 1:length(rhos)
     hold on
     plot(hs,bias_var(i_rho,:), linespecs{i_rho}, 'Color', line_colors(var_indx,:), 'LineWidth', line_width, 'MarkerSize', marker_size);
 end
@@ -63,14 +65,11 @@ xticks(min(hs):5:max(hs))
 ylim([0 3.5])
 title('Bias','interpreter','latex')
 xlabel('Horizon','interpreter','latex')
-% legend({'LP, $\{ \rho = 0.6, \alpha = 1\}$','VAR', ...
-%     'LP, $\{ \rho = 0.9, \alpha = 5\}$', 'VAR'},'Location','Northwest','interpreter','latex')
-% legend({'LP','VAR'},'Location','Northwest','interpreter','latex')
-legend({'LP','VAR $\,\{ \rho = 0.6,\, \alpha = 1\}$', ...
-    'LP', 'VAR $\,\{ \rho = 0.9,\, \alpha = 5\}$'},'Location','Northwest','interpreter','latex')
+legend({'LP','LP','VAR $\,\quad \{ \rho = 0.6,\, \alpha = 1\}$', ...
+    'VAR $\,\quad \{ \rho = 0.9,\, \alpha = 5\}$'},'Location','North','NumColumns', 2, 'interpreter','latex')
 grid on
 hold off
-set(gca, 'FontSize', 12);
+set(gca, 'FontSize', 13);
 set(gca, 'TitleFontSizeMultiplier', 1.2);
 
 subplot(1,2,2)
@@ -82,6 +81,8 @@ set(gca,'TickLabelInterpreter','latex')
 for i_rho = 1:length(rhos)
     hold on
     plot(hs,sqrt(var_lp(i_rho,:)), linespecs{i_rho}, 'Color', line_colors(lp_indx,:), 'LineWidth', line_width, 'MarkerSize', marker_size);
+end
+for i_rho = 1:length(rhos)
     hold on
     plot(hs,sqrt(var_var(i_rho,:)), linespecs{i_rho}, 'Color', line_colors(var_indx,:), 'LineWidth', line_width, 'MarkerSize', marker_size);
 end
@@ -93,10 +94,10 @@ title('Standard Deviation','interpreter','latex')
 xlabel('Horizon','interpreter','latex')
 grid on
 hold off
-set(gca, 'FontSize', 12);
+set(gca, 'FontSize', 13);
 set(gca, 'TitleFontSizeMultiplier', 1.2);
 
 pos = get(gcf, 'Position');
-set(gcf, 'Position', [pos(1) pos(2) 1.8*0.85*pos(3) 1.8*0.4*pos(4)]);
+set(gcf, 'Position', [pos(1) pos(2) 1.8*0.85*pos(3) 1.8*0.425*pos(4)]);
 set(gcf, 'PaperPositionMode', 'auto');
 print('biasvar_simple','-depsc');

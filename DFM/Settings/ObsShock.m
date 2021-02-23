@@ -1,7 +1,6 @@
-% Settings: estimand_type = ObsShock
+%% SPECIFIC SETTINGS FOR OBSERVED SHOCK IDENTIFICATION
 
-
-%% Estimation
+% indicate estimand
 
 settings.est.with_shock      = 1; % shock is observed and ordered first in data?
 settings.est.recursive_shock = 0; % use recursive shock

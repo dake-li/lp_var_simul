@@ -1,6 +1,7 @@
 function plot_loss(horzs, results, add_line, plot_name, plot_legend, font_size, varargin)
+% Function for plotting bias/variance loss results across estimation methods
 
-    % Function for plotting results across estimation methods
+    % settings
 
     line_colors = repmat(lines(7),2,1);
     colors_indx = [4 3 1 2 5 6 7];
@@ -9,6 +10,8 @@ function plot_loss(horzs, results, add_line, plot_name, plot_legend, font_size, 
     line_width  = repmat(2,14,1);
     line_width(1) = 5;
     line_width(4) = 5;
+    
+    % figures
     
     if isempty(varargin)
         figure;
@@ -31,7 +34,6 @@ function plot_loss(horzs, results, add_line, plot_name, plot_legend, font_size, 
         hold off;
         xlim(the_xlim);
     end
-%     title(plot_name,'interpreter','latex','FontSize',9/8*font_size);
     xlabel('Horizon','interpreter','latex','FontSize',font_size);
     set(gca, 'XTick', [min(horzs) 2:2:max(horzs)]);
     if isempty(varargin)
