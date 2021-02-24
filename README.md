@@ -3,7 +3,7 @@
 Matlab code for large-scale simulation studies of impulse response estimators, including Local Projections (LPs), Vector Autoregressions (VARs), and several variants of these
 
 **Reference:**
-Li, Dake, Mikkel Plagborg-Møller, and Christian K. Wolf (2021), "Local Projections vs. VARs: Lessons From Thousands of DGPs", https://scholar.princeton.edu/mikkelpm/lp_var_simul (paper + online supplement)
+Li, Dake, Mikkel Plagborg-Møller, and Christian K. Wolf (2021), "Local Projections vs. VARs: Lessons From Thousands of DGPs"
 
 Tested in: Matlab R2020a on Windows 10 PC (64-bit)
 
@@ -11,6 +11,10 @@ Tested in: Matlab R2020a on Windows 10 PC (64-bit)
 We rely on penalized LP code by [Regis Barnichon & Christian Brownless](https://github.com/ctbrownlees/MATLAB-package-lproj), as well as VAR model averaging code by [Bruce Hansen](https://www.ssc.wisc.edu/~bhansen/progs/var.html). We have slightly modified both of these sets of codes to improve their run-time without affecting their numerical output.
 
 ## Contents
+
+**[Documents](Documents):** Paper, supplement, and documentation
+- [lp_var_simul.pdf](Documents/lp_var_simul.pdf): Main paper
+- [lp_var_simul_supplement.pdf](Documents/lp_var_simul_supplement.pdf): Online supplement
 
 **[Analytical_Illustration](Analytical_Illustration):** Plots for simple analytical illustration
 - [plot_tradeoff.m](Analytical_Illustration/plot_tradeoff.m): Figure 1 in the paper
