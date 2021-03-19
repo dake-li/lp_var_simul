@@ -1,29 +1,64 @@
 function [LRV_Cov_tr_ratio, VAR_largest_root, frac_coef_for_large_lags] = compute_persist_DFM(model, settings)
-%   compute CovMat: 
-%       using ABCDEF representation
-%   compute Innovation Representation:
-%       state-space form (A,B,C,D) based on Fernandez et al. (2005) and use
-%       innovation repressentation as
-%       y_t^* = C * x_t + D w_t
-%       x_{t+1} = A * x_t + B w_t
-%       where y_t^* = (1 - delta(L)) y_t
-%             x_t = (f_t, f_{t-1}, f_{t-2})
-%       and w_t = (eta_{t+1}, v_t)
-%   compute LRVMat:
-%       using VMA in innovation representation and transform spectral
-%       density
-%   compute LRV_Cov_tr_ratio:
-%       ratio btw tr(LRV) over tr(Cov) in each specification
-%   compute truncated VAR representation:
-%       truncate infinite order VAR in innovation representation at a large lag order
-%   compute VAR_largest_root:
-%       largest root using truncated VAR for each specification
-%   compute frac_coef_for_large_lags:
-%       ratio btw VAR coefficient summed up from lag p+1 to lag infinity over 
-%       VAR coefficient summed up from lag 1 to lag infinity using
-%       truncated VAR for each specification
+% Function for computing different population measures of persistency of \bar{w}_t in each DGP
+    %-------------------------------------------------
+    % Long-run variance over variance trace-ratio:
+    %-------------------------------------------------
+    % first, directly use ABCDEF representation to compute Var(\bar{w}_t):
+        % ABCDEF representation:
+            % state transition:  s_t = A * s_{t-1} + B * \epsilon_t
+            % measurement eq:    y_t = C * s_{t-1} + D * \epsilon_t + e^*_t
+            % measurement error: e_t = E * e_{t-1} + F * \omega_t
 
-% prepare
+            % Warning: y_t corresponds to X_t in our paper
+
+    % second, transform DFM representation into ABCD representation:  
+        % ABCD representation: (See details in "Documents/technical_note.pdf")
+            % state transition:  s_{t+1} = A * s_t + B * \zeta_t
+            % measurement eq:    \bar{w}^*_t = C * s_t + D * \zeta_t
+
+            % where \bar{w}^*_t = (1 - \Delta(L)) * \bar{w}_t
+
+    % third, transform ABCD representation into Wold representation:
+        % first, VAR(\infty) representation:
+            % \bar{w}^*_t = \Psi^*(L) \bar{w}^*_{t-1} + u_t (See details in Fernandez et al., 2005)
+        % second, VAR(\infty) representation:
+            % \bar{w}_t = \Psi(L) \bar{w}_{t-1} + u_t
+        % then, VMA(infty) representation:
+            % \bar{w}_t = \Theta(L) u_t
+
+    % fourth, compute LRV(\bar{w}_t) = \Theta(1) * LRV(u_t) * \Theta(1)
+
+    % finally, compute tr(LRV) / tr(Var) for each DGP
+        
+    %-------------------------------------------------
+    % VAR largest root:
+    %-------------------------------------------------
+    % re-use VAR(\infty) representation:
+        % \bar{w}_t = \Psi(L) \bar{w}_{t-1} + u_t
+        
+    % truncate infinite order VAR in innovation representation at a large lag order
+            
+    % compute largest root using truncated VAR for each DGP
+                
+    %-------------------------------------------------
+    % Fraction of VAR coef. beyond lag p:
+    %-------------------------------------------------
+    % re-use VAR(\infty) representation:
+        % \bar{w}_t = \Psi(L) \bar{w}_{t-1} + u_t
+        
+    % sum up VAR coefficients from lag p+1 to lag infinity
+    % (approximated by truncated VAR at a large lag order)
+    
+    % sum up VAR coefficients from lag 1 to lag infinity
+    % (approximated by truncated VAR at a large lag order)
+    
+    % compute the ratio of these two terms for each DGP
+
+%-------------------------------------------------
+% Prepare
+%-------------------------------------------------
+
+% unpack settings
 
 n_y = model.n_y;
 n_s = model.n_s;
@@ -49,17 +84,19 @@ var_select = settings.specifications.var_select;
 n_spec = size(var_select,1);
 n_var = size(var_select,2);
 
-VAR_infinity_truncate = settings.est.VAR_infinity_truncate; % truncate infinite-order VAR
-VAR_fit_nlags = settings.est.n_lags_fix; % examine population fit for VAR(p)
+VAR_infinity_truncate = settings.est.VAR_infinity_truncate; % truncate infinite-order VAR at this lag length
+VAR_fit_nlags = settings.est.n_lags_fix; % later examine population fit for VAR(p)
 
 LRV_Cov_tr_ratio = NaN(n_spec, 1);
 VAR_largest_root = NaN(n_spec, 1);
 frac_coef_for_large_lags = NaN(n_spec,1);
 
+% go thru each DGP
+
 for i_spec = 1:n_spec
    
     %----------------------------------------------------------------
-    % Compute Covariance Matrix for All Observables
+    % Compute Variance-Covariance Matrix for All Observables
     %----------------------------------------------------------------
 
     % covariance matrix for s
@@ -88,10 +125,9 @@ for i_spec = 1:n_spec
         model_D(var_select(i_spec,:), :) * model_D(var_select(i_spec,:), :)' + CovMat_e_star;
 
     %----------------------------------------------------------------
-    % Compute Innovation Representation
+    % Compute ABCD Representation
     %----------------------------------------------------------------
 
-    % derive innovation representation
     % compute A
 
     A = zeros(n_lags_state * n_fac);
@@ -118,6 +154,10 @@ for i_spec = 1:n_spec
 
     D = zeros(n_var, n_fac + n_var);
     D(:, (n_fac + 1):end) = diag(sigma_v(var_select(i_spec, :), 1));
+    
+    %----------------------------------------------------------------
+    % Compute VAR(\infty) Representation
+    %----------------------------------------------------------------
 
     % compute steady state conditional variance in Kalman filter
 

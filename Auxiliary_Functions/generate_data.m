@@ -1,6 +1,20 @@
 function data_sim = generate_data(model,settings)
+% Function for generating simulated data
+    % Use a general ABCDEF representation of the encompassing model (DFM, DSGE or others):
+        % state transition:  s_t = A * s_{t-1} + B * \epsilon_t
+        % measurement eq:    y_t = C * s_{t-1} + D * \epsilon_t + e^*_t
+        % measurement error: e_t = E * e_{t-1} + F * \omega_t
 
-% preparations
+        % where e_t = (e^*_t', e^*_{t-1}', ...)'. Warning: e^*_t corresponds to v_t in our paper
+        %       \epsilon_t are the structural shocks.
+        %       \omega_t are innovations in measurement errors. Warning: \omega_t corresponds to \xi_t in our paper
+        %       y_t are observables. Warning: correspond to X_t in our paper
+    
+    % Warning: shock_weight' * \epsilon_t corresponds to true shock \epsilon_{1t} in our paper
+    
+    % external IV: z_t = \rho * z_{t-1} + \alpha * (shock_weight' * \epsilon_t) + \nu_t
+
+% unpack settings
 
 T      = settings.simul.T;
 T_burn = settings.simul.T_burn;
@@ -24,7 +38,7 @@ if with_IV == 1
     rho     = model.IV.rho;
     alpha   = model.IV.alpha;
     sigma_v = model.IV.sigma_v;
-else % meaningless placeholders
+else % meaningless placeholders in the case of no IV
     rho = 0.1;
     alpha = 1;
     sigma_v = 1;

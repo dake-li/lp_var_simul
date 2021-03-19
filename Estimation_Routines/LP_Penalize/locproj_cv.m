@@ -1,15 +1,18 @@
 function rss = locproj_cv(y, x, w, H_min, H_max, r, lambdaRange, K)
-  
-    % K-fold cross-validation for penalized local projection
+% Function for evaluating MSE of penalized LP using K-fold cross-validation
 
+    % prepare
     L = length(lambdaRange);  
-    rss_fold = zeros(L,K);
+    rss_fold = zeros(L,K); % placeholder for MSE for each lambda and each fold
     
     HR = H_max-H_min+1;
     T = length(y);
     
+    % design data matrix for penalized LP
     [~, Xb, W] = locproj_design(y, x, w, H_min, H_max);
-    chunks = ceil(K*(1:T)/T); % Split sample into K equal-sized chunks
+    
+    % Split sample into K equal-sized chunks
+    chunks = ceil(K*(1:T)/T);
     
     for k=1:K % On each fold...
 

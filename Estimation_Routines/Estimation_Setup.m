@@ -1,3 +1,5 @@
+%% Common Setup for All Estimation Methods
+
 % unpack settings
 
 IRF_hor    = settings.est.IRF_hor;
@@ -21,17 +23,17 @@ end
 
 % collect data
 
-if with_shock == 1
-    Y = [data_sim.data_shock,data_sim.data_y];
-    responseV = response_pos + 1;
-    recursiveShock = 1;
-    normalizeV = recursiveShock;
-elseif with_IV == 1
+if with_shock == 1 % observe shock: w_t = (shock, \bar{w}_t)
+    Y = [data_sim.data_shock,data_sim.data_y]; % Warning: correspond to w_t in our paper
+    responseV = response_pos + 1; % location of response variable
+    recursiveShock = 1; % location of impulse variable
+    normalizeV = recursiveShock; % location of normalization variable
+elseif with_IV == 1 % IV: w_t = (IV, \bar{w}_t)
     Y = [data_sim.data_z,data_sim.data_y];
     responseV = response_pos + 1;
     recursiveShock = 1;
     normalizeV = IV_est_normalize_var_pos + 1;
-else
+else % recursive: w_t = \bar{w}_t
     Y = data_sim.data_y;
     responseV = response_pos;
     recursiveShock = recursive_shock_pos;
@@ -40,12 +42,12 @@ end
 
 % set lag length
 
-if est_n_lag == 0
+if est_n_lag == 0 % fix lag order
     nlags = n_lags_fix;
-elseif est_n_lag_BIC == 1
+elseif est_n_lag_BIC == 1 % estimate lag order via BIC
     [BIC,~] = IC_VAR(Y,n_lags_max);
     [~,nlags] = min(BIC);
-else
+else % estimate lag order via AIC
     [~,AIC] = IC_VAR(Y,n_lags_max);
     [~,nlags] = min(AIC);
 end

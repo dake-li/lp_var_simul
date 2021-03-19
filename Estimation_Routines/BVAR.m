@@ -1,6 +1,9 @@
 function [Bc,By,Sigma,posteriorVarInv] = BVAR(Y,nlags,prior)
-%UNTITLED Summary of this function goes here
-%   Detailed explanation goes here
+% Auxiliary function for estimating Bayesian VAR coefficients
+
+%% PREPARE
+
+% unpack settings
 nv = size(Y,2);
 nT = size(Y,1);
 tight_overall = prior.tight_overall;
@@ -8,7 +11,7 @@ tight_nonown_lag = prior.tight_nonown_lag;
 decay_power = prior.decay_power;
 tight_exogenous = prior.tight_exogenous;
 
-% regular VAR to estimate residual variance
+% least-squares VAR to estimate residual variance matrix (treated as known afterwards)
 [~,~,Sigma,~,~] = VAR(Y,nlags);
 SigmaDiag = diag(Sigma);
 SigmaInv = inv(Sigma);
@@ -20,29 +23,31 @@ X = X((nlags+1):end,:);
 X = [ones(size(X,1),1),X];
 nx = size(X,2);
 
-% MN prior (mean zero)
+%% MN PRIOR (REVISED TO BE MEAN ZERO)
+
+% placeholder for prior variance for each VAR coefficient
 priorVarDiagMat = NaN(nv, nv*nlags);
 
-% overall tightness
+% overall prior tightness
 priorVarDiagMat(:) = tight_overall;
 
-% non-own lag tightness
+% non-own lag prior tightness
 nonown_lag_adjustMat = ones(nv, nv) * tight_nonown_lag + eye(nv)*(-tight_nonown_lag+1);
 nonown_lag_adjustMat = repmat(nonown_lag_adjustMat, [1, nlags]);
 priorVarDiagMat = priorVarDiagMat .* nonown_lag_adjustMat;
 
-% unit scaling
+% prior variance unit scaling based on residual magnitude
 unit_scaling_adjustMat = SigmaDiag * (1./SigmaDiag');
 unit_scaling_adjustMat = repmat(unit_scaling_adjustMat, [1, nlags]);
-unit_scaling_adjustMat = min(100, max(0.01, unit_scaling_adjustMat));
+unit_scaling_adjustMat = min(100, max(0.01, unit_scaling_adjustMat)); % truncate by 0.01 and 100 to avoid ill-conditioned matrix
 priorVarDiagMat = priorVarDiagMat .* unit_scaling_adjustMat;
 
-% lag decay
-lag_decay_adjustMat = (1:nlags).^(-decay_power);
+% lag decay in prior variance
+lag_decay_adjustMat = (1:nlags).^(-decay_power); % exponential decaying with lags
 lag_decay_adjustMat = kron(lag_decay_adjustMat, ones(nv));
 priorVarDiagMat = priorVarDiagMat .* lag_decay_adjustMat;
 
-% exogenous variable tightness
+% exogenous variable (constant term) prior tightness
 priorVarDiagMat = [ones(nv,1)*tight_overall*tight_exogenous, priorVarDiagMat];
 
 % construct diagonal of prior variance matrix
@@ -52,13 +57,13 @@ priorVarDiag = priorVarDiag(:);
 % construct posterior variance
 posteriorVarInv = diag(1./priorVarDiag)+kron(SigmaInv,X'*X);
 
-% compute posterior peak of alpha = vec(Beta)
+% compute posterior mean of VAR coefficients alpha = vec(Beta)
 Alpha = posteriorVarInv \ (kron(SigmaInv,X)' * Y(:));
 
-% back out beta, Bc, By
+% back out VAR coefficients
 Beta = reshape(Alpha, [nx, nv]);
-Bc = Beta(1,:)';
-By = reshape(Beta(2:end,:),[nv,nlags,nv]);
+Bc = Beta(1,:)'; % constant term
+By = reshape(Beta(2:end,:),[nv,nlags,nv]); % lagged term
 By = permute(By,[3,1,2]);
 
 end

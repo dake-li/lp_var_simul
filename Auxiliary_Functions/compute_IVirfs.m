@@ -1,6 +1,5 @@
 function IRF = compute_IVirfs(model,settings);
-%UNTITLED Summary of this function goes here
-%   Detailed explanation goes here
+% Function for computing the true normalized IRF in the IV experiments
 
 true_irf = model.irf;
 var_select = settings.specifications.var_select;

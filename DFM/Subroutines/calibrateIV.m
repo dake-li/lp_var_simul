@@ -1,6 +1,14 @@
 function out = calibrateIV(DFM_estimate)
-%UNTITLED Summary of this function goes here
-%   Detailed explanation goes here
+% Function for calibrating IV strength in the IV DGP
+    % IV DGP: z_t = \rho z_{t-1} + \alpha (shock_weight' * \epsilon_t) + \nu_t
+    % where \alpha = 1, Var(\nu_t) is tuned to match the signal-noise ratio in
+    % the calibration regression
+    
+    % Calibration regression : z_t = c + \sum_{l=-p}^p (a_l' * \epsilon_{t-l}) + residuals_t
+    % where z_t is the observed external IV, \epsilon is the fitted residual in DFM
+    %       R^2 represents the degree of recoverability of this IV using these factor shocks in DFM
+    
+    % Match Var(\nu_t) = 1/R^2 - 1
 
 % load factor shock
 factor_shock = DFM_estimate.fac_shock;

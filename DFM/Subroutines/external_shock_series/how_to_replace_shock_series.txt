@@ -1,0 +1,7 @@
+How to replace the existing shock series with your own shock series:
+
+1. For fiscal policy shock application, open "external_shock_series_G.csv". For monetary policy shock application, open "external_shock_series_MP".
+
+2. Replace the first column with the dates of your own shock series.
+
+3. Replace the second column with the values of your own shock series.

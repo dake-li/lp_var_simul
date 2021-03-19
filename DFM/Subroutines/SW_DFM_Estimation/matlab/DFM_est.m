@@ -1,4 +1,6 @@
 function DFM = DFM_est(n_factors,n_lags_fac,n_lags_uar);
+% Function for estimating parameters in the encompassing DFM model
+% (Revised based on Mark Watson's MATLAB script)
 
 %% PREPARATIONS
 

@@ -1,6 +1,8 @@
 function [MSE, BIAS2, VCE] = irf_perform_summary(est_irf,target_irf,settings)
-%UNTITLED Summary of this function goes here
-%   Detailed explanation goes here
+% Function for summarize IRF estimates across simulations, in terms of MSE,
+% bias squared and variance
+
+% go thru each estimator
 for i_method = 1:settings.est.n_methods
     
     thisMethod = settings.est.methods_name{i_method};

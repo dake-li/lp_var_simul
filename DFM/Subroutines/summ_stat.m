@@ -1,6 +1,11 @@
 function stat_vector = summ_stat(x_vector, winsor_percent, quantiles)
-% summarize the dim of MC into a few stats: mean/std, winsorized mean/std,
-% and quantiles. Return the stat_vector in the similar shape of x_vector
+% Function for summarizing the result matrices
+    % summarize the dim of MC into a few stats:
+        % mean/std
+        % winsorized mean/std
+        % quantiles
+    
+    % return the stat_vector in the similar shape of x_vector
 
 size_vector = size(x_vector); % record the dim of MC
 n_MC = length(x_vector);

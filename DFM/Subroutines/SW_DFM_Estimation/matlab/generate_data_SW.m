@@ -1,8 +1,7 @@
 function [y_data,shocks_data] = generate_data_SW(DFM,settings)
-%UNTITLED3 Summary of this function goes here
-%   Detailed explanation goes here
+% Function for generating simulated data using calibrated DFM
 
-%%%%%%directly use Mark Watson's script%%%%%%%%%
+%%%%%%directly use Mark Watson's MATLAB script%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
 % Generate variables from factor model using normal innovations

@@ -1,40 +1,39 @@
 function [combination_irf,weights,H] = VAR_ModelAverage(dat,recurShock,respV,p,hmax,options)
-% Creates h-step impulse response functions from estimated VAR(p) model with intercept
-% (modified based on Bruce Hansen's "cvar_ir.m" code)
-% https://www.ssc.wisc.edu/~bhansen/progs/var.html
+% Auxiliary function for h-step impulse response computed by a weighted average of different VAR submodels
+% (modified based on Bruce Hansen's "cvar_ir.m" code, https://www.ssc.wisc.edu/~bhansen/progs/var.html)
 
 % Inputs:
-%	dat 			nxm data matrix
-%	p			VAR order p >= 1
-%	hmax			horizon, hmax >= 1
+%	dat 	    nxm data matrix
+%	p			max VAR lag order p >= 1
+%	hmax		max horizon, hmax >= 1
 %   recurShock  which shock?
 %   respV       which respones?
 %   options     numerical options for quadprog
 
 % Outputs:
-%	combination_irf		(hmax+1) orthogonalized impulse responses, horizon 0 to hmax
-%	weights			M x hmax 	model weights, by horizon (1 to hmax) and response variable
-%   H               m x m       choleskey decomp. of residual cov-var matrix
+%	combination_irf		(hmax+1)    averaged impulse responses, horizon 0 to hmax
+%	weights			    M x hmax 	model weights, by horizon (1 to hmax) and response variable
+%   H                   m x m       choleskey decomp. of residual cov-var matrix
 
 
-%% Prepare
+%% PREPARE
 
 % Dimensions
-n = size(dat,1)-p;
-m = size(dat,2);
-k = m*p+1;
+n = size(dat,1)-p; % sample size
+m = size(dat,2); % number of variables
+k = m*p+1; % number of regressors
 
-% Submodels
+% Submodels: ordered as AR(1) to AR(p) and VAR(1) to VAR(p)
 M = 2*p;
-submodel_irf = zeros(hmax+1, M); 
-combination_irf = zeros(hmax+1, 1); 
+submodel_irf = zeros(hmax+1, M); % placeholder for IRF estimated by each submodel
+combination_irf = zeros(hmax+1, 1); % placeholder for IRF averaged across submodels
 
 
-%% Full model estimation
+%% FULL MODEL ESTIMATION
 
-% Least squares
+% Least-squares VAR
 [~,By,sigma,Q,e,Bt,y,x] = VAR(dat,p);
-H = chol(sigma,'lower');
+H = chol(sigma,'lower'); % Warning: correspond to matrix C in our paper
 
 % Asymptotic variance
 xe = repmat(x,1,m) .* e(:,kron(1:m,ones(1,k)));
@@ -62,7 +61,7 @@ for h = 1:hmax
 end
 
 
-%% Estimate submodels and their loss
+%% ESTIMATE SUBMODELS AND THEIR LOSS
 
 % Auxiliary matrices in loss function
 V_G0 = V*G0;
@@ -108,7 +107,7 @@ for r = 1:M-1
 end
 
 
-%% Compute weights for each horizon
+%% COMPUTE WEIGHTS FOR EACH HORIZONS
 
 ir_diff = submodel_irf(2:end,:)'-var_ir;
 weights = zeros(M, hmax);
@@ -118,9 +117,9 @@ for h = 1:hmax
     ird = ir_diff(:,h);
     J0 = n*(ird*ird');
     K = - Kr(:,h)';
-    w = quadprog(J0,K,[],[],ub',1,lb,ub,[],options);
+    w = quadprog(J0,K,[],[],ub',1,lb,ub,[],options); % compute optimal weights for submodels at each horizon h
     weights(:,h) = w;
-    combination_irf(h+1,1) = submodel_irf(h+1,:)*w;
+    combination_irf(h+1,1) = submodel_irf(h+1,:)*w; % compute averaged IRF
 end
 
 end

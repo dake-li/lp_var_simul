@@ -1,8 +1,27 @@
 function [B, Xb, W, Y_resw, Xb_resw] = locproj_design(y, x, w, H_min, H_max)
+% Function for designing data matrix in penalized LP
 
-    % Design matrix for penalized local projection
+    %%% Basic %%%
+    % T:  sample size
+    % K:  number of B-spline basis functions
+    % HR: number of horizons
+    % p:  number of controls
     
-
+    %%% Input %%%
+    % y:       response variable
+    % x:       impulse variable
+    % w:       controls (contemperaneous and lagged)
+    % H_min:   minimum horizon
+    % H_max:   maximum horizon
+    
+    %%% Output %%%
+    % B:       B-spline values for each basis function at each horizon
+    % Xb:      x * B
+    % W:       controls collected for each horizon
+    % Y_resw:  y residualized by w
+    % Xb_resw: Xb residualized by w
+    
+    % prepare
     T  = length(y);
     HR = H_max + 1 - H_min;
 
@@ -14,11 +33,13 @@ function [B, Xb, W, Y_resw, Xb_resw] = locproj_design(y, x, w, H_min, H_max)
     w = [ ones(T,1) w ]; % Add intercept to controls
     p = size(w,2);
 
+    % placeholder for output matrices
     Xb = nan(T,K,HR);
     W = nan(T,p,HR);
     Y_resw = nan(T,HR);
     Xb_resw = nan(T,K,HR);
 
+    % go thru each horizon
     for ih=1:HR
 
         h = H_min-1+ih;

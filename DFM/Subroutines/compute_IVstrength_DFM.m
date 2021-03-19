@@ -1,8 +1,39 @@
 function IV_strength = compute_IVstrength_DFM(model, settings)
+% Function for computing population measure of IV strength for each DGP,
+% i.e. the fraction of y_t being explained by z_t, after controlling lagged
+% z_t and \bar{w}_t
+    % first, incorporate the DGP of z_t into the DFM model to get an augmented DFM:
+        % factor transition: f^*_t = \Phi^*(L) f^*_{t-1} + H \epsilon^*_t
+        % observables:       w_t = \Lambda^* f^*_t + v^*_t
+        % measurement error: v^*_{it} = \Delta^*_i(L) v^*_{i,t-1} + \Xi^*_i \xi^*_{it}
+        
+        % where w_t = (z_t, \bar{w}_t')'
+        %       f^*_t = (f_t', z_t)'
+        %       \epsilon^*_t = (\epsilon_t', \nu_t)
+        % (See "Documents/technical_note.pdf" for details)
+        
+    % second, transform the augmented DFM into ABCD representation:
+        % state transition:  s_{t+1} = A * s_t + B * \zeta_t
+        % measurement eq:    w^*_t = C * s_t + D * \zeta_t
+
+        % where w^*_t = (1 - \Delta(L)) * w_t
+        % (See details in "Documents/technical_note.pdf")
+        
+    % third, transform the ABCD representation into VAR(\infty) representation:
+        % VAR(\infty): % w^*_t = \Psi^*(L) w^*_{t-1} + u_t (See details in Fernandez et al., 2005)
+        % Use Var(u_t) to derive Var(y_t | lagged w_t)
+    
+    % fourth, compute the explained variance of y_t by IV:
+        % Var(y_t | lagged w_t) - Var(y_t | z_t, lagged w_t) = IRF(y,h=0)^2 * \alpha^2 / (\alpha^2 + \sigma^2_\nu)
+        
+    % finally, compute the explained fraction of y_t by IV as:
+        % 1 - Var(y_t | z_t, lagged w_t) / Var(y_t | lagged w_t)
 
 %----------------------------------------------------------------
 % Preparations
 %----------------------------------------------------------------
+
+% unpack settings
 
 n_fac = model.n_fac;
 n_lags_fac = model.n_lags_fac;
@@ -22,7 +53,7 @@ IV_est_normalize_var_pos = settings.est.IV_est_normalize_var_pos;
 IV_strength = NaN(n_spec, 1);
 
 %----------------------------------------------------------------
-% Rewrite Coefficient Matrices for DFM
+% Rewrite Coefficient Matrices for Augmented DFM
 %----------------------------------------------------------------
 
 % original coefficient matrices in DFM
@@ -35,7 +66,7 @@ delta = model.delta;
 sigma_v = model.sigma_v;
 n_y = size(Lambda, 1);
 
-% add z_t into DFM to construct auxiliary form
+% add z_t into augmented DFM to construct auxiliary form
 
 Phi_aux = zeros((n_fac + 1) * n_lags_fac);
 for i_lag_fac = 1:n_lags_fac
@@ -54,7 +85,7 @@ Lambda_aux = [Lambda, zeros(n_y, 1); zeros(1, n_fac), 1];
 delta_aux = [delta; zeros(1, n_lags_uar)];
 sigma_v_aux = [sigma_v; 0];
 
-% add z_t into each specification
+% add z_t into each DGP
 
 var_select = [var_select, (n_y + 1) * ones(n_spec, 1)];
 
@@ -63,7 +94,7 @@ n_fac = size(Lambda_aux, 2);
 n_var = size(var_select, 2);
 
 %----------------------------------------------------------------
-% represent DFM as ABCD
+% Represent Augmented DFM as ABCD
 %----------------------------------------------------------------
 
 % compute A
@@ -78,7 +109,7 @@ A((1 + n_fac):(n_lags_state * n_fac), 1:((n_lags_state - 1) * n_fac)) = eye((n_l
 B = zeros(n_lags_state * n_fac, n_fac + n_var);
 B(1:n_fac, 1:n_fac) = G_aux;
 
-% in each specification
+% in each DGP
 for i_spec = 1:n_spec
     
     % IRF of normalization variable at h = 0
@@ -101,7 +132,7 @@ for i_spec = 1:n_spec
     D(:, (n_fac + 1):end) = diag(sigma_v_aux(var_select(i_spec, :), 1));
     
     %----------------------------------------------------------------
-    % Compute Variance of Reduced-form Errors
+    % Represent ABCD as VAR(\infty)
     %----------------------------------------------------------------
     
     % compute steady state conditional variance in Kalman filter
@@ -109,6 +140,10 @@ for i_spec = 1:n_spec
     
     % compute cov-var matrix of innovations
     Sigma_innovation = C * cond_var * C' + D * D';
+    
+    %----------------------------------------------------------------
+    % IV-Explained and Total Variance of y_t with Lagged Controls
+    %----------------------------------------------------------------
     
     % variance in projection-error
     

@@ -102,7 +102,7 @@ end
 DF_model.n_s   = size(DF_model.Phi,2);
 DF_model.n_eps = size(DF_model.Sigma_eta,2);
 DF_model.n_y   = size(DF_model.Lambda,1);
-DF_model.n_w   = size(DF_model.delta,1);
+DF_model.n_w   = size(DF_model.delta,1); % Warning: n_w stands for the dim of \omega_t
 DF_model.n_e   = DF_model.n_w * DF_model.n_lags_uar;
 
 DF_model.ABCD  = ABCD_fun_DFM(DF_model);

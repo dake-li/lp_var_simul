@@ -1,6 +1,20 @@
 function [IRF, shock_weight] = compute_irfs(model,settings);
+% Function for defining the true shock and computing the true IRF
+    % Use a general ABCDEF representation of the encompassing model (DFM, DSGE or others):
+        % state transition:  s_t = A * s_{t-1} + B * \epsilon_t
+        % measurement eq:    y_t = C * s_{t-1} + D * \epsilon_t + e^*_t
+        % measurement error: e_t = E * e_{t-1} + F * \omega_t
 
-% prepare
+        % where e_t = (e^*_t', e^*_{t-1}', ...)'. Warning: e^*_t corresponds to v_t in our paper
+        %       \epsilon_t are the structural shocks.
+        %       \omega_t are innovations in measurement errors. Warning: \omega_t corresponds to \xi_t in our paper
+        %       y_t are observables. Warning: correspond to X_t in our paper
+    
+    % In this function, we can compute the optimal (IRF-maximizing) linear
+    % combo of these structural shocks (saved as shock_weight) and define it as the true shock
+    % Warning: shock_weight' * \epsilon_t corresponds to true shock \epsilon_{1t} in our paper
+
+% unpack settings
 
 IRF_hor = settings.est.IRF_hor;
 manual_shock_pos = settings.est.manual_shock_pos;
@@ -15,6 +29,8 @@ B = model.ABCD.B;
 C = model.ABCD.C;
 D = model.ABCD.D;
 
+% check if shock weight has been estimated in IV calibration
+
 if (estimate_shock_weight==1) && (shock_weight_calibrate==1)
     calibrated_shock_weight = model.calibrated_shock_weight;
 end
@@ -23,22 +39,41 @@ end
 
 IRF = NaN(IRF_hor, n_y);
 
+% go thru horizon 0 to IRF_hor - 1
 for i = 1:IRF_hor
+    
     if i == 1
+    
         resp = D;
+        
         if (estimate_shock_weight==1) && (shock_weight_calibrate==0)
-            shock_weight = resp(shock_optimize_var_IRF,:)'; % optimal weight in the same direction as impulse
+            
+            % if want to estimate the optimal shock weight to maximize impact response
+            shock_weight = resp(shock_optimize_var_IRF,:)'; % optimal weight is in the same direction as impulse response
             shock_weight = shock_weight / sqrt(sum(shock_weight.^2)); % normalize weight
+            
         elseif (estimate_shock_weight==1) && (shock_weight_calibrate==1)
+            
+            % if want to use the shock weight computed in IV calibration
             shock_weight = calibrated_shock_weight; % calibrated shock weights
+            
         else
+            
+            % if want to mannually choose the true shock
             shock_weight = zeros(n_eps, 1); % manually choose shock
             shock_weight(manual_shock_pos) = 1;
+            
         end
-        IRF(i,:) = (resp * shock_weight)';
+        
+        % IRF to the true shock is now the linear combo of IRF to all the structural shocks
+        IRF(i,:) = (resp * shock_weight)'; 
+        
     else
-        IRF(i,:) = C * A^(i-2) * B * shock_weight;
+        
+        IRF(i,:) = C * A^(i-2) * B * shock_weight; % iterate to get IRF
+        
     end
+    
 end
 
 end

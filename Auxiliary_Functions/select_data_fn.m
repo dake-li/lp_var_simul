@@ -1,6 +1,6 @@
 function [data_sim_select] = select_data_fn(data_sim_all,settings,i_spec)
-%UNTITLED Summary of this function goes here
-%   Detailed explanation goes here
+% Function for extracting the simulated data of \bar{w}_t from the
+% simulated data of y_t, in a specific DGP
 
 var_select = settings.specifications.var_select;
 

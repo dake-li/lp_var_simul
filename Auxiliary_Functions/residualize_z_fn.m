@@ -1,10 +1,10 @@
 function [data_sim_new] = residualize_z_fn(data_sim,settings)
-%UNTITLED2 Summary of this function goes here
-%   Detailed explanation goes here
+% Function for residualizing IV using lagged IV and endogenous variables w_{t-l}
+    % This function should be used before running SVAR-IV estimators
 
 % preparations
 
-run('Estimation_Setup');
+run('Estimation_Setup'); % common setup for all estimation methods
 
 % estimate VAR
 

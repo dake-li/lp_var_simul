@@ -1,14 +1,30 @@
 function R0_sq = compute_invert_DFM(model,settings);
+% Function for computing degree of invertibility of the true shock using
+% the selected endogenous variables in one DGP
+% (for observed-shock and IV experiments)
 
-%   state-space form (A,B,C,D)
-%   y_t^* = C * eta_t^* + D v_t 
-%         = (1 - delta(L)) Lambda (1 - Phi(L))^{-1} G eta_t^* + diag(sigma_v) v_t
-%   eta_t^* = A * eta_{t-1}^* + B u_t 
-%           = [0,0;1,0] eta_{t-1}^* + [1;0] u_t
-%   where y_t^* = (1 - delta(L)) y_t
-%   and eta_^* is dg_invert_n_lags lagged terms of eta_t
+    % First, need to transform the selected DGP from DFM representation to a general ABCD
+    % representation.
+    
+    % DFM representation:
+        % factor transition: f_t = \Phi(L) f_{t-1} + H \epsilon_t
+        % observables:       \bar{w}_t = \Lambda f_t + v_t
+        % measurement error: v_{it} = \Delta_i(L) v_{i,t-1} + \Xi_i \xi_{it}
+    
+    % ABCD representation:
+        % state transition:  s_t = A * s_{t-1} + B * \epsilon_t
+        % measurement eq:    \bar{w}^*_t = C * s_t + D * \xi_t
+        
+        % where \bar{w}^*_t = (I - \Delta(L)) * \bar{w}_t
+        %       s_t = (\epsilon_t', \epsilon_{t-1}', ...)'
+        
+    % Transforming formula can be found in "Documents/technical_note.pdf"
+        
+    % Then, degree of invertibility:
+        % first compute Var(s_t | \bar{w}^*_t, \bar{w}^*_{t-1}, ...) using Kalman filter
+        % then derive R0_sq = Var(shock_weight' * \epsilon_t | \bar{w}_t, \bar{w}_{t-1}, ...)
 
-% preparation
+% unpack settings
 
 n_fac = model.n_fac;
 n_lags_fac = model.n_lags_fac;
@@ -27,13 +43,13 @@ n_var = size(var_select, 2);
 VMA_nlags = settings.est.VMA_nlags;
 shock_weight = settings.est.shock_weight;
 
-% compute (1 - Phi(L))^{-1} polynomial
+% compute (1 - \Phi(L))^{-1} polynomial
 
-Phi_polynomial = zeros(n_fac, n_fac, VMA_nlags + 1); % (1 - Phi(L))^(-1)
+Phi_polynomial = zeros(n_fac, n_fac, VMA_nlags + 1); % (1 - \Phi(L))^(-1)
 Phi_lag = eye(n_fac * n_lags_fac); % Big_Phi_Mat^lag
 Phi_polynomial(:,:,1) = Phi_lag(1:n_fac, 1:n_fac);
 
-G = chol(Sigma_eta, 'lower');
+G = chol(Sigma_eta, 'lower'); % Warning: corresponds to matrix H in our paper
 Phi_polynomial_G = zeros(n_fac, n_fac, VMA_nlags + 1);
 Phi_polynomial_G(:,:,1) = Phi_polynomial(:,:,1) * G;
 
@@ -45,32 +61,36 @@ for ilag = 1:VMA_nlags
     
 end
 
-Phi_polynomial_G_mat = reshape(Phi_polynomial_G,[n_fac, n_fac * (VMA_nlags+1)]);
+Phi_polynomial_G_mat = reshape(Phi_polynomial_G,[n_fac, n_fac * (VMA_nlags+1)]); % (1 - \Phi(L))^{-1} * G
 
-% in each specification
+% placeholder for R0_sq
 
 R0_sq = zeros(n_spec, 1);
 
-% compute A
+% compute matrix A
 
 A = zeros(n_fac * (1 + VMA_nlags));
 A((n_fac+1):end, 1:(VMA_nlags*n_fac)) = eye(VMA_nlags * n_fac);
 A = sparse(A);
 
-% compute B
+% compute matrix B
 
 B = [eye(n_fac); zeros(VMA_nlags * n_fac, n_fac)];
 B = sparse(B);
 
+% go thru each DGP
+
 for i_spec = 1:n_spec
     
-    % compute C
+    % compute matrix C
     
     Lambda_select = Lambda(var_select(i_spec,:),:);
     delta_select = delta(var_select(i_spec,:),:);
     
-    C0 = Lambda_select * Phi_polynomial_G_mat;
+    C0 = Lambda_select * Phi_polynomial_G_mat; % \Lambda * (1 - \Phi(L))^{-1} * G
     C = C0;
+    
+    % (1 - \Delta(L)) * \Lambda * (1 - \Phi(L))^{-1} * G
     
     for ilag = 1:n_lags_uar
         
@@ -81,17 +101,17 @@ for i_spec = 1:n_spec
         
     end
     
-    % compute D
+    % compute matrix D
     
     sigma_v_select = sigma_v(var_select(i_spec,:),:);
     D = diag(sigma_v_select);
     
     % run Kalman filter to compute R0_sq
     
-    cond_var_include_lag = cond_var_fn_St(A,B,C,D);
-    cond_var = cond_var_include_lag(1:n_fac, 1:n_fac);
-    R0_sq(i_spec, 1) = 1 - shock_weight' * cond_var * shock_weight;
-    
+    cond_var_include_lag = cond_var_fn_St(A,B,C,D); % Var(s_t | \bar{w}^*_t, \bar{w}^*_{t-1}, ...)
+    cond_var = cond_var_include_lag(1:n_fac, 1:n_fac); % Var(\epsilon_t | \bar{w}^*_t, \bar{w}^*_{t-1}, ...)
+    R0_sq(i_spec, 1) = 1 - shock_weight' * cond_var * shock_weight; % Var(shock_weight' * \epsilon_t | \bar{w}^*_t, \bar{w}^*_{t-1}, ...)
+    % equivalent to Var(shock_weight' * \epsilon_t | \bar{w}_t, \bar{w}_{t-1}, ...)
 end
 
 end
