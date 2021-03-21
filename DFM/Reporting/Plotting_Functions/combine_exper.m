@@ -1,6 +1,6 @@
 function res = combine_exper(res, res_part)
-%UNTITLED2 Summary of this function goes here
-%   Detailed explanation goes here
+% Function for combining the results from several experiments (in our case,
+% the fiscal and monetary experiments)
 
 %----------------------------------------------------------------
 % combine DFM_estimate

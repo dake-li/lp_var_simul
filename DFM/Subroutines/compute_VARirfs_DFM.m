@@ -1,13 +1,12 @@
 function IRF = compute_VARirfs_DFM(model, settings)
 % Function for computing true IRF for each DGP in recursive experiments
-% (only for recursive experiments)
 
     % First, need to transform the selected DGP from DFM representation to a general ABCD
     % representation.
     
     % DFM representation:
         % factor transition: f_t = \Phi(L) f_{t-1} + H \epsilon_t
-        % observables:       w_t = \Lambda f_t + v_t
+        % observables:       \bar{w}_t = \bar{\Lambda} f_t + v_t
         % measurement error: v_{it} = \Delta_i(L) v_{i,t-1} + \Xi_i \xi_{it}
     
     % ABCD representation:
@@ -16,9 +15,9 @@ function IRF = compute_VARirfs_DFM(model, settings)
         
         % where w^*_t = (I - \Delta(L)) * w_t
         %       s_t = (f_t', f_{t-1}', f_{t-2}')'
-        %       \zeta_t = (\epsilon_{t+1}', \xi_t')'
+        %       \zeta_t = (\epsilon_t', \xi_t')'
         
-    % Transforming formula can be found in "Documents/technical_note.pdf"
+    % Transforming formula can be found in Technical Companion Note
         
     % Then, transform this ABCD representation into VAR(\infty) representation:
         % w^*_t = \Psi^*(L) w^*_{t-1} + u_t (See details in Fernandez et al., 2005)

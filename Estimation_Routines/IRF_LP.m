@@ -1,5 +1,5 @@
 function irf = IRF_LP(Y,recurShock,respV,nlags,nhorizons)
-% Auxiliary function for estimating IRF using least-squares LP
+% Auxiliary function for estimating IRFs using least-squares LP
 
 nv = size(Y,2);
 nT = size(Y,1);

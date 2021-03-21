@@ -1,5 +1,5 @@
 function [IRF,nlags,weightOut] = VAR_avg_est(data_sim,settings)
-% Function for estimating IRF using VAR model averaging
+% Function for estimating IRFs using VAR model averaging
 
 % preparations
 

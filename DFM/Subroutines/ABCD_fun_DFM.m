@@ -19,7 +19,7 @@ function ABCD = ABCD_fun_DFM(model)
         %       \omega_t are innovations in measurement errors. Warning: \omega_t corresponds to \xi_t in our paper
         %       y_t are observables, s_t are states. Warning: y_t correspond to X_t in our paper
 
-    % Transforming formula can be found in "Documents/technical_note.pdf"
+    % Transforming formula can be found in Technical Companion Note
     
     % Input:
         % model: struct that contains all parameters in DFM

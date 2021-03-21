@@ -1,5 +1,5 @@
 function [VARout,IVout] = SVAR_IV(H,normlzV,nlags)
-% Auxiliary function for estimating SVAR coefficients via IV
+% Auxiliary function for identifying a SVAR using an external IV series
 
 % split IV and endogenous variables in the data matrix
 Z = H(:,1);

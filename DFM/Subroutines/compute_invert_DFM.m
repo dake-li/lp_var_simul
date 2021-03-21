@@ -8,17 +8,17 @@ function R0_sq = compute_invert_DFM(model,settings);
     
     % DFM representation:
         % factor transition: f_t = \Phi(L) f_{t-1} + H \epsilon_t
-        % observables:       \bar{w}_t = \Lambda f_t + v_t
+        % observables:       \bar{w}_t = \bar{\Lambda} f_t + v_t
         % measurement error: v_{it} = \Delta_i(L) v_{i,t-1} + \Xi_i \xi_{it}
     
     % ABCD representation:
         % state transition:  s_t = A * s_{t-1} + B * \epsilon_t
         % measurement eq:    \bar{w}^*_t = C * s_t + D * \xi_t
         
-        % where \bar{w}^*_t = (I - \Delta(L)) * \bar{w}_t
+        % where \bar{w}^*_t = (I - \bar{\Delta}(L)) * \bar{w}_t
         %       s_t = (\epsilon_t', \epsilon_{t-1}', ...)'
         
-    % Transforming formula can be found in "Documents/technical_note.pdf"
+    % Transforming formula can be found in Technical Companion Note
         
     % Then, degree of invertibility:
         % first compute Var(s_t | \bar{w}^*_t, \bar{w}^*_{t-1}, ...) using Kalman filter

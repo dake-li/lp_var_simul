@@ -1,5 +1,5 @@
 function [LRV_Cov_tr_ratio, VAR_largest_root, frac_coef_for_large_lags] = compute_persist_DFM(model, settings)
-% Function for computing different population measures of persistency of \bar{w}_t in each DGP
+% Function for computing different population measures of persistence of \bar{w}_t in each DGP
     %-------------------------------------------------
     % Long-run variance over variance trace-ratio:
     %-------------------------------------------------
@@ -9,10 +9,10 @@ function [LRV_Cov_tr_ratio, VAR_largest_root, frac_coef_for_large_lags] = comput
             % measurement eq:    y_t = C * s_{t-1} + D * \epsilon_t + e^*_t
             % measurement error: e_t = E * e_{t-1} + F * \omega_t
 
-            % Warning: y_t corresponds to X_t in our paper
+            % Warning: y_t corresponds to X_t in the paper
 
     % second, transform DFM representation into ABCD representation:  
-        % ABCD representation: (See details in "Documents/technical_note.pdf")
+        % ABCD representation: (See details in Technical Companion Note)
             % state transition:  s_{t+1} = A * s_t + B * \zeta_t
             % measurement eq:    \bar{w}^*_t = C * s_t + D * \zeta_t
 

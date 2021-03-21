@@ -1,6 +1,6 @@
 function specifications = pick_var_fn(model, settings, spec_id)
 % Function for randomly choosing DGPs from the encompassing model
-    % Warning: specification corresponds to DGP in our paper
+    % Warning: a "specification" here is a "DGP" in the paper
 
     % prepare
     

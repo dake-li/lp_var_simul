@@ -10,14 +10,14 @@ function IV_strength = compute_IVstrength_DFM(model, settings)
         % where w_t = (z_t, \bar{w}_t')'
         %       f^*_t = (f_t', z_t)'
         %       \epsilon^*_t = (\epsilon_t', \nu_t)
-        % (See "Documents/technical_note.pdf" for details)
+        % (See Technical Companion Note for details)
         
     % second, transform the augmented DFM into ABCD representation:
         % state transition:  s_{t+1} = A * s_t + B * \zeta_t
         % measurement eq:    w^*_t = C * s_t + D * \zeta_t
 
         % where w^*_t = (1 - \Delta(L)) * w_t
-        % (See details in "Documents/technical_note.pdf")
+        % (See details in Technical Companion Note)
         
     % third, transform the ABCD representation into VAR(\infty) representation:
         % VAR(\infty): % w^*_t = \Psi^*(L) w^*_{t-1} + u_t (See details in Fernandez et al., 2005)

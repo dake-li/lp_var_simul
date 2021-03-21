@@ -1,5 +1,5 @@
 function [y,x,w] = LP_gen_data(Y,recurShock,respV,nlags,nhorizon)
-% Function for generating rountine data matrices for LP
+% Function for generating standard data matrices for LP
 
 nv = size(Y,2);
 nT = size(Y,1);

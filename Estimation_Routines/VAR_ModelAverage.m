@@ -1,5 +1,5 @@
 function [combination_irf,weights,H] = VAR_ModelAverage(dat,recurShock,respV,p,hmax,options)
-% Auxiliary function for h-step impulse response computed by a weighted average of different VAR submodels
+% Auxiliary function for h-step impulse responses computed by a weighted average of different VAR submodels
 % (modified based on Bruce Hansen's "cvar_ir.m" code, https://www.ssc.wisc.edu/~bhansen/progs/var.html)
 
 % Inputs:

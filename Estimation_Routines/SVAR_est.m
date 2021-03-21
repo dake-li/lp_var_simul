@@ -1,5 +1,5 @@
 function [IRF,nlags,largest_root,LM_stat,LM_pvalue,Granger_stat,Granger_pvalue] = SVAR_est(data_sim,settings,bias_corrected);
-% Function for estimating IRF using least-squares VAR or bias-corrected VAR
+% Function for estimating IRFs using least-squares VAR or bias-corrected VAR
 
 % preparations
 

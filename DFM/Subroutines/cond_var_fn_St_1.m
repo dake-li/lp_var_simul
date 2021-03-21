@@ -1,6 +1,6 @@
 function cond_var = cond_var_fn_St_1(A, B, C, D)
-% Function to compute the conditional variance, Var(s_t | y_t, y_{t-1},...) using Kalman filter
-    % This function applies to the state-space form of the following:
+% Function to compute the conditional variance, Var(s_t | y_t, y_{t-1},...) using the Kalman filter
+    % This function applies to the state-space form of the following form:
         %   s_{t+1} = A * s_t + B w_t
         %   y_t = C * s_t + D w_t
         % (state-space form based on Fernandez et al., 2005)

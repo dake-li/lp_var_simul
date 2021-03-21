@@ -1,5 +1,5 @@
 function [IRF,nlags,lambda_opt] = LP_shrink_est(data_sim,settings);
-% Function for estimating IRF using penalized LP
+% Function for estimating IRFs using penalized LP
 
 % preparations
 lambdaRange = settings.est.lambdaRange;

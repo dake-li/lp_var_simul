@@ -1,5 +1,5 @@
 %% COMBINE RESULTS FOR MULTIPLE DGP CHOICE SETS
-% Dake Li, Mikkel Plagborg-MÃ¸ller and Christian Wolf
+% Dake Li, Mikkel Plagborg-Møller and Christian Wolf
 % This version: 02/23/2021
 
 clear all;

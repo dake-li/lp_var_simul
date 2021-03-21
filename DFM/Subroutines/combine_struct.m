@@ -1,12 +1,12 @@
 function [DFM_estimate_combined, DF_model_combined, settings_combined, results_combined] = combine_struct(save_folder, file_prefix, spec_id_array, winsor_percent, quantiles)
 % Function to combine the results across different choice set of DGPs
-    % Typically when run the experiment on clusters, set up different
-    % choice set of DGPs to parallel
+    % Typically when running the experiment on clusters, we set up different
+    % choice sets of DGPs to run in parallel
     
     % This function reads in different *.mat files to combine the results
-    % across different choice set of DGPs
+    % across different choice sets of DGPs
     
-    % Finally save the combined result into one *.mat file
+    % Finally save the combined results into one *.mat file
 
 % go thru each choice set of DGPs
 for id = spec_id_array

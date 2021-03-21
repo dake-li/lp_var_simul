@@ -1,5 +1,5 @@
 function [IRF,nlags,F_stat,F_pvalue] = SVAR_IV_est(data_sim,settings);
-% Function for estimating IRF using SVAR-IV
+% Function for estimating IRFs using SVAR-IV
 
 % residualize IV (reg Z on lagged Z and Y)
 

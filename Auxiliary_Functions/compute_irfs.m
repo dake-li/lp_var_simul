@@ -5,14 +5,14 @@ function [IRF, shock_weight] = compute_irfs(model,settings);
         % measurement eq:    y_t = C * s_{t-1} + D * \epsilon_t + e^*_t
         % measurement error: e_t = E * e_{t-1} + F * \omega_t
 
-        % where e_t = (e^*_t', e^*_{t-1}', ...)'. Warning: e^*_t corresponds to v_t in our paper
+        % where e_t = (e^*_t', e^*_{t-1}', ...)'. Warning: e^*_t corresponds to v_t in the paper
         %       \epsilon_t are the structural shocks.
-        %       \omega_t are innovations in measurement errors. Warning: \omega_t corresponds to \xi_t in our paper
-        %       y_t are observables. Warning: correspond to X_t in our paper
+        %       \omega_t are innovations in measurement errors. Warning: \omega_t corresponds to \xi_t in the paper
+        %       y_t are observables. Warning: corresponds to X_t in the paper
     
     % In this function, we can compute the optimal (IRF-maximizing) linear
-    % combo of these structural shocks (saved as shock_weight) and define it as the true shock
-    % Warning: shock_weight' * \epsilon_t corresponds to true shock \epsilon_{1t} in our paper
+    % combination of these structural shocks (saved as shock_weight) and define it as the true shock
+    % Note that shock_weight' * \epsilon_t is then equal to the true shock \epsilon_{1t}
 
 % unpack settings
 

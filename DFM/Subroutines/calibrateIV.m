@@ -6,7 +6,7 @@ function out = calibrateIV(DFM_estimate)
     
     % Calibration regression : z_t = c + \sum_{l=-p}^p (a_l' * \epsilon_{t-l}) + residuals_t
     % where z_t is the observed external IV, \epsilon is the fitted residual in DFM
-    %       R^2 represents the degree of recoverability of this IV using these factor shocks in DFM
+    %       R^2 represents the degree of recoverability of the IV shock using the factors
     
     % Match Var(\nu_t) = 1/R^2 - 1
 
