@@ -27,6 +27,12 @@ settings_shared;
 tab_stat = {'LRV_Cov_tr_ratio', 'VAR_largest_root', 'frac_coef_for_large_lags', 'R0_sq'}; % Summary stats to copy (in addition to IRF stats defined below)
 tab_quants = [0.1 0.25 0.5 0.75 0.9]; % Quantiles to report across specifications
 
+% Table with model specification tests
+spec_lags_cutoff = 2; % Report how often quantiles of lag length exceeds this number
+spec_lags_quants = [0.5 0.75 0.9]; % Quantiles of lag length to report
+spec_lm_power = 0.25; % Report fraction of DGPs with at least this power of LM test
+spec_lm_signifs = [0.05 0.1 0.25]; % Significance levels for LM test
+
 % IRF examples to plot
 spec_select = [10 20 30 3010 3020 3030];
 linestyles = {'-', '--', ':', '-o', '--o', ':o'};
@@ -91,6 +97,30 @@ for nf=1:length(lags_folders) % For each folder...
         writetable(tab_summ, fullfile(output_folder, 'dgp_summ.csv'));
         
         clearvars I X betas resid tab tab_summ tab_summ2;        
+        
+        %----------------------------------------------------------------
+        % Tables of Specification Tests
+        %----------------------------------------------------------------
+        
+        tab_spec = table;
+
+        % Number of lags
+        for ii=1:length(spec_lags_quants)
+            tab_spec.(sprintf('%s%02d', 'nlag_exceed_q', round(100*spec_lags_quants(ii)))) ...
+                = mean(res.results.n_lags.svar(2+find(res.settings.simul.quantiles==spec_lags_quants(ii)),:)>=spec_lags_cutoff);
+        end
+        
+        % Power of LM test
+        for ii=1:length(spec_lm_signifs)
+            tab_spec.(sprintf('%s%02d', 'lm_power_', round(100*spec_lm_signifs(ii)))) ...
+                = mean(res.results.LM_pvalue.svar(2+find(res.settings.simul.quantiles==spec_lm_power),:)<spec_lm_signifs(ii));
+        end
+        
+        % Write to file
+        writetable(tab_spec, fullfile(output_folder, 'dgp_spec.csv'));
+        
+        clearvars tab_spec;
+        
         
         %----------------------------------------------------------------
         % Plots to summarize DGP Features
