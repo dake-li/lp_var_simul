@@ -39,7 +39,7 @@ end
 
 IRF = NaN(IRF_hor, n_y);
 
-% go thru horizon 0 to IRF_hor - 1
+% go through horizon 0 to IRF_hor - 1
 for i = 1:IRF_hor
     
     if i == 1
@@ -59,7 +59,7 @@ for i = 1:IRF_hor
             
         else
             
-            % if want to mannually choose the true shock
+            % if want to manually choose the true shock
             shock_weight = zeros(n_eps, 1); % manually choose shock
             shock_weight(manual_shock_pos) = 1;
             
