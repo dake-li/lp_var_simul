@@ -61,7 +61,7 @@ for i_rho = 1:length(rhos)
 end
 set(gcf,'color','w')
 xlim([min(hs) max(hs)]);
-xticks(min(hs):5:max(hs))
+xticks(min(hs):4:max(hs))
 ylim([0 3.5])
 title('Bias','interpreter','latex')
 xlabel('Horizon','interpreter','latex')
@@ -88,7 +88,7 @@ for i_rho = 1:length(rhos)
 end
 set(gcf,'color','w')
 xlim([min(hs) max(hs)]);
-xticks(min(hs):5:max(hs))
+xticks(min(hs):4:max(hs))
 ylim([0 3.5])
 title('Standard Deviation','interpreter','latex')
 xlabel('Horizon','interpreter','latex')

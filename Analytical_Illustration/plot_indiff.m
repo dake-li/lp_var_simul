@@ -50,11 +50,10 @@ for ir=1:num_rho
     end
     hold off;
     title(sprintf('%s%3.1f%s', '$\rho=', rhos(ir), '$'), 'Interpreter', 'latex');
-    set(gca, 'XTick', [min(hs) 5:5:max(hs)]);
     grid on;
     xlim([min(hs) max(hs)]);
     xlabel('Horizon','Interpreter','latex');
-    xticks(min(hs):5:max(hs))
+    xticks([min(hs) 4:4:max(hs)])
     ylim([0 1]);
     set(gca, 'FontSize', 12);
     set(gca, 'TitleFontSizeMultiplier', 1.2);
