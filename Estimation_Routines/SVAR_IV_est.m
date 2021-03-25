@@ -11,7 +11,7 @@ run('Estimation_Setup'); % common setup for all estimation methods
 
 % estimate SVAR via IV
 
-[VARout,IVout] = SVAR_IV(Y,IV_est_normalize_var_pos,nlags);
+[VARout,IVout] = SVAR_IV(Y,normalize_pos,nlags);
 ShockVector = IVout.gamma;
 
 % estimate IRF

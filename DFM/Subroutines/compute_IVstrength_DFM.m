@@ -48,7 +48,7 @@ n_spec = size(var_select,1);
 n_var = size(var_select,2);
 
 shock_weight = settings.est.shock_weight;
-IV_est_normalize_var_pos = settings.est.IV_est_normalize_var_pos;
+normalize_pos = settings.est.est_normalize_var_pos;
 
 IV_strength = NaN(n_spec, 1);
 
@@ -114,7 +114,7 @@ for i_spec = 1:n_spec
     
     % IRF of normalization variable at h = 0
     
-    IRF_initial = model.irf(1,var_select(i_spec, IV_est_normalize_var_pos));
+    IRF_initial = model.irf(1,var_select(i_spec, normalize_pos));
 
     % compute C
     C_right = zeros(n_var * (n_lags_uar + 1), n_fac * n_lags_state);
@@ -147,7 +147,7 @@ for i_spec = 1:n_spec
     
     % variance in projection-error
     
-    variance_projection_error = Sigma_innovation(IV_est_normalize_var_pos, IV_est_normalize_var_pos);
+    variance_projection_error = Sigma_innovation(normalize_pos, normalize_pos);
     
     % variance explained by IV
     
