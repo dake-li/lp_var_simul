@@ -15,7 +15,7 @@ We rely on penalized LP code by [Regis Barnichon & Christian Brownless](https://
 **[Documents](Documents):** Paper, supplement, and documentation
 - [lp_var_simul.pdf](Documents/lp_var_simul.pdf): Main paper
 - [lp_var_simul_supplement.pdf](Documents/lp_var_simul_supplement.pdf): Online supplement
-- [technical_note.pdf](Documents/technical_note.pdf): Technical documentation
+- [lp_var_simul_companion.pdf](Documents/lp_var_simul_companion.pdf): Technical documentation
 
 **[Analytical_Illustration](Analytical_Illustration):** Plots for simple analytical illustration
 - [plot_tradeoff.m](Analytical_Illustration/plot_tradeoff.m): Figure 1 in the paper
