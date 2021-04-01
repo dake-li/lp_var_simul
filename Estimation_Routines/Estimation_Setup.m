@@ -15,6 +15,10 @@ with_shock = settings.est.with_shock;
 recursive_shock = settings.est.recursive_shock;
 with_IV = settings.est.with_IV;
 
+if with_shock == 1
+    normalize_with_shock_std_dev = settings.est.normalize_with_shock_std_dev;
+end
+
 if recursive_shock == 1
     recursive_shock_pos = settings.est.recursive_shock_pos;
 end
@@ -25,7 +29,11 @@ if with_shock == 1 % observe shock: w_t = (shock, \bar{w}_t)
     Y = [data_sim.data_shock,data_sim.data_y]; % Warning: correspond to w_t in our paper
     responseV = response_pos + 1; % location of response variable
     recursiveShock = 1; % location of impulse variable
-    normalizeV = normalize_pos + 1; % location of normalization variable
+    if normalize_with_shock_std_dev == 1
+        normalizeV = 1; % normalize with one std dev of shock
+    else
+        normalizeV = normalize_pos + 1; % location of normalization variable
+    end
 elseif with_IV == 1 % IV: w_t = (IV, \bar{w}_t)
     Y = [data_sim.data_z,data_sim.data_y];
     responseV = response_pos + 1;
