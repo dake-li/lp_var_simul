@@ -169,16 +169,16 @@ DF_model.R0_sq = compute_invert_DFM(DF_model,settings);
 switch estimand_type
     
     case 'ObsShock'
-        DF_model.target_irf = DF_model.irf(settings.est.IRF_select, ...
-            settings.specifications.var_select(:,settings.est.IRF_response_var_pos));
+        DF_model.normalized_irf = compute_normalized_irfs(DF_model,settings);
+        DF_model.target_irf = DF_model.normalized_irf(settings.est.IRF_select, :);
         
     case 'Recursive'
         DF_model.VAR_irf = compute_VARirfs_DFM(DF_model,settings);
         DF_model.target_irf = DF_model.VAR_irf(settings.est.IRF_select, :);
         
     case 'IV'
-        DF_model.IV_irf = compute_IVirfs(DF_model,settings);
-        DF_model.target_irf = DF_model.IV_irf(settings.est.IRF_select, :);
+        DF_model.normalized_irf = compute_normalized_irfs(DF_model,settings);
+        DF_model.target_irf = DF_model.normalized_irf(settings.est.IRF_select, :);
 
 end
 

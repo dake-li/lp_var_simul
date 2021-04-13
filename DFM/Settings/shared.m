@@ -30,7 +30,7 @@ settings.est.manual_shock_pos         = 1; % if loading is not estimated, we jus
 
 % IRFs of interest
 
-settings.est.IRF_hor              = 20; % maximal horizon (include contemporary)
+settings.est.IRF_hor              = 21; % maximal horizon (include contemporary)
 settings.est.IRF_select           = 1:settings.est.IRF_hor; % which IRFs to study
 
 % compute R0_sq using VMA representation
@@ -64,7 +64,7 @@ settings.est.est_n_lag_BIC  = 0; % if estimate: use BIC? default is AIC
 settings.est.n_lags_fix     = lag_type; % default number of lags if not estimated
 settings.est.n_lags_max     = 20; % maximal lag length for info criteria
 
-settings.est.res_autocorr_nlags = 1; % check autocorr of VAR(p) residuals up to this order
+settings.est.res_autocorr_nlags = 2; % check autocorr of VAR(p) residuals up to this order
 
 % BVAR prior
 

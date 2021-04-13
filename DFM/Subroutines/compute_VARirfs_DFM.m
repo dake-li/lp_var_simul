@@ -50,6 +50,7 @@ n_lags_state = max(n_lags_uar + 1, n_lags_fac);
 
 recursive_shock_pos = settings.est.recursive_shock_pos;
 IRF_response_var_pos = settings.est.IRF_response_var_pos;
+normalize_pos = settings.est.est_normalize_var_pos;
 
 IRF = NaN(IRF_hor, n_spec);
 
@@ -122,7 +123,7 @@ for i_spec = 1:n_spec
     end
     
     % store normalized IRF
-    IRF(:, i_spec) = IRF_y(:, IRF_response_var_pos) / IRF_y(1, recursive_shock_pos);
+    IRF(:, i_spec) = IRF_y(:, IRF_response_var_pos) / IRF_y(1, normalize_pos);
 
 end
 

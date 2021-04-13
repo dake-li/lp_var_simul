@@ -8,13 +8,14 @@ Matlab code for large-scale simulation studies of impulse response estimators, i
 Tested in: Matlab R2020a on Windows 10 PC (64-bit)
 
 **Acknowledgements:**
-We rely on penalized LP code by [Regis Barnichon & Christian Brownless](https://github.com/ctbrownlees/MATLAB-package-lproj), as well as VAR model averaging code by [Bruce Hansen](https://www.ssc.wisc.edu/~bhansen/progs/var.html). We have slightly modified both of these sets of codes to improve their run-time without affecting their numerical output.
+We rely on penalized LP code by [Regis Barnichon & Christian Brownless](https://github.com/ctbrownlees/MATLAB-package-lproj), as well as VAR model averaging code by [Bruce Hansen](https://www.ssc.wisc.edu/~bhansen/progs/var.html). We have slightly modified both of these sets of codes to improve their run-time without affecting their numerical output. We also use Dynamic Factor Model code and data by [Eben Lazarus, Daniel Lewis, Jim Stock & Mark Watson](http://www.princeton.edu/~mwatson/ddisk/LLSW_ReplicationFiles_071418.zip).
 
 ## Contents
 
 **[Documents](Documents):** Paper, supplement, and documentation
 - [lp_var_simul.pdf](Documents/lp_var_simul.pdf): Main paper
 - [lp_var_simul_supplement.pdf](Documents/lp_var_simul_supplement.pdf): Online supplement
+- [lp_var_simul_companion.pdf](Documents/lp_var_simul_companion.pdf): Technical documentation
 
 **[Analytical_Illustration](Analytical_Illustration):** Plots for simple analytical illustration
 - [plot_tradeoff.m](Analytical_Illustration/plot_tradeoff.m): Figure 1 in the paper
@@ -37,3 +38,4 @@ We rely on penalized LP code by [Regis Barnichon & Christian Brownless](https://
   - [settings_shared.m](DFM/Reporting/settings_shared.m): Shared settings for plotting functions
 - [Settings](DFM/Settings): Folder with simulation settings
 - [Subroutines](DFM/Subroutines): Folder with data for calibrating the DFM and various functions for simulation and computing summary statistics
+  - [SW_DFM_Estimation](DFM/Subroutines/SW_DFM_Estimation): DFM code and data from [Lazarus, Lewis, Stock & Watson (2018)](https://doi.org/10.1080/07350015.2018.1506926)

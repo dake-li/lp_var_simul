@@ -51,9 +51,9 @@ for nf=1:length(lags_folders) % For each folder...
         the_rms_irf  = sqrt(mean(the_true_irf.^2)); % Root average squared true IRF across horizons
         
         % Compute robust statistics
-        q1_idx = 2 + find(res.settings.simul.quantiles==0.25); % Index of first quartile
-        med_idx = 2 + find(res.settings.simul.quantiles==0.5); % Index of median
-        q3_idx = 2 + find(res.settings.simul.quantiles==0.75); % Index of third quartile
+        q1_idx = stat_index(0.25, res.settings); % Index of first quartile
+        med_idx = stat_index(0.5, res.settings); % Index of median
+        q3_idx = stat_index(0.75, res.settings); % Index of third quartile
         the_fields = fieldnames(res.results.irf);
         for ii=1:length(the_fields)
             res.results.medBIAS2.(the_fields{ii}) = (squeeze(res.results.irf.(the_fields{ii})(:,med_idx,:))-the_true_irf).^2; % Median bias squared
