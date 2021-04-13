@@ -1,4 +1,4 @@
-function plot_frontier(loss, frontier, methods, font_size)
+function plot_frontier(loss, frontier, methods, font_size, plot_title, pos, dist)
 % Function for plotting the bias/variance frontier
 
     % settings
@@ -22,14 +22,24 @@ function plot_frontier(loss, frontier, methods, font_size)
     grid on
     hold on
     for i = 1:size(bias_methods,1)
-        text(bias_methods(i),std_methods(i),methods{i},'Color', line_colors(i,:),'FontSize',20,'interpreter','latex','FontWeight','bold');
-%         plot(bias_methods(i),std_methods(i),'x','Color', line_colors(i,:),'MarkerSize',20,'LineWidth',10)
+%         text(bias_methods(i),std_methods(i),methods{i},'Color', line_colors(i,:),'FontSize',20,'interpreter','latex','FontWeight','bold');
+        plot(bias_methods(i),std_methods(i),'x','Color', line_colors(i,:),'MarkerSize',20,'LineWidth',10)
+        if pos(i) == 1
+        labelpoints(bias_methods(i),std_methods(i),methods{i},'NE',dist(i),'interpreter','latex','FontSize',font_size)
+        elseif pos(i) == 2
+        labelpoints(bias_methods(i),std_methods(i),methods{i},'SE',dist(i),'interpreter','latex','FontSize',font_size)
+        elseif pos(i) == 3
+        labelpoints(bias_methods(i),std_methods(i),methods{i},'SW',dist(i),'interpreter','latex','FontSize',font_size)
+        elseif pos(i) == 4
+        labelpoints(bias_methods(i),std_methods(i),methods{i},'NW',dist(i),'interpreter','latex','FontSize',font_size)
+        end
         hold on
     end
     hold on
     plot(bias_frontier,std_frontier,'Color',[0.4 0.4 0.4],'LineWidth',4,'LineStyle','--')
     xlabel('Bias','interpreter','latex','FontSize',font_size);
     ylabel('St. Dev.','interpreter','latex','FontSize',font_size);
+    title(plot_title,'interpreter','latex','FontSize',5/4*font_size);
 %     legend(methods, 'Location', 'eastoutside', 'NumColumns', 1, 'interpreter', 'latex','FontSize',font_size);
     ylim([0 max(std_methods) * 1.1])
     hold off
