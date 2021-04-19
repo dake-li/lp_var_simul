@@ -26,6 +26,19 @@ methods_recursive_select = [1 2 3 4 5 6];
 % Apply shared settings
 settings_shared;
 
+% Plot settings
+horzs_plot = [4 10]; % Plot results for these horizons side by side
+method_labels = {'VAR', [0.06 0.04], [0.06 0.04];
+                 'Bias-corrected VAR', [0.1 -0.2], [-0.04 -0.09];
+                 'Bayesian VAR', [0 0.07], [0 0.07];
+                 'LP', [0 0.05], [0 0.05];
+                 'Penalized LP', [0.05 0], [0.05 0];
+                 'VAR model averaging', [0 0.05], [0 0.05]};
+    % Label for each estimator, as well as coordinate offset (in
+    % 'normalized' units) for text box relative to data point
+fontsize_plot = 12; % Font size for plot axes
+
+
 %% FIGURES
 
 for nf=1:length(lags_folders) % For each folder...
@@ -50,59 +63,32 @@ for nf=1:length(lags_folders) % For each folder...
         the_true_irf = res.DF_model.target_irf; % True IRF
         the_rms_irf  = sqrt(mean(the_true_irf.^2)); % Root average squared true IRF across horizons
         
-        % frontier settings
-        
-        frontier_hor_lb_1 = 3;
-        frontier_hor_ub_1 = 3;
-        frontier_hor_lb_2 = 8;
-        frontier_hor_ub_2 = 8;
-        frontier_hor_lb_3 = 4;
-        frontier_hor_ub_3 = 16;
-        
-        % bias
+        % bias and standard deviation
         
         the_bias = squeeze(median(sqrt(extract_struct(res.results.BIAS2))./the_rms_irf, 2));
-        
-        the_bias_1 = mean(the_bias(frontier_hor_lb_1:frontier_hor_ub_1,:),1)';
-        the_bias_2 = mean(the_bias(frontier_hor_lb_2:frontier_hor_ub_2,:),1)';
-        the_bias_3 = mean(the_bias(frontier_hor_lb_3:frontier_hor_ub_3,:),1)';
-        
-        % standard deviation
-        
         the_std = squeeze(median(sqrt(extract_struct(res.results.VCE))./the_rms_irf, 2));  
         
-        the_std_1 = mean(the_std(frontier_hor_lb_1:frontier_hor_ub_1,:),1)';
-        the_std_2 = mean(the_std(frontier_hor_lb_2:frontier_hor_ub_2,:),1)';
-        the_std_3 = mean(the_std(frontier_hor_lb_3:frontier_hor_ub_3,:),1)';
+        horzs_sel = ismember(res.settings.est.IRF_select, horzs_plot); % Selected horizons
+        the_bias_sel = the_bias(horzs_sel,:);
+        the_std_sel = the_std(horzs_sel,:);
         
-        % approximate frontier
+        % approximate frontier for visual aid
         
-        bias_frontier_1 = linspace(0.25 * min(the_bias_1),1.25 * max(the_bias_1),20)';
-        bias_frontier_2 = linspace(0.25 * min(the_bias_2),1.25 * max(the_bias_2),20)';
-        bias_frontier_3 = linspace(0.25 * min(the_bias_3),1.25 * max(the_bias_3),20)';
-        
-        std_frontier_1 = std_frontier_fn(the_bias_1,the_std_1,bias_frontier_1);
-        std_frontier_2 = std_frontier_fn(the_bias_2,the_std_2,bias_frontier_2);
-        std_frontier_3 = std_frontier_fn(the_bias_3,the_std_3,bias_frontier_3);
+        the_bias_frontier_grid = linspace(0.8 * min(the_bias_sel(:)),1.2 * max(the_bias_sel(:)),100)';
+        the_max_std = max(the_std_sel(:))*1.2;
         
         %----------------------------------------------------------------
         % Plot Results
         %----------------------------------------------------------------
         
-        pos_1  = [2 3 1 1 1 1];
-        dist_1 = [0.05 1 0.25 0.25 0.25 0.25];       
-        plot_frontier([the_bias_1,the_std_1],[bias_frontier_1,std_frontier_1],methods_names_plot,20,...
-            ['Horizon: h = ' num2str(frontier_hor_lb_1)],pos_1,dist_1);
-        
-        pos_2  = [1 3 1 1 1 1];
-        dist_2 = [0.05 1 0.25 0.25 0.25 0.25];       
-        plot_frontier([the_bias_2,the_std_2],[bias_frontier_2,std_frontier_2],methods_names_plot,20,...
-            ['Horizon: h = ' num2str(frontier_hor_lb_2)],pos_2,dist_2);
-        
-        pos_3  = [1 3 1 1 1 1];
-        dist_3 = [0.05 1 0.25 0.25 0.25 0.25];       
-        plot_frontier([the_bias_3,the_std_3],[bias_frontier_3,std_frontier_3],methods_names_plot,20,...
-            ['Average between h = ' num2str(frontier_hor_lb_3) ' and h = ' num2str(frontier_hor_ub_3)],pos_3,dist_3);
+        for ih=1:length(horzs_plot)
+            figure('Units', 'normalize', 'Position', [ih*0.3 0.3 0.3 0.5]);
+            plot_frontier(the_bias_sel(ih,:)',the_std_sel(ih,:)',the_bias_frontier_grid,the_max_std,...
+                [method_labels(:,1) method_labels(:,ih+1)],fontsize_plot,...
+                sprintf('%s%d%s', 'Horizon: ', horzs_plot(ih), ' Quarters'));
+            set(gcf, 'PaperPositionMode', 'auto');
+            plot_save(fullfile(output_folder, sprintf('%s%d', 'frontier_h', horzs_plot(ih))), output_suffix);
+        end
         
     end
     
