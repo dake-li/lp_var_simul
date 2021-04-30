@@ -18,7 +18,7 @@ end
 
 % estimate different VAR submodels
 
-[combination_irf,weights,G] = VAR_ModelAverage(Y,recursiveShock,responseV,n_lags_average_over,IRF_hor - 1,settings.est.average_options);
+[combination_irf,weights,G] = VAR_ModelAverage(Y,recursiveShock,responseV,n_lags_average_over,nlags,IRF_hor - 1,settings.est.average_options);
 IRF = combination_irf / G(normalizeV, recursiveShock); % IRF normalize by response of normalization variable. Warning: correspond to matrix C in our paper
 
 % store weights
