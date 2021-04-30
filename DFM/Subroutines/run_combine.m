@@ -6,10 +6,10 @@ clear all;
 
 %% SET UP DESTINATION FOLDER AND FILES
 
-spec_id_array = 1:2; % specification choice set id array
+spec_id_array = 1; % specification choice set id array
 dgp_type = 'G'; % Either 'G' or 'MP'
-estimand_type = 'IV'; % Either 'ObsShock', 'Recursive', or 'IV'
-lag_type = NaN; % No. of lags to impose in estimation, or NaN (meaning AIC)
+estimand_type = 'ObsShock'; % Either 'ObsShock', 'Recursive', or 'IV'
+lag_type = 4; % No. of lags to impose in estimation, or NaN (meaning AIC)
 winsor_percent = 0.025; % winsorize each tail with this percentage to compute winsorized mean and std
 quantiles = [0.1,0.25,0.5,0.75,0.9]; % summarize MCs in the order of mean, std, winsorized mean, winsorized std, and these quantiles
 % the name of each summary statistic is stored in settings.simul.summ_stat_name
