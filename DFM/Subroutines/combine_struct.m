@@ -39,7 +39,7 @@ for id = spec_id_array
         end
         
         % concatenate
-        if id == 1
+        if id == spec_id_array(1)
             DF_model_combined.(first_tier{i}) = DF_model.(first_tier{i});
         elseif ~isnan(concatenate_dim)
             DF_model_combined.(first_tier{i}) = cat(concatenate_dim, DF_model_combined.(first_tier{i}), DF_model.(first_tier{i})); 
@@ -68,7 +68,7 @@ for id = spec_id_array
             end
             
             % concatenate
-            if id == 1
+            if id == spec_id_array(1)
                 settings_combined.(first_tier{i}).(second_tier{j}) = settings.(first_tier{i}).(second_tier{j});
             elseif ~isnan(concatenate_dim)
                 settings_combined.(first_tier{i}).(second_tier{j}) = cat(concatenate_dim, settings_combined.(first_tier{i}).(second_tier{j}), settings.(first_tier{i}).(second_tier{j})); 
@@ -123,7 +123,7 @@ for id = spec_id_array
             end
             
             % concatenate (spec)
-            if id == 1
+            if id == spec_id_array(1)
                 results_combined.(first_tier{i}).(second_tier{j}) = results_summarized.(first_tier{i}).(second_tier{j});
             elseif ~isnan(concatenate_dim)
                 results_combined.(first_tier{i}).(second_tier{j}) = cat(concatenate_dim, results_combined.(first_tier{i}).(second_tier{j}), results_summarized.(first_tier{i}).(second_tier{j})); 
