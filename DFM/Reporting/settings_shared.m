@@ -41,6 +41,10 @@ exper_names   = exper_names_list(exper_select);
 
 % select estimation methods for each experiment
 
+methods_iv_fields       = {'svar','svar_corrbias','bvar','lp','lp_penalize','var_avg','svar_iv'};
+methods_obsshock_fields       = {'svar','svar_corrbias','bvar','lp','lp_penalize','var_avg'};
+methods_recursive_fields       = {'svar','svar_corrbias','bvar','lp','lp_penalize','var_avg'};
+
 methods_iv_names        = {'VAR','BC VAR','BVAR','LP','Pen LP','VAR Avg','SVAR-IV'};
 methods_obsshock_names  = {'VAR','BC VAR','BVAR','LP','Pen LP','VAR Avg'};
 methods_recursive_names = {'VAR','BC VAR','BVAR','LP','Pen LP','VAR Avg'};
@@ -48,6 +52,10 @@ methods_recursive_names = {'VAR','BC VAR','BVAR','LP','Pen LP','VAR Avg'};
 methods_select = {methods_iv_select,methods_obsshock_select,methods_recursive_select,...
                     methods_iv_select,methods_obsshock_select,methods_recursive_select};
 methods_select = methods_select(exper_select);
+
+methods_fields = {methods_iv_fields(methods_iv_select),methods_obsshock_fields(methods_obsshock_select),methods_recursive_fields(methods_recursive_select),...
+                    methods_iv_fields(methods_iv_select),methods_obsshock_fields(methods_obsshock_select),methods_recursive_fields(methods_recursive_select)};
+methods_fields = methods_fields(exper_select);
 
 methods_names = {methods_iv_names(methods_iv_select),methods_obsshock_names(methods_obsshock_select),methods_recursive_names(methods_recursive_select),...
                     methods_iv_names(methods_iv_select),methods_obsshock_names(methods_obsshock_select),methods_recursive_names(methods_recursive_select)};
@@ -59,4 +67,4 @@ methods_names = methods_names(exper_select);
 
 font_size = 16;         % Font size of method labels (titles and tick labels will be scaled accordingly)
 output_dir = 'fig';     % Folder
-output_suffix = 'eps';  % File suffix
+output_suffix = 'png';  % File suffix
