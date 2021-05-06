@@ -1,4 +1,5 @@
-function [IRF,nlags,largest_root,LM_stat,LM_pvalue,Granger_stat,Granger_pvalue] = SVAR_est(data_sim,settings,bias_corrected);
+function [IRF,nlags,largest_root,LM_stat,LM_pvalue,Granger_stat,Granger_pvalue,Hausman_stat,Hausman_pvalue] ...
+    = SVAR_est(data_sim,settings,bias_corrected);
 % Function for estimating IRFs using least-squares VAR or bias-corrected VAR
 
 % preparations
@@ -59,6 +60,12 @@ if nargout > 2
         LM_stat = (nT-nlags-res_autocorr_nlags - nv*nlags - 1 - nv*res_autocorr_nlags - 0.5) *...
             log(det(Sigma_original) / det(Sigma_auxiliary));
         LM_pvalue = chi2cdf(LM_stat, nv^2 * res_autocorr_nlags, 'upper');
+        
+        % Hausman test of hypothesis SVAR IRF = LP IRF
+        
+        if with_shock == 1
+            [Hausman_stat, Hausman_pvalue] = IRF_Hausman(Y,responseV,IRF,By,Sigma,Sxx);
+        end
 
         % test if IV granger-causes endogenous variables
         
