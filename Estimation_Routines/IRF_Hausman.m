@@ -16,18 +16,16 @@ function [stat, pvalue, irf_LP, varcov_VAR, varcov_LP] = IRF_Hausman(Y,respV,irf
     irf_LP = IRF_LP(Y,1,respV,nlags,nhorizons)';
     
     % Compute various IRFs based on VAR
-    G = chol(Sigma, 'lower'); % Warning: corresponds to matrix C in our paper
+    G = chol(Sigma, 'lower'); % Warning: corresponds to matrix B in our paper
     gamma = G(:,1)/G(1,1);
     irf_gamma_VAR = IRF_SVAR(By,gamma,nhorizons); % Normalized IRFs of all variables wrt. first orthogonalized shock
-    irf_respV_VAR = nan(nv,1+nhorizons); % Will contain IRFs of response variable wrt. all orthogonalized shocks
     irf_respV_redf_VAR = nan(nv,1+nhorizons); % Will contain reduced-form IRFs of response variable
     the_eye = eye(nv);
     for i=1:nv
-        the_irf = IRF_SVAR(By,G(:,i),nhorizons);
-        irf_respV_VAR(i,:) = the_irf(respV,:);
         the_irf_redf = IRF_SVAR(By,the_eye(:,i),nhorizons);
         irf_respV_redf_VAR(i,:) = the_irf_redf(respV,:);
     end
+    irf_respV_VAR = G'*irf_respV_redf_VAR; % IRFs of response variable wrt. all orthogonalized shocks
     
     % Build LP residual MA structure and VAR IRF Jacobian
     jacob_VAR = zeros(nv,nv*nv*nlags,1+nhorizons); % Will contain Jacobian of VAR IRF wrt. By (VAR coefficients)

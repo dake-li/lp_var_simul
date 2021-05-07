@@ -39,11 +39,15 @@ hausman_pvals = nan(numrep,num_p);
 irf_tstats_VAR = nan(numrep,1+maxhorz,num_p);
 irf_tstats_LP = nan(numrep,1+maxhorz,num_p);
 
+rng_seeds = randi(2^32-1,numrep,1);
+
 timer = tic;
 
 parfor i=1:numrep
+% for i=1:numrep
     
     % Simulate data
+    rng(rng_seeds(i), 'twister');
     Y_sim = simulate(mdl, T);
     
     the_hausman_stats = nan(1,num_p);
@@ -64,10 +68,8 @@ parfor i=1:numrep
             IRF_Hausman(Y_sim,response_var,the_irf_VAR,the_By,the_Sigma,the_Sxx);
         
         % Test true IRF
-        the_irf_VAR_diff = the_irf_VAR-irf_true;
-        the_irf_tstats_VAR(:,j) = the_irf_VAR_diff./sqrt(diag(the_varcov_VAR));
-        the_irf_LP_diff = the_irf_LP-irf_true;
-        the_irf_tstats_LP(:,j) = the_irf_LP_diff./sqrt(diag(the_varcov_LP));
+        the_irf_tstats_VAR(:,j) = (the_irf_VAR-irf_true)./sqrt(diag(the_varcov_VAR));
+        the_irf_tstats_LP(:,j) = (the_irf_LP-irf_true)./sqrt(diag(the_varcov_LP));
         
     end
 
