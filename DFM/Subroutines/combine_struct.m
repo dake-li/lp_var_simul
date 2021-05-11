@@ -94,7 +94,7 @@ for id = spec_id_array
             % decide which dim to summarize (MC)
             if any(strcmp(first_tier{i},{'irf'}))
                 summarize_dim = 2;
-            elseif any(strcmp(first_tier{i},{'weight'}))
+            elseif any(strcmp(first_tier{i},{'weight','submodel_irf'}))
                 summarize_dim = 3;
             elseif any(strcmp(first_tier{i},{'n_lags','largest_root','LM_stat','LM_pvalue','Granger_stat','Granger_pvalue','F_stat','F_pvalue','lambda'}))
                 summarize_dim = 1;
@@ -112,9 +112,9 @@ for id = spec_id_array
             end
             
             % decide which dim to concatenate (spec)
-            if any(strcmp(first_tier{i},{'irf'}))
+            if any(strcmp(first_tier{i},{'irf','oracle_weight'}))
                 concatenate_dim = 3;
-            elseif any(strcmp(first_tier{i},{'weight'}))
+            elseif any(strcmp(first_tier{i},{'weight','submodel_irf'}))
                 concatenate_dim = 4;
             elseif any(strcmp(first_tier{i},{'n_lags','largest_root','LM_stat','LM_pvalue','Granger_stat','Granger_pvalue','F_stat','F_pvalue','lambda','MSE','BIAS2','VCE'}))
                 concatenate_dim = 2;
@@ -136,8 +136,8 @@ for id = spec_id_array
 end
 
 % update count of specifications
-settings_combined.specifications.random_n_spec = settings_combined.specifications.random_n_spec * length(spec_id_array);
-settings_combined.specifications.n_spec = settings_combined.specifications.n_spec * length(spec_id_array);
+settings_combined.specifications.random_n_spec = size(settings_combined.specifications.var_select,1);
+settings_combined.specifications.n_spec = size(settings_combined.specifications.var_select,1);
 
 % update settings
 settings_combined.specifications.spec_id_array = spec_id_array;

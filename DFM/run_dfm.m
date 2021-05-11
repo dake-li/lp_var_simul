@@ -138,6 +138,8 @@ results_Granger_pvalue_svar = NaN(settings.simul.n_MC,settings.specifications.n_
 results_lambda_lp_penalize = NaN(settings.simul.n_MC,settings.specifications.n_spec); % pen. LP lambda: size n_MC*n_spec
 results_weight_var_avg = NaN(2*settings.est.n_lags_max,length(settings.est.average_store_weight),...
     settings.simul.n_MC,settings.specifications.n_spec); % weights in VAR averaging: size n_models*n_horizon*n_MC*n_spec
+results_submodel_irf_var_avg = NaN(2*settings.est.n_lags_max,settings.est.IRF_hor,...
+    settings.simul.n_MC,settings.specifications.n_spec); % IRF in each VAR submodel: size n_models*IRF_hor*n_MC*n_spec
 results_F_stat_svar_iv = NaN(settings.simul.n_MC,settings.specifications.n_spec); % VAR-IV F statistic: size n_MC*n_spec
 results_F_pvalue_svar_iv = NaN(settings.simul.n_MC,settings.specifications.n_spec); % VAR-IV F p value: size n_MC*n_spec
 
@@ -228,6 +230,8 @@ parfor i_MC = 1:settings.simul.n_MC
     temp_lambda_lp_penalize = NaN(1,settings.specifications.n_spec);
     temp_weight_var_avg = NaN(2*settings.est.n_lags_max,...
         length(settings.est.average_store_weight),settings.specifications.n_spec);
+    temp_submodel_irf_var_avg = NaN(2*settings.est.n_lags_max,...
+        settings.est.IRF_hor,settings.specifications.n_spec);
     temp_F_stat_svar_iv = NaN(1,settings.specifications.n_spec);
     temp_F_pvalue_svar_iv = NaN(1,settings.specifications.n_spec);
     
@@ -270,7 +274,7 @@ parfor i_MC = 1:settings.simul.n_MC
                         = LP_shrink_est(data_sim_select,settings);
 
                 case 'var_avg' % VAR model averaging
-                    [temp_irf(i_method,:,i_spec),temp_n_lags(i_method,i_spec), temp_weight_var_avg(:,:,i_spec)]...
+                    [temp_irf(i_method,:,i_spec),temp_n_lags(i_method,i_spec), temp_weight_var_avg(:,:,i_spec), temp_submodel_irf_var_avg(:,:,i_spec)]...
                         = VAR_avg_est(data_sim_select,settings);
 
                 case 'svar_iv' % SVAR-IV       
@@ -298,6 +302,7 @@ parfor i_MC = 1:settings.simul.n_MC
     results_Granger_pvalue_svar(i_MC,:) = temp_Granger_pvalue_svar;
     results_lambda_lp_penalize(i_MC,:) = temp_lambda_lp_penalize;
     results_weight_var_avg(:,:,i_MC,:) = temp_weight_var_avg;
+    results_submodel_irf_var_avg(:,:,i_MC,:) = temp_submodel_irf_var_avg;
     results_F_stat_svar_iv(i_MC,:) = temp_F_stat_svar_iv;
     results_F_pvalue_svar_iv(i_MC,:) = temp_F_pvalue_svar_iv;
 
@@ -341,6 +346,9 @@ end
 
 if any(strcmp(settings.est.methods_name, 'var_avg'))
     results.weight.var_avg = results_weight_var_avg;
+    if settings.est.average_store_submodel_irf == 1
+        results.submodel_irf.var_avg = results_submodel_irf_var_avg;
+    end
 end
 
 if any(strcmp(settings.est.methods_name, 'svar_iv'))

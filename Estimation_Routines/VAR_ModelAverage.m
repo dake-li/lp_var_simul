@@ -1,4 +1,4 @@
-function [combination_irf,weights,H_default] = VAR_ModelAverage(dat,recurShock,respV,p,default_lag,hmax,options)
+function [combination_irf,weights,H_default,submodel_irf] = VAR_ModelAverage(dat,recurShock,respV,p,default_lag,hmax,options)
 % Auxiliary function for h-step impulse responses computed by a weighted average of different VAR submodels
 % (modified based on Bruce Hansen's "cvar_ir.m" code, https://www.ssc.wisc.edu/~bhansen/progs/var.html)
 
@@ -124,7 +124,7 @@ for h = 1:hmax
     ird = ir_diff(:,h);
     J0 = n*(ird*ird');
     K = - Kr(:,h)';
-    w = quadprog(J0,K,[],[],ub',1,lb,ub,[],options); % compute optimal weights for submodels at each horizon h
+    w = quadprog(J0,K,[],[],ones(M,1)',1,lb,ub,[],options); % compute optimal weights for submodels at each horizon h
     weights(:,h) = w;
     combination_irf(h+1,1) = submodel_irf(h+1,:)*w; % compute averaged IRF
 end
