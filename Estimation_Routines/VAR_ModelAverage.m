@@ -34,11 +34,12 @@ combination_irf = zeros(hmax+1, 1); % placeholder for IRF averaged across submod
 
 % Default impact effect matrix
 [~,~,sigma_default] = VAR(dat(p + 1 - default_lag:end,:), default_lag);
-H_default = chol(sigma_default,'lower');
+H_default = chol(sigma_default,'lower'); % Warning: correspond to matrix C in our paper
 
 % Least-squares VAR(p)
 [~,By,sigma,Q,e,Bt,y,x] = VAR(dat,p);
-H = chol(sigma,'lower'); % Warning: correspond to matrix C in our paper
+% H = chol(sigma,'lower');
+H = H_default; % use H from VAR with default lag order
 
 % Asymptotic variance
 xe = repmat(x,1,m) .* e(:,kron(1:m,ones(1,k)));
@@ -97,7 +98,8 @@ for r = 1:M-1
     % IRF
     er = y - x*Btr;
     sigmar = (er'*er) / (n-k+sum(sel_vec)/m);
-    Hr = chol(sigmar,'lower');
+    % Hr = chol(sigmar,'lower');
+    Hr = H_default; % use H from VAR with default lag order
     Byr = reshape(Btr(2:end,:),[m,p,m]);
     Byr = permute(Byr,[3,1,2]);
     irfr = IRF_SVAR(Byr,Hr(:,recurShock),hmax);
