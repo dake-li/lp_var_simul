@@ -46,14 +46,20 @@ else % recursive: w_t = \bar{w}_t
     normalizeV = normalize_pos;
 end
 
+% estimate lag length
+
+if est_n_lag_BIC == 1 % estimate lag order via BIC
+    [BIC,~] = IC_VAR(Y,n_lags_max);
+    [~,n_lags_est] = min(BIC);
+else % estimate lag order via AIC
+    [~,AIC] = IC_VAR(Y,n_lags_max);
+    [~,n_lags_est] = min(AIC);
+end
+
 % set lag length
 
 if est_n_lag == 0 % fix lag order
     nlags = n_lags_fix;
-elseif est_n_lag_BIC == 1 % estimate lag order via BIC
-    [BIC,~] = IC_VAR(Y,n_lags_max);
-    [~,nlags] = min(BIC);
-else % estimate lag order via AIC
-    [~,AIC] = IC_VAR(Y,n_lags_max);
-    [~,nlags] = min(AIC);
+else % use estimated lag order
+    nlags = n_lags_est; 
 end

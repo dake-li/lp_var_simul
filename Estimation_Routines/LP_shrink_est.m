@@ -1,4 +1,4 @@
-function [IRF,nlags,lambda_opt] = LP_shrink_est(data_sim,settings);
+function [IRF,n_lags_est,lambda_opt] = LP_shrink_est(data_sim,settings);
 % Function for estimating IRFs using penalized LP
 
 % preparations

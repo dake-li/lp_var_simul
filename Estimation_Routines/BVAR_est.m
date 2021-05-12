@@ -1,4 +1,4 @@
-function [IRF,nlags] = BVAR_est(data_sim,settings);
+function [IRF,n_lags_est] = BVAR_est(data_sim,settings);
 % Function for estimating IRFs using a Bayesian VAR approach
 
 % preparations
