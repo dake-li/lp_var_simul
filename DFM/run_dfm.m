@@ -133,6 +133,8 @@ results_n_lags = NaN(settings.est.n_methods,settings.simul.n_MC,settings.specifi
 results_largest_root_svar = NaN(settings.simul.n_MC,settings.specifications.n_spec); % largest VAR root: size n_MC*n_spec
 results_LM_stat_svar = NaN(settings.simul.n_MC,settings.specifications.n_spec); % LM statistic: size n_MC*n_spec
 results_LM_pvalue_svar = NaN(settings.simul.n_MC,settings.specifications.n_spec); % LM p value: size n_MC*n_spec
+results_Hausman_stat_svar = NaN(settings.simul.n_MC,settings.specifications.n_spec); % LM statistic: size n_MC*n_spec
+results_Hausman_pvalue_svar = NaN(settings.simul.n_MC,settings.specifications.n_spec); % LM p value: size n_MC*n_spec
 results_Granger_stat_svar = NaN(settings.simul.n_MC,settings.specifications.n_spec); % Granger statistic: size n_MC*n_spec
 results_Granger_pvalue_svar = NaN(settings.simul.n_MC,settings.specifications.n_spec); % Granger p value: size n_MC*n_spec
 results_lambda_lp_penalize = NaN(settings.simul.n_MC,settings.specifications.n_spec); % pen. LP lambda: size n_MC*n_spec
@@ -225,6 +227,8 @@ parfor i_MC = 1:settings.simul.n_MC
     temp_largest_root_svar = NaN(1,settings.specifications.n_spec);
     temp_LM_stat_svar = NaN(1,settings.specifications.n_spec);
     temp_LM_pvalue_svar = NaN(1,settings.specifications.n_spec);
+    temp_Hausman_stat_svar = NaN(1,settings.specifications.n_spec);
+    temp_Hausman_pvalue_svar = NaN(1,settings.specifications.n_spec);
     temp_Granger_stat_svar = NaN(1,settings.specifications.n_spec);
     temp_Granger_pvalue_svar = NaN(1,settings.specifications.n_spec);
     temp_lambda_lp_penalize = NaN(1,settings.specifications.n_spec);
@@ -252,8 +256,9 @@ parfor i_MC = 1:settings.simul.n_MC
             switch settings.est.methods_name{i_method}
 
                 case 'svar' % VAR
-                    [temp_irf(i_method,:,i_spec),temp_n_lags(i_method,i_spec),...
-                        temp_largest_root_svar(i_spec),temp_LM_stat_svar(i_spec),temp_LM_pvalue_svar(i_spec),...
+                    [temp_irf(i_method,:,i_spec),temp_n_lags(i_method,i_spec),temp_largest_root_svar(i_spec),...
+                        temp_LM_stat_svar(i_spec),temp_LM_pvalue_svar(i_spec),...
+                        temp_Hausman_stat_svar(i_spec),temp_Hausman_pvalue_svar(i_spec),...
                         temp_Granger_stat_svar(i_spec),temp_Granger_pvalue_svar(i_spec)]...
                         = SVAR_est(data_sim_select,settings,0);
 
@@ -298,6 +303,8 @@ parfor i_MC = 1:settings.simul.n_MC
     results_largest_root_svar(i_MC,:) = temp_largest_root_svar;
     results_LM_stat_svar(i_MC,:) = temp_LM_stat_svar;
     results_LM_pvalue_svar(i_MC,:) = temp_LM_pvalue_svar;
+    results_Hausman_stat_svar(i_MC,:) = temp_Hausman_stat_svar;
+    results_Hausman_pvalue_svar(i_MC,:) = temp_Hausman_pvalue_svar;
     results_Granger_stat_svar(i_MC,:) = temp_Granger_stat_svar;
     results_Granger_pvalue_svar(i_MC,:) = temp_Granger_pvalue_svar;
     results_lambda_lp_penalize(i_MC,:) = temp_lambda_lp_penalize;
@@ -334,6 +341,10 @@ if any(strcmp(settings.est.methods_name, 'svar'))
     results.largest_root.svar = results_largest_root_svar;
     results.LM_stat.svar = results_LM_stat_svar;
     results.LM_pvalue.svar = results_LM_pvalue_svar;
+    if strcmp(estimand_type, 'ObsShock')
+        results.Hausman_stat.svar = results_Hausman_stat_svar;
+        results.Hausman_pvalue.svar = results_Hausman_pvalue_svar;
+    end
     if strcmp(estimand_type, 'IV')
         results.Granger_stat.svar = results_Granger_stat_svar;
         results.Granger_pvalue.svar = results_Granger_pvalue_svar;
