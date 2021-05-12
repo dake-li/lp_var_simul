@@ -1,4 +1,4 @@
-function [IRF,nlags,largest_root,LM_stat,LM_pvalue,Granger_stat,Granger_pvalue,Hausman_stat,Hausman_pvalue] ...
+function [IRF,nlags,largest_root,LM_stat,LM_pvalue,Hausman_stat,Hausman_pvalue,Granger_stat,Granger_pvalue] ...
     = SVAR_est(data_sim,settings,bias_corrected);
 % Function for estimating IRFs using least-squares VAR or bias-corrected VAR
 
@@ -24,7 +24,7 @@ IRF = IRF_SVAR(By,ShockVector,IRF_hor - 1); % IRF to one unit of shock
 IRF = IRF(responseV,:) / IRF(normalizeV,1); % normalize by response of normalization variable
 IRF = IRF';
 
-% when largest_root, LM_stat, Granger_stat are computed
+% when largest_root, LM_stat, Hausman_stat, Granger_stat are computed
 
 if nargout > 2
     
@@ -33,6 +33,8 @@ if nargout > 2
         largest_root = NaN;
         LM_stat = NaN;
         LM_pvalue = NaN;
+        Hausman_stat = NaN;
+        Hausman_pvalue = NaN;
         Granger_stat = NaN;
         Granger_pvalue = NaN;
         
@@ -63,7 +65,10 @@ if nargout > 2
         
         % Hausman test of hypothesis SVAR IRF = LP IRF
         
-        if with_shock == 1
+        if with_shock == 0
+            Hausman_stat = NaN;
+            Hausman_pvalue = NaN;
+        else
             [Hausman_stat, Hausman_pvalue] = IRF_Hausman(Y,responseV,IRF,By,Sigma,Sxx);
         end
 
