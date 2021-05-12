@@ -91,9 +91,10 @@ DFM.Sigma_eta  = fac_est_out.varout.seps; % var-cov matrix for reduced-form shoc
 DFM.sigma_v    = factor_model.uar_ser_mat;
 DFM.delta      = factor_model.uar_coef_mat;
 
-DFM.bpnamevec = datain.bpnamevec;
+DFM.bpnamevec = datain.bpnamevec; % variable name
 DFM.bplabvec_long = datain.bplabvec_long;
 DFM.bplabvec_short = datain.bplabvec_short;
+DFM.bptcodevec = datain.bptcodevec; % transformation code
 
 DFM.fac = fac_est_out.fac;
 DFM.fac_res = fac_est_out.varout.resid;

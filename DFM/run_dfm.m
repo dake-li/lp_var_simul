@@ -66,6 +66,9 @@ DF_model.delta         = DFM_estimate.delta;
 DF_model.sigma_v       = DFM_estimate.sigma_v;
 
 DF_model.variable_name = DFM_estimate.bplabvec_long;
+DF_model.trans_code = DFM_estimate.bptcodevec; % transformation code
+% (1) y = x, (2) y = (1-L)x, (3) y = (1-L)^2 x,
+% (4) y = ln(x), (5) y = (1-L)ln(x), (6) y = (1-L)^2 ln(x)
 
 %----------------------------------------------------------------
 % Calibrate IV Strength
