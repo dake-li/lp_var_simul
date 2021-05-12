@@ -30,7 +30,7 @@ if with_shock == 1 % observe shock: w_t = (shock, \bar{w}_t)
     responseV = response_pos + 1; % location of response variable
     recursiveShock = 1; % location of impulse variable
     if normalize_with_shock_std_dev == 1
-        normalizeV = 1; % normalize with one std dev of shock
+        normalizeV = 1; % normalize with one unit of shock (shock std-dev is 1)
     else
         normalizeV = normalize_pos + 1; % location of normalization variable
     end
