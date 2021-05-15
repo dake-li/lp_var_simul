@@ -73,6 +73,10 @@ settings.est.prior.tight_nonown_lag   = 0.25;
 settings.est.prior.decay_power        = 2;
 settings.est.prior.tight_exogenous    = 1e5;
 
+% BVAR posterior draws
+
+settings.est.posterior_ndraw = 100; % number of posterior draws (if set to 0, only use posterior mean of VAR coefficient to compute posterior mean of IRF)
+
 % LP smoothing
 
 settings.est.lambdaRange   = [0.001:0.005:0.021, 0.05:0.1:1.05, 2:1:19, 20:20:100, 200:200:2000]; % cross validation grid, scaled up by T

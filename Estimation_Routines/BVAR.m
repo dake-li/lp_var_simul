@@ -1,4 +1,4 @@
-function [Bc,By,Sigma,posteriorVarInv] = BVAR(Y,nlags,prior)
+function [Bc,By,Sigma,Beta,Alpha,posteriorVarInv] = BVAR(Y,nlags,prior)
 % Auxiliary function for estimating Bayesian VAR coefficients
 
 %% PREPARE
