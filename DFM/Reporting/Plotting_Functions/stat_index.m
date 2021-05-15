@@ -14,7 +14,7 @@ if isnumeric(stat_name)
 end
 
 % find the index
-index = find(contains(summ_stat_name, stat_name));
+index = find(strcmp(summ_stat_name, stat_name));
 
 end
 

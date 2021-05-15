@@ -96,7 +96,7 @@ for id = spec_id_array
                 summarize_dim = 2;
             elseif any(strcmp(first_tier{i},{'weight','submodel_irf'}))
                 summarize_dim = 3;
-            elseif any(strcmp(first_tier{i},{'n_lags','largest_root','LM_stat','LM_pvalue','Granger_stat','Granger_pvalue','F_stat','F_pvalue','lambda'}))
+            elseif any(strcmp(first_tier{i},{'n_lags','largest_root','LM_stat','LM_pvalue','Hausman_stat','Hausman_pvalue','Granger_stat','Granger_pvalue','F_stat','F_pvalue','lambda'}))
                 summarize_dim = 1;
             else
                 summarize_dim = NaN;
@@ -116,7 +116,7 @@ for id = spec_id_array
                 concatenate_dim = 3;
             elseif any(strcmp(first_tier{i},{'weight','submodel_irf'}))
                 concatenate_dim = 4;
-            elseif any(strcmp(first_tier{i},{'n_lags','largest_root','LM_stat','LM_pvalue','Granger_stat','Granger_pvalue','F_stat','F_pvalue','lambda','MSE','BIAS2','VCE'}))
+            elseif any(strcmp(first_tier{i},{'n_lags','largest_root','LM_stat','LM_pvalue','Hausman_stat','Hausman_pvalue','Granger_stat','Granger_pvalue','F_stat','F_pvalue','lambda','MSE','BIAS2','VCE'}))
                 concatenate_dim = 2;
             else
                 concatenate_dim = NaN;

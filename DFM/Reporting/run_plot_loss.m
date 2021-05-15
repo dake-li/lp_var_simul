@@ -67,7 +67,7 @@ for nf=1:length(lags_folders) % For each folder...
         the_objects = {'BIAS2',    'VCE',   'medBIAS2',     'IQR2'}; % Objects to plot
         the_titles =  {'Bias',     'Std',   'MedBias',      'IQR'};  % Plot titles/file names
 
-        the_methods_index = cellfun(@(x) find(contains(res.settings.est.methods_name, x)), methods_fields{ne}); % index of each method
+        the_methods_index = cellfun(@(x) find(strcmp(res.settings.est.methods_name, x)), methods_fields{ne}); % index of each method
 
         for j=1:length(the_objects)
             
