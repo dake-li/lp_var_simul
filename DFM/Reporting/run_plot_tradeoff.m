@@ -9,6 +9,7 @@ clear all
 close all
 
 addpath('Plotting_Functions')
+addpath(genpath(fullfile('..', 'Subroutines')))
 warning('off','MATLAB:structOnObject')
 
 %% SETTINGS
@@ -27,6 +28,10 @@ exper_select_group = {[2,5], [1,4], [3,6]};
 methods_iv_select        = [1 2 3 4 5 6 7];
 methods_obsshock_select  = [1 2 3 4 5 6];
 methods_recursive_select = [1 2 3 4 5 6];
+
+% select a subset of DGPs
+select_DGP = 0; % if select a subset of DGPs?
+select_DGP_fn = @(i_dgp, res) res.DF_model.VAR_largest_root(i_dgp) > median(res.DF_model.VAR_largest_root); % binary selection criteria
 
 % Apply shared settings
 settings_shared;
@@ -111,14 +116,22 @@ for nf=1:length(lags_folders) % For each folder...
             continue;
         end
         
+        % keep only the selected subset of DGPs
+        if select_DGP == 1
+            DGP_selected = arrayfun(@(x) select_DGP_fn(x,res), 1:res.settings.specifications.n_spec)'; % binary DGP selection label
+            res = combine_struct(res,[],[],DGP_selected);
+        end
+        
         % Results relative to true IRF
         the_true_irf = res.DF_model.target_irf; % True IRF
         the_rms_irf = sqrt(mean(the_true_irf.^2)); % Root average squared true IRF across horizons
         
+        the_methods_index = cellfun(@(x) find(strcmp(res.settings.est.methods_name, x)), methods_fields{ne}); % index of each method
+        
         the_BIAS2 = extract_struct(res.results.BIAS2);
-        the_BIAS2 = the_BIAS2(:,:,methods_select{ne});
+        the_BIAS2 = the_BIAS2(:,:,the_methods_index);
         the_VCE   = extract_struct(res.results.VCE);
-        the_VCE   = the_VCE(:,:,methods_select{ne});
+        the_VCE   = the_VCE(:,:,the_methods_index);
 
         the_BIAS2rel = the_BIAS2./the_rms_irf.^2;
         the_VCErel   = the_VCE./the_rms_irf.^2;

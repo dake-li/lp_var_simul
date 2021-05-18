@@ -6,6 +6,7 @@ clc
 close all
 clear all;
 addpath('Plotting_Functions');
+addpath(genpath(fullfile('..', 'Subroutines')))
 
 %% SETTINGS
 
@@ -19,6 +20,10 @@ exper_select_group = {[2,5], [3,6], [1,4]}; % combine G and MP for observed shoc
 methods_iv_select        = [1 2 3 4 5 6 7];
 methods_obsshock_select  = [1 2 3 4 5 6];
 methods_recursive_select = [1 2 3 4 5 6];
+
+% select a subset of DGPs
+select_DGP = 0; % if select a subset of DGPs?
+select_DGP_fn = @(i_dgp, res) res.DF_model.VAR_largest_root(i_dgp) > median(res.DF_model.VAR_largest_root); % binary selection criteria
 
 % Apply shared settings
 settings_shared;
@@ -53,6 +58,12 @@ for nf=1:length(lags_folders) % For each folder...
         % see if ready to plot for this group of experiments
         if exper_group_end(ne) == 0
             continue;
+        end
+        
+        % keep only the selected subset of DGPs
+        if select_DGP == 1
+            DGP_selected = arrayfun(@(x) select_DGP_fn(x,res), 1:res.settings.specifications.n_spec)'; % binary DGP selection label
+            res = combine_struct(res,[],[],DGP_selected);
         end
         
         % Record the index of median across MCs
