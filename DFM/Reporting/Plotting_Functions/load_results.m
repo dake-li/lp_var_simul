@@ -18,7 +18,7 @@ if (ne == 1) || (exper_group_end(ne-1) == 1)
     mkdir(output_folder); % Create output folder
 else
     res_part = load(fullfile(rootfolder, strcat(file_name, '.mat'))); % Load
-    res = combine_exper(res, res_part); % Merge
+    res = combine_struct(res, res_part, [], []); % Merge
 end
 
 horzs = res.settings.est.IRF_select; % Impulse response horizons
