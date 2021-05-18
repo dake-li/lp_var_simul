@@ -10,6 +10,10 @@ function out = calibrateIV(DFM_estimate)
     
     % Match Var(\nu_t) = 1/R^2 - 1
 
+%----------------------------------------------------------------
+% Load Results
+%----------------------------------------------------------------
+
 % load factor shock
 factor_shock = DFM_estimate.fac_shock;
 factor_shock_time_range = DFM_estimate.factor_shock_time_range;
@@ -23,18 +27,31 @@ factor_shock_time_range(1) = factor_shock_time_range(1) + number_of_NaN / factor
 external_shock = DFM_estimate.external_shock;
 external_shock_time_range = DFM_estimate.external_shock_time_range;
 
+%----------------------------------------------------------------
+% Residualize External Shock
+%----------------------------------------------------------------
+
+% fit AR(1) to external shock
+[~,rho,~,~,res_external_shock] = VAR(external_shock,1);
+res_external_shock_time_range = external_shock_time_range;
+res_external_shock_time_range(1) = res_external_shock_time_range(1) + 1 / res_external_shock_time_range(3);
+
+%----------------------------------------------------------------
+% Calibrate Signal-noise Ratio
+%----------------------------------------------------------------
+
 % pick overlapping time range
 overlap_time_range = [NaN, NaN, factor_shock_time_range(3)];
-overlap_time_range(1) = max(factor_shock_time_range(1), external_shock_time_range(1));
-overlap_time_range(2) = min(factor_shock_time_range(2), external_shock_time_range(2));
+overlap_time_range(1) = max(factor_shock_time_range(1), res_external_shock_time_range(1));
+overlap_time_range(2) = min(factor_shock_time_range(2), res_external_shock_time_range(2));
 
 % pick rows of data
 factor_shock_index = [NaN, NaN];
 factor_shock_index(1) = (overlap_time_range(1) - factor_shock_time_range(1)) * factor_shock_time_range(3) + 1;
 factor_shock_index(2) = (overlap_time_range(2) - factor_shock_time_range(1)) * factor_shock_time_range(3) + 1;
-external_shock_index = [NaN, NaN];
-external_shock_index(1) = (overlap_time_range(1) - external_shock_time_range(1)) * external_shock_time_range(3) + 1;
-external_shock_index(2) = (overlap_time_range(2) - external_shock_time_range(1)) * external_shock_time_range(3) + 1;
+res_external_shock_index = [NaN, NaN];
+res_external_shock_index(1) = (overlap_time_range(1) - res_external_shock_time_range(1)) * res_external_shock_time_range(3) + 1;
+res_external_shock_index(2) = (overlap_time_range(2) - res_external_shock_time_range(1)) * res_external_shock_time_range(3) + 1;
 
 % iterate thru different number of leads and lags
 max_num = 10; % max number of leads and lags
@@ -44,7 +61,7 @@ Sigma_list = NaN(1, max_num+1);
 for i_num = 0:max_num
 
     % construct regressors
-    Y = external_shock(external_shock_index(1):external_shock_index(2),1);
+    Y = res_external_shock(res_external_shock_index(1):res_external_shock_index(2),1);
     nobs = size(Y,1); % number of observations
     X = factor_shock(factor_shock_index(1):factor_shock_index(2),:);
     X = lagmatrix(X, (-i_num):i_num);
@@ -72,7 +89,7 @@ alpha = 1; % IV shock coefficient
 sigma_v = sqrt((1-R2)/R2) * alpha; % IV noise
 
 % pack up result
-out.rho = []; % placeholders for calibrated rho
+out.rho = rho;
 out.weight = []; % placeholders for calibrated weight
 out.alpha = alpha;
 out.sigma_v = sigma_v;

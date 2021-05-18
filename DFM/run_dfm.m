@@ -88,8 +88,18 @@ clear external_shock_data;
 DFM_estimate.calibrate_out       = calibrateIV(DFM_estimate);
 DF_model.calibrated_shock_weight = DFM_estimate.calibrate_out.weight;
 
+% set up IV DGP
+
 if strcmp(estimand_type, 'IV')
-    if DF_model.IV.IV_strength_calibrate==1
+    if settings.est.IV.IV_persistence_calibrate==1
+        DF_model.IV.rho = DFM_estimate.calibrate_out.rho;
+    else
+        DF_model.IV.rho = DF_model.IV.manual_rho;
+    end
+    
+    DF_model.IV.rho_grid = DF_model.IV.rho * settings.est.IV.IV_persistence_scale;
+    
+    if settings.est.IV.IV_strength_calibrate==1
         DF_model.IV.alpha = DFM_estimate.calibrate_out.alpha;
         DF_model.IV.sigma_v = DFM_estimate.calibrate_out.sigma_v;
     else
@@ -116,7 +126,19 @@ DF_model.ABCD  = ABCD_fun_DFM(DF_model);
 % Select Individual DGPs from Encompassing Model
 %----------------------------------------------------------------
 
+% randomly draw DGPs
+
 settings.specifications = pick_var_fn(DF_model, settings, spec_id);
+
+% replicate draws of DGPs for multiple IV persistence setups
+
+settings.specifications.var_select = repmat(settings.specifications.var_select, ...
+    [length(settings.est.IV.IV_persistence_scale),1]);
+settings.specifications.rho_select = repmat(DF_model.IV.rho_grid, ...
+    [settings.specifications.n_spec, 1]);
+settings.specifications.rho_select = settings.specifications.rho_select(:);
+settings.specifications.random_n_spec = size(settings.specifications.var_select, 1);
+settings.specifications.n_spec = size(settings.specifications.var_select, 1);
 
 %----------------------------------------------------------------
 % Create Placeholders for Results

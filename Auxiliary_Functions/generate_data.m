@@ -35,11 +35,13 @@ n_e   = model.n_e;
 with_IV = settings.est.with_IV;
 
 if with_IV == 1
-    rho     = model.IV.rho;
-    alpha   = model.IV.alpha;
-    sigma_v = model.IV.sigma_v;
+    rho      = model.IV.rho;
+    rho_grid = model.IV.rho_grid;
+    alpha    = model.IV.alpha;
+    sigma_v  = model.IV.sigma_v;
 else % meaningless placeholders in the case of no IV
     rho = 0.1;
+    rho_grid = 0.1;
     alpha = 1;
     sigma_v = 1;
 end
@@ -72,9 +74,12 @@ for t = 1:T
 end
 
 % simulate IV
+z = NaN(T+T_burn, length(rho_grid)); % multiple IV persistence setups
+for idx = 1:length(rho_grid)
+    z(:,idx) = filter(1, [1 -rho_grid(idx)], alpha * data_eps * shock_weight + sigma_v * randn(T+T_burn,1));
+end
 
-z = filter(1, [1 -rho], alpha * data_eps * shock_weight + sigma_v * randn(T+T_burn,1));
-data_z = z(T_burn+1:end);
+data_z = z(T_burn+1:end,:);
 
 % collect results and shift timing
 

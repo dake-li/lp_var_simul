@@ -61,7 +61,7 @@ for id = spec_id_array
         for j = 1:length(second_tier)
             
             % decide which dim to concatenate
-            if any(strcmp(second_tier{j},{'var_select'}))
+            if any(strcmp(second_tier{j},{'var_select','rho_select'}))
                 concatenate_dim = 1;
             else
                 concatenate_dim = NaN;
