@@ -43,6 +43,7 @@ IV_rho = model.IV.rho;
 IV_alpha = model.IV.alpha;
 IV_sigma_v = model.IV.sigma_v;
 
+rho_select = settings.specifications.rho_select;
 var_select = settings.specifications.var_select;
 n_spec = size(var_select,1);
 n_var = size(var_select,2);
@@ -97,20 +98,24 @@ n_var = size(var_select, 2);
 % Represent Augmented DFM as ABCD
 %----------------------------------------------------------------
 
-% compute A
-
-n_lags_state = max(n_lags_uar + 1, n_lags_fac);
-A = zeros(n_lags_state * n_fac);
-A(1:n_fac, 1:(n_lags_fac * n_fac)) = Phi_aux(1:n_fac, :);
-A((1 + n_fac):(n_lags_state * n_fac), 1:((n_lags_state - 1) * n_fac)) = eye((n_lags_state - 1) * n_fac);
-
-% compute B
-
-B = zeros(n_lags_state * n_fac, n_fac + n_var);
-B(1:n_fac, 1:n_fac) = G_aux;
-
 % in each DGP
 for i_spec = 1:n_spec
+    
+    % use this particular IV_rho in Phi_aux
+    
+    Phi_aux(n_fac, n_fac) = rho_select(i_spec);
+    
+    % compute A
+
+    n_lags_state = max(n_lags_uar + 1, n_lags_fac);
+    A = zeros(n_lags_state * n_fac);
+    A(1:n_fac, 1:(n_lags_fac * n_fac)) = Phi_aux(1:n_fac, :);
+    A((1 + n_fac):(n_lags_state * n_fac), 1:((n_lags_state - 1) * n_fac)) = eye((n_lags_state - 1) * n_fac);
+
+    % compute B
+
+    B = zeros(n_lags_state * n_fac, n_fac + n_var);
+    B(1:n_fac, 1:n_fac) = G_aux;
     
     % IRF of normalization variable at h = 0
     

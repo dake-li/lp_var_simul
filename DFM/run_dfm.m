@@ -132,13 +132,15 @@ settings.specifications = pick_var_fn(DF_model, settings, spec_id);
 
 % replicate draws of DGPs for multiple IV persistence setups
 
-settings.specifications.var_select = repmat(settings.specifications.var_select, ...
-    [length(settings.est.IV.IV_persistence_scale),1]);
-settings.specifications.rho_select = repmat(DF_model.IV.rho_grid, ...
-    [settings.specifications.n_spec, 1]);
-settings.specifications.rho_select = settings.specifications.rho_select(:);
-settings.specifications.random_n_spec = size(settings.specifications.var_select, 1);
-settings.specifications.n_spec = size(settings.specifications.var_select, 1);
+if strcmp(estimand_type, 'IV')
+    settings.specifications.var_select = repmat(settings.specifications.var_select, ...
+        [length(settings.est.IV.IV_persistence_scale),1]);
+    settings.specifications.rho_select = repmat(DF_model.IV.rho_grid, ...
+        [settings.specifications.n_spec, 1]);
+    settings.specifications.rho_select = settings.specifications.rho_select(:);
+    settings.specifications.random_n_spec = size(settings.specifications.var_select, 1);
+    settings.specifications.n_spec = size(settings.specifications.var_select, 1);
+end
 
 %----------------------------------------------------------------
 % Create Placeholders for Results
