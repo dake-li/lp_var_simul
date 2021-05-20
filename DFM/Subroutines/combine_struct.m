@@ -126,7 +126,7 @@ for i = 1:length(first_tier)
     for j = 1:length(second_tier)
 
         % decide which dim to concatenate
-        if any(strcmp(second_tier{j},{'var_select','rho_select'}))
+        if any(strcmp(second_tier{j},{'var_select','rho_select','rho_select_grid_idx'}))
             concatenate_dim = 1;
         else
             concatenate_dim = NaN;
