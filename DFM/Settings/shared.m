@@ -85,7 +85,7 @@ settings.est.CV_folds      = 5; % Number of folds used for cross validation
 
 % VAR model averaging
 
-settings.est.average_store_weight       = 2:21; % store model weights at which horizon
+settings.est.average_store_weight       = [2, 5, 9, 15, 21]; % store model weights at which horizon
 settings.est.average_store_submodel_irf = 0; % store IRF of each submodel? Only store if want to comput oracle weight
 settings.est.average_max_lags           = 1; % include lags up to n_lags_max? otherwise up to estimated lags
 settings.est.average_options            = optimoptions('quadprog','Display','off');

@@ -1,5 +1,6 @@
 function specifications = pick_var_fn(model, settings, spec_id)
-% Function for randomly choosing DGPs from the encompassing model
+% Function for randomly choosing DGPs from the encompassing model and
+% choosing IV persistence from the pre-specified grid
     % Warning: a "specification" here is a "DGP" in the paper
 
     % prepare
@@ -10,6 +11,13 @@ function specifications = pick_var_fn(model, settings, spec_id)
     
     n_y = model.n_y;
     
+    with_IV = settings.est.with_IV;
+    
+    if with_IV == 1
+        rho = model.IV.rho;
+        rho_grid = model.IV.rho_grid;
+    end
+    
     manual_var_select = specifications.manual_var_select;
     random_select = specifications.random_select;
     random_category_range = specifications.random_category_range;
@@ -19,6 +27,11 @@ function specifications = pick_var_fn(model, settings, spec_id)
     if random_select == 0
 
         var_select = manual_var_select;
+        
+        if with_IV == 1
+            rho_select_grid_idx = randi(length(rho_grid)) * ones(size(var_select, 1), 1); % arbitrarily pick one if there's multiple IV persitence levels
+            rho_select = reshape(rho_grid(rho_select_grid_idx), [],1);
+        end
 
     else
         
@@ -28,6 +41,11 @@ function specifications = pick_var_fn(model, settings, spec_id)
         random_fixed_pos      = specifications.random_fixed_pos;
         random_category_setup = specifications.random_category_setup;
 
+        if with_IV == 1
+            rho_select_grid_idx = randi(length(rho_grid), [random_n_spec, 1]); % index of rho from rho_grid
+            rho_select = reshape(rho_grid(rho_select_grid_idx), [],1); % value of rho
+        end
+        
         var_select = nan(random_n_spec, random_n_var);
         var_select(:, 1) = random_fixed_var;
         fixed_category = sum(random_fixed_var > random_category_range(:,2)) + 1; % category of fixed variable
@@ -66,7 +84,6 @@ function specifications = pick_var_fn(model, settings, spec_id)
             
         end
         
-        
         % put fixed variable at the fixed position
         var_select(:, [1 random_fixed_pos]) = var_select(:, [random_fixed_pos 1]); % put fixed var at fixed position
         
@@ -80,5 +97,10 @@ function specifications = pick_var_fn(model, settings, spec_id)
     specifications.var_select = var_select;
     specifications.n_spec     = n_spec;
     specifications.n_var      = n_var;
+    
+    if with_IV == 1
+        specifications.rho_select = rho_select;
+        specifications.rho_select_grid_idx = rho_select_grid_idx;
+    end
 
 end

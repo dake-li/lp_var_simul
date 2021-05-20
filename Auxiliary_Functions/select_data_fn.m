@@ -8,17 +8,14 @@ n_spec = settings.specifications.n_spec;
 with_IV = settings.est.with_IV;
 
 if with_IV == 1
-    IV_persistence_scale = settings.est.IV.IV_persistence_scale;
-    n_rho_grid = length(IV_persistence_scale);
+    rho_select_grid_idx = settings.specifications.rho_select_grid_idx;
+    this_rho_grid_idx = rho_select_grid_idx(i_spec);
 else
-    n_rho_grid = 1;
+    this_rho_grid_idx = 1;
 end
 
-n_spec_unique = n_spec / n_rho_grid;
-i_rho_grid = ceil(i_spec / n_spec_unique);
-
 data_sim_select.data_y = data_sim_all.data_y(:,var_select(i_spec,:));
-data_sim_select.data_z = data_sim_all.data_z(:,i_rho_grid);
+data_sim_select.data_z = data_sim_all.data_z(:,this_rho_grid_idx);
 data_sim_select.data_shock = data_sim_all.data_shock;
 
 end

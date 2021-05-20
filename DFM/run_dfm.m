@@ -71,7 +71,7 @@ DF_model.trans_code = DFM_estimate.bptcodevec; % transformation code
 % (4) y = ln(x), (5) y = (1-L)ln(x), (6) y = (1-L)^2 ln(x)
 
 %----------------------------------------------------------------
-% Calibrate IV Strength
+% Calibrate IV Persistence and Strength
 %----------------------------------------------------------------
 
 % extract reduced-form factor innovations and external structural shock series
@@ -88,7 +88,9 @@ clear external_shock_data;
 DFM_estimate.calibrate_out       = calibrateIV(DFM_estimate);
 DF_model.calibrated_shock_weight = DFM_estimate.calibrate_out.weight;
 
-% set up IV DGP
+%----------------------------------------------------------------
+% Set Up IV DGP
+%----------------------------------------------------------------
 
 if strcmp(estimand_type, 'IV')
     if settings.est.IV.IV_persistence_calibrate==1
@@ -129,18 +131,6 @@ DF_model.ABCD  = ABCD_fun_DFM(DF_model);
 % randomly draw DGPs
 
 settings.specifications = pick_var_fn(DF_model, settings, spec_id);
-
-% replicate draws of DGPs for multiple IV persistence setups
-
-if strcmp(estimand_type, 'IV')
-    settings.specifications.var_select = repmat(settings.specifications.var_select, ...
-        [length(settings.est.IV.IV_persistence_scale),1]);
-    settings.specifications.rho_select = repmat(DF_model.IV.rho_grid, ...
-        [settings.specifications.n_spec, 1]);
-    settings.specifications.rho_select = settings.specifications.rho_select(:);
-    settings.specifications.random_n_spec = size(settings.specifications.var_select, 1);
-    settings.specifications.n_spec = size(settings.specifications.var_select, 1);
-end
 
 %----------------------------------------------------------------
 % Create Placeholders for Results
