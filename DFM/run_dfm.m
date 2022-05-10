@@ -222,8 +222,7 @@ disp(['lag type: ', num2str(lag_type)]);
 parfor i_MC = 1:settings.simul.n_MC
 
     if mod(i_MC, 100) == 0
-        disp("Monte Carlo repetitions:")
-        disp(i_MC)
+        disp(['Monte Carlo repetitions: ', num2str(i_MC)])
     end
 
     %----------------------------------------------------------------
