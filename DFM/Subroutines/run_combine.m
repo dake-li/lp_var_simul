@@ -3,6 +3,7 @@
 % This version: 02/23/2021
 
 clear all;
+addpath(genpath(fullfile('..', '..', 'Auxiliary_Functions')))
 
 %% SET UP DESTINATION FOLDER AND FILES
 
