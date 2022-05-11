@@ -28,6 +28,7 @@ function specifications = pick_var_fn(model, settings, spec_id)
 
         var_select = manual_var_select;
         
+        % draw IV persistency
         if with_IV == 1
             rho_select_grid_idx = randi(length(rho_grid)) * ones(size(var_select, 1), 1); % arbitrarily pick one if there's multiple IV persitence levels
             rho_select = reshape(rho_grid(rho_select_grid_idx), [],1);
@@ -40,11 +41,6 @@ function specifications = pick_var_fn(model, settings, spec_id)
         random_fixed_var      = specifications.random_fixed_var;
         random_fixed_pos      = specifications.random_fixed_pos;
         random_category_setup = specifications.random_category_setup;
-
-        if with_IV == 1
-            rho_select_grid_idx = randi(length(rho_grid), [random_n_spec, 1]); % index of rho from rho_grid
-            rho_select = reshape(rho_grid(rho_select_grid_idx), [],1); % value of rho
-        end
         
         var_select = nan(random_n_spec, random_n_var);
         var_select(:, 1) = random_fixed_var;
@@ -86,6 +82,12 @@ function specifications = pick_var_fn(model, settings, spec_id)
         
         % put fixed variable at the fixed position
         var_select(:, [1 random_fixed_pos]) = var_select(:, [random_fixed_pos 1]); % put fixed var at fixed position
+        
+        % draw IV persistency
+        if with_IV == 1
+            rho_select_grid_idx = randi(length(rho_grid), [random_n_spec, 1]); % index of rho from rho_grid
+            rho_select = reshape(rho_grid(rho_select_grid_idx), [],1); % value of rho
+        end
         
     end
     
