@@ -8,6 +8,12 @@ DF_model.n_fac      = 6; % number of factors
 DF_model.n_lags_fac = 2; % lag order of factors
 DF_model.n_lags_uar = 2; % lag order of measurement error
 
+% scale up calibrated persistency of factors
+
+DF_model.fac_persist.scale = 0; % scale calibrated persistence of factors?
+DF_model.fac_persist.target_largest_root = 0.95; % match the targeted largest root in factor equation
+DF_model.fac_persist.keep_fac_variation = 1; % adjust factor innovation scale to keep factor variation?
+
 %% PREPARATIONS FOR STRUCTURAL ESTIMANDS
 
 % selection of DGPs from encompassing model

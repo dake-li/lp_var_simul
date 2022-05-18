@@ -71,6 +71,14 @@ DF_model.trans_code = DFM_estimate.bptcodevec; % transformation code
 % (4) y = ln(x), (5) y = (1-L)ln(x), (6) y = (1-L)^2 ln(x)
 
 %----------------------------------------------------------------
+% Scale up Factor Persistence
+%----------------------------------------------------------------
+
+if DF_model.fac_persist.scale == 1
+    DF_model = scale_fac_persist(DF_model);
+end
+
+%----------------------------------------------------------------
 % Calibrate IV Persistence and Strength
 %----------------------------------------------------------------
 
