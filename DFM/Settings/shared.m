@@ -24,6 +24,9 @@ settings.specifications.random_n_var          = 5; % number of variables in each
 settings.specifications.random_category_range = [1 20; 21 31; 32 76; 77 86; 87 94; 95 131; 132 141;...
                                                  142 159; 160 171; 172 180; 181 207]; % ranges for Stock-Watson variable categories (see their Table 1)
 settings.specifications.random_category_setup = {[1,2,3], 6}; % at least draw one from certain categories
+settings.specifications.random_from_key_series = 0; % randomly select from some key series in DFM list?
+settings.specifications.random_exhaust_key_series = 0; % exhaust all the combinations from key series, or have only random_n_spec draws?
+settings.specifications.random_key_series = [1,2,6,12,56,95,97,121,132,142,147,151,172,181,193,196,202]; % list of key series
 
 settings.specifications.manual_var_select     = [1 142; 1 97]; % if manual selection, then these sets of variables will be selected
 
