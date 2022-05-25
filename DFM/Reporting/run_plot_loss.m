@@ -28,6 +28,10 @@ methods_recursive_select = [1 2 3 4 5 6];
 select_DGP = 0; % if select a subset of DGPs?
 select_DGP_fn = @(i_dgp, res) res.DF_model.VAR_largest_root(i_dgp) > median(res.DF_model.VAR_largest_root); % binary selection criteria
 
+% regress bias/std on variable category counts
+reg_cat = 1; % if run regression?
+reg_cat_horz = []; % if non-empty, only use subset of horizons for regression (e.g., [1 2] means first and second estimated horizons)
+
 % Apply shared settings
 settings_shared;
 
@@ -52,6 +56,38 @@ for nf=1:length(lags_folders) % For each folder...
         if select_DGP == 1
             DGP_selected = arrayfun(@(x) select_DGP_fn(x,res), 1:res.settings.specifications.n_spec)'; % binary DGP selection label
             res = combine_struct(res,[],[],DGP_selected);
+        end
+        
+        %----------------------------------------------------------------
+        % Prepare regression on variable category counts (if desired)
+        %----------------------------------------------------------------
+        
+        if reg_cat==1
+            
+            % Mapping between variables and categories
+            aux = zeros(res.DF_model.n_y,1);
+            aux(res.settings.specifications.random_category_range(:,1)) = 1;
+            var_cat = cumsum(aux); % mapping between variables and categories
+            spec_cat = var_cat(res.settings.specifications.var_select); % list of categories included in each DGP
+            
+            % Categories in each DGP
+            num_cat = size(res.settings.specifications.random_category_range,1); % no. of categories
+            aux2 = reshape(bsxfun(@eq,spec_cat(:),1:num_cat),res.settings.specifications.n_spec,res.settings.specifications.n_var,num_cat);
+            spec_cat_num = permute(sum(aux2,2),[1 3 2]); % category counts for each DGP
+            
+            % Covariate matrix for regressions
+            aux3 = repmat(eye(res.settings.est.IRF_hor),res.settings.specifications.n_spec,1); % indicators for horizon
+            the_reg_cat_horz = reg_cat_horz;
+            if isempty(the_reg_cat_horz)
+                the_reg_cat_horz = 1:res.settings.est.IRF_hor; % all horizons
+            end
+            reg_sel = any(aux3(:,the_reg_cat_horz),2); % include only selected horizons in regressions
+            aux4 = kron(spec_cat_num,ones(res.settings.est.IRF_hor,1));
+            reg_cat_X = [aux4(:,1:end-1) aux3(:,the_reg_cat_horz)]; % omit last category and any undesired horizons
+            reg_cat_vars = [strcat('cat', cellfun(@num2str, num2cell(1:num_cat-1), 'UniformOutput', false)) strcat('h', cellfun(@num2str, num2cell(res.settings.est.IRF_select(the_reg_cat_horz)-1), 'UniformOutput', false))];
+            reg_cat_vars = reg_cat_vars(:);
+            
+            clearvars aux aux2 aux3 aux4;
         end
         
         %----------------------------------------------------------------
@@ -97,6 +133,18 @@ for nf=1:length(lags_folders) % For each folder...
             plot_loss(horzs-1, squeeze(mean(the_ranks, 2)), [], ...
                 strjoin({exper_plotname, ': Average rank of', the_titles{j}}), methods_names_plot, font_size);
             plot_save(fullfile(output_folder, strcat(exper_names{ne}, '_loss_', lower(the_titles{j}), '_avgrank')), output_suffix);
+            
+            % regression on variable category counts
+            
+            if reg_cat==1
+                reg_cat_Y = log(reshape(the_result./the_rms_irf,res.settings.est.IRF_hor*res.settings.specifications.n_spec,[])); % log loss
+                reg_beta = reg_cat_X(reg_sel,:)\reg_cat_Y(reg_sel,:); % OLS regression of log loss on category and horizon variables
+                the_tab = array2table(reg_beta);
+                the_tab.Properties.VariableNames = res.settings.est.methods_name(the_methods_index);
+                the_tab_var = table;
+                the_tab_var.VARIABLE = reg_cat_vars;
+                writetable([the_tab_var the_tab],fullfile(output_folder, strcat(exper_names{ne}, '_loss_', lower(the_titles{j}), '_regcat', '.csv'))); % write table to file
+            end
             
         end
         
