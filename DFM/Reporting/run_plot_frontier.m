@@ -13,6 +13,9 @@ addpath(genpath(fullfile('..', 'Subroutines')))
 
 %% SETTINGS
 
+% select robustness check mode
+mode_select    = 1; % options: 1 (baseline), 2 (cumulative IRF), 3 (persistent DGP), 4 (small sample), 5 (salient series)
+
 % select lag length specifications
 lags_select    = 2; % options: 1 (AIC), 2 (4 lags), 3 (8 lags)
 
@@ -46,61 +49,65 @@ fontsize_plot = 12; % Font size for plot axes
 
 %% FIGURES
 
-for nf=1:length(lags_folders) % For each folder...
+for n_mode=1:length(mode_folders) % For each robustness check mode...
 
-    for ne=1:length(exper_files) % For each experiment in folder...
-               
-        %----------------------------------------------------------------
-        % Load Results
-        %----------------------------------------------------------------
-        
-        load_results;
-        
-        % see if ready to plot for this group of experiments
-        if exper_group_end(ne) == 0
-            continue;
-        end
-        
-        % keep only the selected subset of DGPs
-        if select_DGP == 1
-            DGP_selected = arrayfun(@(x) select_DGP_fn(x,res), 1:res.settings.specifications.n_spec)'; % binary DGP selection label
-            res = combine_struct(res,[],[],DGP_selected);
-        end
-        
-        %----------------------------------------------------------------
-        % Compute Reporting Results
-        %----------------------------------------------------------------
-        
-        the_true_irf = res.DF_model.target_irf; % True IRF
-        the_rms_irf  = sqrt(mean(the_true_irf.^2)); % Root average squared true IRF across horizons
-        
-        % bias and standard deviation
-        
-        the_bias = squeeze(median(sqrt(extract_struct(res.results.BIAS2))./the_rms_irf, 2));
-        the_std = squeeze(median(sqrt(extract_struct(res.results.VCE))./the_rms_irf, 2));  
-        
-        horzs_sel = ismember(res.settings.est.IRF_select, horzs_plot); % Selected horizons
-        the_bias_sel = the_bias(horzs_sel,:);
-        the_std_sel = the_std(horzs_sel,:);
-        
-        % approximate frontier for visual aid
-        
-        the_bias_frontier_grid = linspace(0.8 * min(the_bias_sel(:)),1.2 * max(the_bias_sel(:)),100)';
-        the_max_std = max(the_std_sel(:))*1.2;
-        
-        %----------------------------------------------------------------
-        % Plot Results
-        %----------------------------------------------------------------
-        
-        for ih=1:length(horzs_plot)
-            figure('Units', 'normalize', 'Position', [ih*0.3 0.3 0.3 0.5]);
-            plot_frontier(the_bias_sel(ih,:)',the_std_sel(ih,:)',the_bias_frontier_grid,the_max_std,...
-                [method_labels(:,1) method_labels(:,ih+1)],fontsize_plot,...
-                sprintf('%s%d%s', 'Horizon: ', horzs_plot(ih), ' Quarters'));
-            set(gcf, 'PaperPositionMode', 'auto');
-            plot_save(fullfile(output_folder, sprintf('%s%d', 'frontier_h', horzs_plot(ih))), output_suffix);
+    for nf=1:length(lags_folders) % For each lag-order folder...
+    
+        for ne=1:length(exper_files) % For each experiment in folder...
+                   
+            %----------------------------------------------------------------
+            % Load Results
+            %----------------------------------------------------------------
+            
+            load_results;
+            
+            % see if ready to plot for this group of experiments
+            if exper_group_end(ne) == 0
+                continue;
+            end
+            
+            % keep only the selected subset of DGPs
+            if select_DGP == 1
+                DGP_selected = arrayfun(@(x) select_DGP_fn(x,res), 1:res.settings.specifications.n_spec)'; % binary DGP selection label
+                res = combine_struct(res,[],[],DGP_selected);
+            end
+            
+            %----------------------------------------------------------------
+            % Compute Reporting Results
+            %----------------------------------------------------------------
+            
+            the_true_irf = res.DF_model.target_irf; % True IRF
+            the_rms_irf  = sqrt(mean(the_true_irf.^2)); % Root average squared true IRF across horizons
+            
+            % bias and standard deviation
+            
+            the_bias = squeeze(median(sqrt(extract_struct(res.results.BIAS2))./the_rms_irf, 2));
+            the_std = squeeze(median(sqrt(extract_struct(res.results.VCE))./the_rms_irf, 2));  
+            
+            horzs_sel = ismember(res.settings.est.IRF_select, horzs_plot); % Selected horizons
+            the_bias_sel = the_bias(horzs_sel,:);
+            the_std_sel = the_std(horzs_sel,:);
+            
+            % approximate frontier for visual aid
+            
+            the_bias_frontier_grid = linspace(0.8 * min(the_bias_sel(:)),1.2 * max(the_bias_sel(:)),100)';
+            the_max_std = max(the_std_sel(:))*1.2;
+            
+            %----------------------------------------------------------------
+            % Plot Results
+            %----------------------------------------------------------------
+            
+            for ih=1:length(horzs_plot)
+                figure('Units', 'normalize', 'Position', [ih*0.3 0.3 0.3 0.5]);
+                plot_frontier(the_bias_sel(ih,:)',the_std_sel(ih,:)',the_bias_frontier_grid,the_max_std,...
+                    [method_labels(:,1) method_labels(:,ih+1)],fontsize_plot,...
+                    sprintf('%s%d%s', 'Horizon: ', horzs_plot(ih), ' Quarters'));
+                set(gcf, 'PaperPositionMode', 'auto');
+                plot_save(fullfile(output_folder, sprintf('%s%d', 'frontier_h', horzs_plot(ih))), output_suffix);
+            end
+            
         end
         
     end
-    
+
 end

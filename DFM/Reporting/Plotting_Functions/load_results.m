@@ -4,8 +4,8 @@
 
 exper_filename = exper_files{ne}; % Name of current experiment
 exper_plotname = exper_names{ne};
-file_name = fullfile(lags_folders{nf}, exper_filename); % Name of .mat results file
-folder_name = fullfile(lags_folders{nf}, exper_folders{ne}); % Name of .mat results file
+file_name = fullfile(mode_folders{n_mode}, lags_folders{nf}, exper_filename); % Name of .mat results file
+folder_name = fullfile(mode_folders{n_mode}, lags_folders{nf}, exper_folders{ne}); % Name of figure folder
 output_folder = fullfile(output_dir, folder_name); % Name of output folder  
 
 %----------------------------------------------------------------

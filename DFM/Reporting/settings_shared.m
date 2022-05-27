@@ -2,6 +2,11 @@
 
 rootfolder = fullfile('..', 'Results'); % Root folder with files
 
+% select robustness check mode
+
+mode_list   = {'baseline', 'cumulative', 'persistent', 'small', 'salient'};
+mode_folders = mode_list(mode_select);
+
 % select lag length specifications
 
 lags_list      = {'lag_aic', 'lag4', 'lag8'}; % Folders with files
