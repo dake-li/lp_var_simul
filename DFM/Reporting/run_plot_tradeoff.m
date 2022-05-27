@@ -36,6 +36,9 @@ methods_recursive_select = [1 2 3 4 5 6];
 select_DGP = 0; % if select a subset of DGPs?
 select_DGP_fn = @(i_dgp, res) res.DF_model.VAR_largest_root(i_dgp) > median(res.DF_model.VAR_largest_root); % binary selection criteria
 
+% select loss measurement
+loss_measure_select = 1; % options: 1 (bias + std), 2 (median bias + IQR), 3 (90th percentile bias + 10-90 percentile range)
+
 % Apply shared settings
 settings_shared;
 
@@ -131,11 +134,36 @@ for n_mode=1:length(mode_folders) % For each robustness check mode...
             the_true_irf = res.DF_model.target_irf; % True IRF
             the_rms_irf = sqrt(mean(the_true_irf.^2)); % Root average squared true IRF across horizons
             
+            % Compute robust statistics
+            p10_idx = stat_index(0.1, res.settings); % Index of 10th percentile
+            q1_idx = stat_index(0.25, res.settings); % Index of first quartile
+            med_idx = stat_index(0.5, res.settings); % Index of median
+            q3_idx = stat_index(0.75, res.settings); % Index of third quartile
+            p90_idx = stat_index(0.9, res.settings); % Index of 90th percentile
+            the_fields = fieldnames(res.results.irf);
+            for ii=1:length(the_fields)
+                res.results.medBIAS2.(the_fields{ii}) = (squeeze(res.results.irf.(the_fields{ii})(:,med_idx,:))-the_true_irf).^2; % Median bias squared
+                res.results.IQR2.(the_fields{ii}) = squeeze(res.results.irf.(the_fields{ii})(:,q3_idx,:)-res.results.irf.(the_fields{ii})(:,q1_idx,:)).^2; % IQR squared
+                res.results.p90BIAS2.(the_fields{ii}) = (squeeze(res.results.irf.(the_fields{ii})(:,p90_idx,:))-the_true_irf).^2; % 90th percentile bias squared
+                res.results.p10_p90_RANGE2.(the_fields{ii}) = squeeze(res.results.irf.(the_fields{ii})(:,p90_idx,:)-res.results.irf.(the_fields{ii})(:,p10_idx,:)).^2; % 10-90 percentile range squared
+            end
+            
+            % select measurement objects
+            
+            the_loss_objects_list = {'BIAS2', 'VCE', 'medBIAS2', 'IQR2', 'p90BIAS2', 'p10_p90_RANGE2'}; % Objects to plot
+            the_loss_titles_list =  {'Loss', 'MedLoss', 'p90Loss'};  % Plot titles/file names
+            
+            if length(loss_measure_select) > 1
+                error('Select more than one loss measurement');
+            end
+            
+            % extract loss measurements
+
             the_methods_index = cellfun(@(x) find(strcmp(res.settings.est.methods_name, x)), methods_fields{ne}); % index of each method
             
-            the_BIAS2 = extract_struct(res.results.BIAS2);
+            the_BIAS2 = extract_struct(res.results.(the_loss_objects_list{2*loss_measure_select-1}));
             the_BIAS2 = the_BIAS2(:,:,the_methods_index);
-            the_VCE   = extract_struct(res.results.VCE);
+            the_VCE   = extract_struct(res.results.(the_loss_objects_list{2*loss_measure_select}));
             the_VCE   = the_VCE(:,:,the_methods_index);
     
             the_BIAS2rel = the_BIAS2./the_rms_irf.^2;
@@ -177,8 +205,8 @@ for n_mode=1:length(mode_folders) % For each robustness check mode...
                     
                     % plot final results
                     plot_tradeoff(pref_base(:,the_start_ind:end), cmap, horzs(the_start_ind:end)-1, weight_grid, ...
-                        strjoin({exper_plotname, ':', base_method_name, 'Preferred Over', the_titles{j}}), font_size)
-                    plot_save(fullfile(output_folder, strcat(exper_names{ne}, '_tradeoff_', removeChars(base_method_name), '_vs_', removeChars(the_titles{j}))), output_suffix);
+                        strjoin({exper_plotname, ':', base_method_name, 'Preferred Over', the_titles{j}, '(', the_loss_titles_list{loss_measure_select}, ')'}), font_size)
+                    plot_save(fullfile(output_folder, strcat(exper_names{ne}, '_tradeoff_', lower(the_loss_titles_list{loss_measure_select}), '_', removeChars(base_method_name), '_vs_', removeChars(the_titles{j}))), output_suffix);
     
                 end
             
@@ -196,11 +224,11 @@ for n_mode=1:length(mode_folders) % For each robustness check mode...
                 [~,choice_raw(i_weight,:)] = min(loss_all,[],2);
             end
             
-            writematrix([0 horzs; weight_grid(:) choice_raw], fullfile(output_folder, 'tradeoff_best.csv')); % Save to file
+            writematrix([0 horzs; weight_grid(:) choice_raw], fullfile(output_folder, strcat('tradeoff_', lower(the_loss_titles_list{loss_measure_select}), '_best.csv'))); % Save to file
             
             plot_choice(choice_raw, lines_plot, horzs, weight_grid, methods_select{ne}, ...
-                    strjoin({exper_plotname, ': Best Procedure'}), methods_names_plot, 1, font_size);
-            plot_save(fullfile(output_folder, strcat(exper_names{ne}, '_tradeoff_best')), output_suffix);  
+                    strjoin({exper_plotname, ': Best Procedure', '(', the_loss_titles_list{loss_measure_select}, ')'}), methods_names_plot, 1, font_size);
+            plot_save(fullfile(output_folder, strcat(exper_names{ne}, '_tradeoff_', lower(the_loss_titles_list{loss_measure_select}), '_best')), output_suffix);  
             
         end
         
