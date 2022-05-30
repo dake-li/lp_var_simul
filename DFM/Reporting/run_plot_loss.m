@@ -35,9 +35,6 @@ select_DGP_fn = @(i_dgp, res) res.DF_model.VAR_largest_root(i_dgp) > median(res.
 reg_cat = 1; % if run regression?
 reg_cat_horz = []; % if non-empty, only use subset of horizons for regression (e.g., [1 2] means first and second estimated horizons)
 
-% select loss measurement
-loss_measure_select = 1; % options: 1 (bias + std), 2 (median bias + IQR), 3 (90th percentile bias + 10-90 percentile range)
-
 % Apply shared settings
 settings_shared;
 
@@ -106,27 +103,21 @@ for n_mode=1:length(mode_folders) % For each robustness check mode...
             the_rms_irf  = sqrt(mean(the_true_irf.^2)); % Root average squared true IRF across horizons
             
             % Compute robust statistics
-            p10_idx = stat_index(0.1, res.settings); % Index of 10th percentile
             q1_idx = stat_index(0.25, res.settings); % Index of first quartile
             med_idx = stat_index(0.5, res.settings); % Index of median
             q3_idx = stat_index(0.75, res.settings); % Index of third quartile
-            p90_idx = stat_index(0.9, res.settings); % Index of 90th percentile
             the_fields = fieldnames(res.results.irf);
             for ii=1:length(the_fields)
                 res.results.medBIAS2.(the_fields{ii}) = (squeeze(res.results.irf.(the_fields{ii})(:,med_idx,:))-the_true_irf).^2; % Median bias squared
                 res.results.IQR2.(the_fields{ii}) = squeeze(res.results.irf.(the_fields{ii})(:,q3_idx,:)-res.results.irf.(the_fields{ii})(:,q1_idx,:)).^2; % IQR squared
-                res.results.p90BIAS2.(the_fields{ii}) = (squeeze(res.results.irf.(the_fields{ii})(:,p90_idx,:))-the_true_irf).^2; % 90th percentile bias squared
-                res.results.p10_p90_RANGE2.(the_fields{ii}) = squeeze(res.results.irf.(the_fields{ii})(:,p90_idx,:)-res.results.irf.(the_fields{ii})(:,p10_idx,:)).^2; % 10-90 percentile range squared
             end
             
             %----------------------------------------------------------------
             % Plot Results
             %----------------------------------------------------------------
             
-            the_loss_objects_list = {'BIAS2', 'VCE', 'medBIAS2', 'IQR2', 'p90BIAS2', 'p10_p90_RANGE2'}; % Objects to plot
-            the_loss_titles_list =  {'Bias',  'Std', 'MedBias',  'IQR',  'p90Bias',  'p10p90Range'};  % Plot titles/file names
-            the_objects = the_loss_objects_list(sort([2*loss_measure_select, 2*loss_measure_select-1])); % select objects
-            the_titles = the_loss_titles_list(sort([2*loss_measure_select, 2*loss_measure_select-1])); % select titles
+            the_objects = {'BIAS2',    'VCE',   'medBIAS2',     'IQR2'}; % Objects to plot
+            the_titles =  {'Bias',     'Std',   'MedBias',      'IQR'};  % Plot titles/file names
     
             the_methods_index = cellfun(@(x) find(strcmp(res.settings.est.methods_name, x)), methods_fields{ne}); % index of each method
     
