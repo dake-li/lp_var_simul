@@ -77,10 +77,11 @@ settings.est.res_autocorr_nlags = 2; % check autocorr of VAR(p) residuals up to 
 
 % BVAR prior
 
-settings.est.prior.tight_overall      = 0.04;
-settings.est.prior.tight_nonown_lag   = 0.25;
-settings.est.prior.decay_power        = 2;
-settings.est.prior.tight_exogenous    = 1e5;
+settings.est.prior.towards_random_walk = 0; % prior shrinking towards random walk? otherwise towards zero
+settings.est.prior.tight_overall       = 0.04;
+settings.est.prior.tight_nonown_lag    = 0.25;
+settings.est.prior.decay_power         = 2;
+settings.est.prior.tight_exogenous     = 1e5;
 
 % BVAR posterior draws
 
