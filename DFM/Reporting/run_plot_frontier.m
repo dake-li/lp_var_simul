@@ -31,6 +31,9 @@ methods_recursive_select = [1 2 3 4 5 6];
 select_DGP = 0; % if select a subset of DGPs?
 select_DGP_fn = @(i_dgp, res) res.DF_model.VAR_largest_root(i_dgp) > median(res.DF_model.VAR_largest_root); % binary selection criteria
 
+% report quantile loss across DGPs
+loss_quant = 0.5; % report which quantile loss across DGPs? (default is median loss, i.e. 0.5)
+
 % Apply shared settings
 settings_shared;
 
@@ -81,8 +84,8 @@ for n_mode=1:length(mode_folders) % For each robustness check mode...
             
             % bias and standard deviation
             
-            the_bias = squeeze(median(sqrt(extract_struct(res.results.BIAS2))./the_rms_irf, 2));
-            the_std = squeeze(median(sqrt(extract_struct(res.results.VCE))./the_rms_irf, 2));  
+            the_bias = squeeze(quantile(sqrt(extract_struct(res.results.BIAS2))./the_rms_irf, loss_quant, 2));
+            the_std = squeeze(quantile(sqrt(extract_struct(res.results.VCE))./the_rms_irf, loss_quant, 2));  
             
             horzs_sel = ismember(res.settings.est.IRF_select, horzs_plot); % Selected horizons
             the_bias_sel = the_bias(horzs_sel,:);
@@ -97,13 +100,19 @@ for n_mode=1:length(mode_folders) % For each robustness check mode...
             % Plot Results
             %----------------------------------------------------------------
             
+            if loss_quant == 0.5
+                remark_loss_quant = ''; % remark in file name for quantile loss
+            else
+                remark_loss_quant = strcat('_p', num2str(round(loss_quant*100)));
+            end
+
             for ih=1:length(horzs_plot)
                 figure('Units', 'normalize', 'Position', [ih*0.3 0.3 0.3 0.5]);
                 plot_frontier(the_bias_sel(ih,:)',the_std_sel(ih,:)',the_bias_frontier_grid,the_max_std,...
                     [method_labels(:,1) method_labels(:,ih+1)],fontsize_plot,...
                     sprintf('%s%d%s', 'Horizon: ', horzs_plot(ih), ' Quarters'));
                 set(gcf, 'PaperPositionMode', 'auto');
-                plot_save(fullfile(output_folder, sprintf('%s%d', 'frontier_h', horzs_plot(ih))), output_suffix);
+                plot_save(fullfile(output_folder, sprintf('%s%d', 'frontier_h', horzs_plot(ih), remark_loss_quant)), output_suffix);
             end
             
         end

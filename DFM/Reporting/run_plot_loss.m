@@ -35,6 +35,9 @@ select_DGP_fn = @(i_dgp, res) res.DF_model.VAR_largest_root(i_dgp) > median(res.
 reg_cat = 1; % if run regression?
 reg_cat_horz = []; % if non-empty, only use subset of horizons for regression (e.g., [1 2] means first and second estimated horizons)
 
+% report quantile loss across DGPs
+loss_quant = 0.5; % report which quantile loss across DGPs? (default is median loss, i.e. 0.5)
+
 % Apply shared settings
 settings_shared;
 
@@ -118,6 +121,12 @@ for n_mode=1:length(mode_folders) % For each robustness check mode...
             
             the_objects = {'BIAS2',    'VCE',   'medBIAS2',     'IQR2'}; % Objects to plot
             the_titles =  {'Bias',     'Std',   'MedBias',      'IQR'};  % Plot titles/file names
+
+            if loss_quant == 0.5
+                remark_loss_quant = ''; % remark in file name for quantile loss
+            else
+                remark_loss_quant = strcat('_p', num2str(round(loss_quant*100)));
+            end
     
             the_methods_index = cellfun(@(x) find(strcmp(res.settings.est.methods_name, x)), methods_fields{ne}); % index of each method
     
@@ -129,9 +138,9 @@ for n_mode=1:length(mode_folders) % For each robustness check mode...
     
                 % normalized losses
                 
-                plot_loss(horzs-1, squeeze(median(the_result./the_rms_irf, 2)), [], ...
+                plot_loss(horzs-1, squeeze(quantile(the_result./the_rms_irf, loss_quant, 2)), [], ...
                     strjoin({exper_plotname, ': Relative', the_titles{j}}), methods_names_plot, font_size);
-                plot_save(fullfile(output_folder, strcat(exper_names{ne}, '_loss_', lower(the_titles{j}), '_reltruth')), output_suffix);
+                plot_save(fullfile(output_folder, strcat(exper_names{ne}, '_', lower(the_titles{j}), '_reltruth', remark_loss_quant)), output_suffix);
                 
                 % loss function ranks
                 

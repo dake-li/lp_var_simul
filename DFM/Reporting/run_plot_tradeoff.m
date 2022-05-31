@@ -22,10 +22,10 @@ warning('off','MATLAB:structOnObject')
 mode_select    = 1; % options: 1 (baseline), 2 (cumulative IRF), 3 (persistent DGP), 4 (small sample), 5 (salient series)
 
 % select lag length specifications
-lags_select    = 2;
+lags_select    = 2; % options: 1 (AIC), 2 (4 lags), 3 (8 lags)
 
 % select and group experiments
-exper_select_group = {[2,5], [1,4], [3,6]};
+exper_select_group = {[2,5]}; % {[2,5], [1,4], [3,6]}; % combine G and MP for observed shock, recursive, and IV
 
 % select estimation methods for each experiment
 methods_iv_select        = [1 2 3 4 5 6 7];
@@ -35,6 +35,9 @@ methods_recursive_select = [1 2 3 4 5 6];
 % select a subset of DGPs
 select_DGP = 0; % if select a subset of DGPs?
 select_DGP_fn = @(i_dgp, res) res.DF_model.VAR_largest_root(i_dgp) > median(res.DF_model.VAR_largest_root); % binary selection criteria
+
+% report quantile loss across DGPs in best-method plot
+loss_quant = []; % report which quantile loss across DGPs? (default is mean loss, i.e. [])
 
 % Apply shared settings
 settings_shared;
@@ -188,19 +191,32 @@ for n_mode=1:length(mode_folders) % For each robustness check mode...
             % Compute & Plot Best Overall Procedure
             %----------------------------------------------------------------
             
+            if isempty(loss_quant)
+                remark_loss_quant = ''; % remark in file name for quantile loss
+            else
+                remark_loss_quant = strcat('_p', num2str(round(loss_quant*100)));
+            end
+
             choice_raw = zeros(n_weight,max(res.settings.est.IRF_select));
             for i_weight = 1:n_weight
-                loss_all = weight_grid(i_weight) * the_BIAS2rel + (1-weight_grid(i_weight)) * the_VCErel;
-                loss_all = squeeze(mean(loss_all,2));
+
+                if isempty(loss_quant) % mean loss across DGPs
+                    loss_all = weight_grid(i_weight) * the_BIAS2rel + (1-weight_grid(i_weight)) * the_VCErel;
+                    loss_all = squeeze(mean(loss_all,2));
+                else % quantile loss across DGPs
+                    loss_all = weight_grid(i_weight) * squeeze(quantile(the_BIAS2rel,loss_quant,2)) + ...
+                        (1-weight_grid(i_weight)) * squeeze(quantile(the_VCErel,loss_quant,2));
+                end
+
                 loss_all(:,2:end) = loss_all(:,2:end) + sqrt(eps);
                 [~,choice_raw(i_weight,:)] = min(loss_all,[],2);
             end
             
-            writematrix([0 horzs; weight_grid(:) choice_raw], fullfile(output_folder, 'tradeoff_best.csv')); % Save to file
+            writematrix([0 horzs; weight_grid(:) choice_raw], fullfile(output_folder, strcat('tradeoff_best', remark_loss_quant, '.csv'))); % Save to file
             
             plot_choice(choice_raw, lines_plot, horzs, weight_grid, methods_select{ne}, ...
                     strjoin({exper_plotname, ': Best Procedure'}), methods_names_plot, 1, font_size);
-            plot_save(fullfile(output_folder, strcat(exper_names{ne}, '_tradeoff_best')), output_suffix);  
+            plot_save(fullfile(output_folder, strcat(exper_names{ne}, '_tradeoff_best', remark_loss_quant)), output_suffix);  
             
         end
         
