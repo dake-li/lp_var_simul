@@ -140,7 +140,7 @@ for n_mode=1:length(mode_folders) % For each robustness check mode...
                 
                 plot_loss(horzs-1, squeeze(quantile(the_result./the_rms_irf, loss_quant, 2)), [], ...
                     strjoin({exper_plotname, ': Relative', the_titles{j}}), methods_names_plot, font_size);
-                plot_save(fullfile(output_folder, strcat(exper_names{ne}, '_', lower(the_titles{j}), '_reltruth', remark_loss_quant)), output_suffix);
+                plot_save(fullfile(output_folder, strcat(exper_names{ne}, '_loss_', lower(the_titles{j}), '_reltruth', remark_loss_quant)), output_suffix);
                 
                 % loss function ranks
                 

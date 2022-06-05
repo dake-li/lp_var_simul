@@ -25,7 +25,7 @@ mode_select    = 1; % options: 1 (baseline), 2 (cumulative IRF), 3 (persistent D
 lags_select    = 2; % options: 1 (AIC), 2 (4 lags), 3 (8 lags)
 
 % select and group experiments
-exper_select_group = {[2,5]}; % {[2,5], [1,4], [3,6]}; % combine G and MP for observed shock, recursive, and IV
+exper_select_group = {[2,5], [1,4], [3,6]}; % combine G and MP for observed shock, recursive, and IV
 
 % select estimation methods for each experiment
 methods_iv_select        = [1 2 3 4 5 6 7];
