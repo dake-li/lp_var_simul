@@ -3,6 +3,7 @@
 % take DFM dimensions from Stock-Watson (2016)
 
 DF_model.n_y        = 207; % number of observables
+DF_model.reorder    = [1:76, 87:94, 77:86, 95:171, 181:195, 172:180, 196:207]; % index to reorder data to match variable list in Stock-Watson (2016)
 
 DF_model.n_fac      = 6; % number of factors
 DF_model.n_lags_fac = 2; % lag order of factors

@@ -54,7 +54,7 @@ save_folder = fullfile(save_pre, strcat('lag', save_suff));
 
 % estimate DFM from dataset
 
-DFM_estimate = DFM_est(DF_model.n_fac, DF_model.n_lags_fac, DF_model.n_lags_uar);
+DFM_estimate = DFM_est(DF_model.n_fac, DF_model.n_lags_fac, DF_model.n_lags_uar, DF_model.reorder);
 
 % extract and store estimated DFM parameters
 
@@ -65,7 +65,9 @@ DF_model.Lambda        = DFM_estimate.Lambda;
 DF_model.delta         = DFM_estimate.delta;
 DF_model.sigma_v       = DFM_estimate.sigma_v;
 
-DF_model.variable_name = DFM_estimate.bplabvec_long;
+DF_model.variable_name_code = DFM_estimate.bpnamevec;
+DF_model.variable_name_short = DFM_estimate.bplabvec_short;
+DF_model.variable_name_long = DFM_estimate.bplabvec_long;
 DF_model.trans_code = DFM_estimate.bptcodevec; % transformation code
 % (1) y = x, (2) y = (1-L)x, (3) y = (1-L)^2 x,
 % (4) y = ln(x), (5) y = (1-L)ln(x), (6) y = (1-L)^2 ln(x)

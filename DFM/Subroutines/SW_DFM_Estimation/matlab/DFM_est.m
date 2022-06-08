@@ -1,4 +1,4 @@
-function DFM = DFM_est(n_factors,n_lags_fac,n_lags_uar);
+function DFM = DFM_est(n_factors,n_lags_fac,n_lags_uar, reorder);
 % Function for estimating parameters in the encompassing DFM model
 % (Revised based on Mark Watson's MATLAB script)
 
@@ -100,5 +100,18 @@ DFM.fac = fac_est_out.fac;
 DFM.fac_res = fac_est_out.varout.resid;
 DFM.r2 = fac_est_out.r2;
 DFM.factor_shock_time_range = [1959 2014.75 4]; % (start, end, freq)
+
+%% REORDER VARIABLES TO MATCH VARIABLE LIST IN S&W (2016)
+
+DFM.Lambda(reorder, :) = DFM.Lambda;
+DFM.sigma_v(reorder) = DFM.sigma_v;
+DFM.delta(reorder, :) = DFM.delta;
+
+DFM.bpnamevec(reorder) = DFM.bpnamevec;
+DFM.bplabvec_long(reorder) = DFM.bplabvec_long;
+DFM.bplabvec_short(reorder) = DFM.bplabvec_short;
+DFM.bptcodevec(reorder) = DFM.bptcodevec;
+
+DFM.r2(reorder) = DFM.r2;
 
 end
