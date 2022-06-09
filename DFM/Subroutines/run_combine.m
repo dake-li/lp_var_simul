@@ -30,12 +30,15 @@ summ_option.summ_stat_name = [{'mean','std','winsorized_mean','winsorized_std'},
 % Storage folder for results
 
 save_pre = fullfile('..', 'Results');
+save_mode_dir = 'baseline'; % set up directory for robustness-check modes
+% choose mode directory from {'baseline', 'cumulative', 'persistent', 'small', 'salient'}
+
 if isnan(lag_type)
     save_suff = '_aic';
 else
     save_suff = num2str(lag_type);
 end
-save_folder = fullfile(save_pre, strcat('lag', save_suff));
+save_folder = fullfile(save_pre, save_mode_dir, strcat('lag', save_suff));
 
 %% COMBINE ALL THE RESULTS
 
