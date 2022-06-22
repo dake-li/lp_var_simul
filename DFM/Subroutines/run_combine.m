@@ -13,12 +13,20 @@ spec_id_array = 1; % specification choice set id array
 dgp_type = 'G'; % Either 'G' or 'MP'
 estimand_type = 'ObsShock'; % Either 'ObsShock', 'Recursive', or 'IV'
 lag_type = 4; % No. of lags to impose in estimation, or NaN (meaning AIC)
+mode_type = 1; % robustness check mode:
+               % 1 (baseline), 2 (cumulative IRF), 
+               % 3 (persistent DGP), 4 (persistent DGP with MN prior), 
+               % 5 (small sample), 6 (salient series)
 
 % Cumulative IRF for certain variables
 
-cum_irf_by_trans_code = [0,1,1,0,1,1]; % cumulative IRF or not for each transformation code
+cum_irf_by_trans_code = [0,0,0,0,0,0]; % cumulative IRF or not for each transformation code
 % (1) y = x, (2) y = (1-L)x, (3) y = (1-L)^2 x,
 % (4) y = ln(x), (5) y = (1-L)ln(x), (6) y = (1-L)^2 ln(x)
+
+if mode_type == 2 % rewrite settings for cumulative IRF
+    cum_irf_by_trans_code = [0,1,1,0,1,1]; % cumulative IRF for some transformation codes
+end
 
 % Summary statistics across Monte Carlo simulations
 
@@ -30,8 +38,9 @@ summ_option.summ_stat_name = [{'mean','std','winsorized_mean','winsorized_std'},
 % Storage folder for results
 
 save_pre = fullfile('..', 'Results');
-save_mode_dir = 'baseline'; % set up directory for robustness-check modes
-% choose mode directory from {'baseline', 'cumulative', 'persistent', 'small', 'salient'}
+
+mode_list   = {'baseline', 'cumulative', 'persistent', 'persistent_BVAR_MN_prior' , 'small', 'salient'};
+save_mode_dir = mode_list{mode_type}; % set up directory for robustness-check modes
 
 if isnan(lag_type)
     save_suff = '_aic';
@@ -87,4 +96,4 @@ results = res.results;
 save(fullfile(save_folder, strcat('DFM_', dgp_type, '_', estimand_type)), ...
     'DFM_estimate','DF_model','settings','results','-v7.3');
 
-clear save_folder save_pre save_suff filename spec_id* summ_option res res_part dgp_type estimand_type lag_type cum_irf_by_trans_code
+clear save_folder save_pre save_mode_dir save_suff filename spec_id* summ_option res res_part dgp_type estimand_type lag_type mode_type mode_list cum_irf_by_trans_code

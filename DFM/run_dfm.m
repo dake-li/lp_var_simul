@@ -27,6 +27,10 @@ spec_id = 1; % seed for random draws of specifications (= DGPs from encompassing
 dgp_type = 'G'; % structural shock: either 'G' or 'MP'
 estimand_type = 'ObsShock'; % structural estimand: either 'ObsShock', 'Recursive', or 'IV'
 lag_type = 4; % No. of lags to impose in estimation, or NaN (= AIC)
+mode_type = 1; % robustness check mode:
+               % 1 (baseline), 2 (cumulative IRF), 
+               % 3 (persistent DGP), 4 (persistent DGP with MN prior), 
+               % 5 (small sample), 6 (salient series)
 
 %% SETTINGS
 
@@ -35,12 +39,11 @@ lag_type = 4; % No. of lags to impose in estimation, or NaN (= AIC)
 run(fullfile('Settings', 'shared'));
 run(fullfile('Settings', dgp_type));
 run(fullfile('Settings', estimand_type));
+run(fullfile('Settings', 'check_mode'));
 
 % Storage folder for results
 
 save_pre = 'Results'; % destination to store the results
-save_mode_dir = 'baseline'; % set up directory for robustness-check modes
-% choose mode directory from {'baseline', 'cumulative', 'persistent', 'small', 'salient'}
 
 if isnan(lag_type)
     save_suff = '_aic';
@@ -411,9 +414,9 @@ clear results_* i_method thisMethod
 mkdir(save_folder);
 save(fullfile(save_folder, strcat('DFM_', dgp_type, '_', estimand_type, '_', num2str(spec_id))), ...
     'DFM_estimate','DF_model','settings','results',...
-    'spec_id','dgp_type','estimand_type','lag_type','-v7.3'); % save results
+    'spec_id','dgp_type','estimand_type','lag_type', 'mode_type', '-v7.3'); % save results
 
 delete(poolobj);
-clear save_folder save_pre save_suff poolobj
+clear save_folder save_pre save_mode_dir save_suff poolobj mode_list
 
 toc;

@@ -7,14 +7,19 @@ addpath(genpath(fullfile('..', '..', 'Auxiliary_Functions')))
 
 %% SET UP DESTINATION FOLDER AND FILES
 
-spec_id = 3; % specification choice set id array
+spec_id = 1; % specification choice set id array
 dgp_type = 'G'; % Either 'G' or 'MP'
 estimand_type = 'ObsShock'; % Either 'ObsShock', 'Recursive', or 'IV'
 lag_type = 4; % No. of lags to impose in estimation, or NaN (meaning AIC)
+mode_type = 1; % robustness check mode:
+               % 1 (baseline), 2 (cumulative IRF), 
+               % 3 (persistent DGP), 4 (persistent DGP with MN prior), 
+               % 5 (small sample), 6 (salient series)
 
 save_pre = fullfile('..', 'Results');
-save_mode_dir = 'baseline'; % set up directory for robustness-check modes
-% choose mode directory from {'baseline', 'cumulative', 'persistent', 'small', 'salient'}
+
+mode_list   = {'baseline', 'cumulative', 'persistent', 'persistent_BVAR_MN_prior' , 'small', 'salient'};
+save_mode_dir = mode_list{mode_type}; % set up directory for robustness-check modes
 
 if isnan(lag_type)
     save_suff = '_aic';
@@ -117,4 +122,4 @@ save(fullfile(save_folder_new, strcat('DFM_', dgp_type, '_', estimand_type, '_',
     'DFM_estimate','DF_model','settings','results',...
     'spec_id','dgp_type','estimand_type','lag_type','-v7.3');
 
-clear save_folder save_pre save_suff save_folder_new save_pre_new save_field_name avg_methods_in_var_avg methods_to_average method_avg_irf method_avg_weight minimize_*
+clear save_folder save_pre save_mode_dir mode_list save_suff save_folder_new save_pre_new save_field_name avg_methods_in_var_avg methods_to_average method_avg_irf method_avg_weight minimize_*

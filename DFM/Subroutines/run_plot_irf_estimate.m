@@ -13,6 +13,10 @@ spec_id = 1; % specification choice set id
 dgp_type = 'G'; % Either 'G' or 'MP'
 estimand_type = 'ObsShock'; % Either 'ObsShock', 'Recursive', or 'IV'
 lag_type = 4; % No. of lags to impose in estimation, or NaN (meaning AIC)
+mode_type = 1; % robustness check mode:
+               % 1 (baseline), 2 (cumulative IRF), 
+               % 3 (persistent DGP), 4 (persistent DGP with MN prior), 
+               % 5 (small sample), 6 (salient series)
 
 % Select methods
 
@@ -30,8 +34,9 @@ output_suffix = 'png';
 % Storage folder for results
 
 save_pre = fullfile('..', 'Results');
-save_mode_dir = 'baseline'; % set up directory for robustness-check modes
-% choose mode directory from {'baseline', 'cumulative', 'persistent', 'small', 'salient'}
+
+mode_list   = {'baseline', 'cumulative', 'persistent', 'persistent_BVAR_MN_prior' , 'small', 'salient'};
+save_mode_dir = mode_list{mode_type}; % set up directory for robustness-check modes
 
 if isnan(lag_type)
     save_suff = '_aic';
