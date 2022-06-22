@@ -21,7 +21,7 @@ methods_select = 1:6; % choose index from ('VAR','BC VAR','BVAR','LP','Pen LP','
 % Plot settings
 
 rng(1, 'twister');
-dgp_idx_to_plot = 2; % plot which DGP
+dgp_idx_to_plot = 3; % plot which DGP
 n_estimate_randomly_select = 10; % randomly select several estimates to plot
 
 font_size = 10;
@@ -64,6 +64,7 @@ for i_method = methods_select
 
     figure;
     set(gca,'FontSize', font_size);
+    set(gca,'TickLabelInterpreter','latex')
     grid on;
     hold on;
 
@@ -83,7 +84,7 @@ for i_method = methods_select
 
     hold off;
     % title(strjoin({estimand_type, dgp_type, ':', thisMethodName, 'IRFs'}));
-    xlabel('Horizon','FontSize',font_size);
+    xlabel('Horizon','interpreter','latex','FontSize',font_size);
     set(gca, 'XTick', [min(res.settings.est.IRF_select-1) 2:2:max(res.settings.est.IRF_select-1)]);
 
     % save plot
