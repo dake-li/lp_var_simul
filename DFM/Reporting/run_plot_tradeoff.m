@@ -200,12 +200,12 @@ for n_mode=1:length(mode_folders) % For each robustness check mode...
             choice_raw = zeros(n_weight,max(res.settings.est.IRF_select));
             for i_weight = 1:n_weight
 
+                loss_all = weight_grid(i_weight) * the_BIAS2rel + (1-weight_grid(i_weight)) * the_VCErel;
+
                 if isempty(loss_quant) % mean loss across DGPs
-                    loss_all = weight_grid(i_weight) * the_BIAS2rel + (1-weight_grid(i_weight)) * the_VCErel;
                     loss_all = squeeze(mean(loss_all,2));
                 else % quantile loss across DGPs
-                    loss_all = weight_grid(i_weight) * squeeze(quantile(the_BIAS2rel,loss_quant,2)) + ...
-                        (1-weight_grid(i_weight)) * squeeze(quantile(the_VCErel,loss_quant,2));
+                    loss_all = squeeze(quantile(loss_all, loss_quant, 2));
                 end
 
                 loss_all(:,2:end) = loss_all(:,2:end) + sqrt(eps);
