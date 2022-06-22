@@ -1,10 +1,11 @@
-function [combination_irf,weights,H] = VAR_ModelAverage(dat,recurShock,respV,p,hmax,options)
+function [combination_irf,weights,H_default,submodel_irf] = VAR_ModelAverage(dat,recurShock,respV,p,default_lag,hmax,options)
 % Auxiliary function for h-step impulse responses computed by a weighted average of different VAR submodels
 % (modified based on Bruce Hansen's "cvar_ir.m" code, https://www.ssc.wisc.edu/~bhansen/progs/var.html)
 
 % Inputs:
 %	dat 	    nxm data matrix
 %	p			max VAR lag order p >= 1
+%   default_lag default lag order for impact effect
 %	hmax		max horizon, hmax >= 1
 %   recurShock  which shock?
 %   respV       which respones?
@@ -13,7 +14,7 @@ function [combination_irf,weights,H] = VAR_ModelAverage(dat,recurShock,respV,p,h
 % Outputs:
 %	combination_irf		(hmax+1)    averaged impulse responses, horizon 0 to hmax
 %	weights			    M x hmax 	model weights, by horizon (1 to hmax) and response variable
-%   H                   m x m       choleskey decomp. of residual cov-var matrix
+%   H_default           m x m       choleskey decomp. of residual cov-var matrix with default lag order
 
 
 %% PREPARE
@@ -31,9 +32,14 @@ combination_irf = zeros(hmax+1, 1); % placeholder for IRF averaged across submod
 
 %% FULL MODEL ESTIMATION
 
-% Least-squares VAR
+% Default impact effect matrix
+[~,~,sigma_default] = VAR(dat(p + 1 - default_lag:end,:), default_lag);
+H_default = chol(sigma_default,'lower'); % Warning: correspond to matrix C in our paper
+
+% Least-squares VAR(p)
 [~,By,sigma,Q,e,Bt,y,x] = VAR(dat,p);
-H = chol(sigma,'lower'); % Warning: correspond to matrix C in our paper
+% H = chol(sigma,'lower');
+H = H_default; % use H from VAR with default lag order
 
 % Asymptotic variance
 xe = repmat(x,1,m) .* e(:,kron(1:m,ones(1,k)));
@@ -45,7 +51,7 @@ V = WI*omega*WI;
 irf = IRF_SVAR(By,H(:,recurShock),hmax);
 var_ir = irf(respV,2:end);
 submodel_irf(:,M) = irf(respV,:);
-combination_irf(1,1) = irf(respV,1);
+combination_irf(1,1) = H_default(respV,recurShock); % use default impact effect for averaged IRF
 
 % Jacobian
 jacobs_p = zeros(m*p,k*m);
@@ -92,7 +98,8 @@ for r = 1:M-1
     % IRF
     er = y - x*Btr;
     sigmar = (er'*er) / (n-k+sum(sel_vec)/m);
-    Hr = chol(sigmar,'lower');
+    % Hr = chol(sigmar,'lower');
+    Hr = H_default; % use H from VAR with default lag order
     Byr = reshape(Btr(2:end,:),[m,p,m]);
     Byr = permute(Byr,[3,1,2]);
     irfr = IRF_SVAR(Byr,Hr(:,recurShock),hmax);
@@ -117,7 +124,7 @@ for h = 1:hmax
     ird = ir_diff(:,h);
     J0 = n*(ird*ird');
     K = - Kr(:,h)';
-    w = quadprog(J0,K,[],[],ub',1,lb,ub,[],options); % compute optimal weights for submodels at each horizon h
+    w = quadprog(J0,K,[],[],ones(M,1)',1,lb,ub,[],options); % compute optimal weights for submodels at each horizon h
     weights(:,h) = w;
     combination_irf(h+1,1) = submodel_irf(h+1,:)*w; % compute averaged IRF
 end

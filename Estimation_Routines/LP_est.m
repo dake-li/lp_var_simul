@@ -1,4 +1,4 @@
-function [IRF,nlags] = LP_est(data_sim,settings);
+function [IRF,n_lags_est] = LP_est(data_sim,settings);
 % Function for estimating IRFs using least-squares LP
 
 % preparations

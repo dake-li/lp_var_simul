@@ -10,10 +10,10 @@ nT = size(Y,1);
 % write VAR coefficients in companion form
 
 VAR_companion_form = zeros(nv * nlags);
-VAR_companion_form(1:nv,:) = reshape(-By(:,:,:), [nv, nv*nlags]);
+VAR_companion_form(1:nv,:) = reshape(By(:,:,:), [nv, nv*nlags]);
 VAR_companion_form((nv+1):end, 1:(nv*(nlags-1))) = eye(nv*(nlags-1));
 
-if abs(eigs(VAR_companion_form,1)) > 1
+if max(abs(eig(VAR_companion_form))) > 1
     
     % if OLS is non-stationary then no correction (Kilian (1998), p. 220)
     
@@ -39,7 +39,7 @@ else
     G = zeros(nv * nlags);
     G(1:nv,1:nv) = Sigma;
 
-    b = G * (inv(eye(nv * nlags) - CompAy') + CompAy' / (eye(nv * nlags) - CompAy' * CompAy') + sm) / Gamma0;
+    b = G * (inv(eye(nv * nlags) - CompAy') + CompAy' / (eye(nv * nlags) - (CompAy') * (CompAy')) + sm) / Gamma0;
     Bias = - b / (nT - nlags);
 
     % correct the bias in VAR coefficients
@@ -59,12 +59,12 @@ else
         % write bias-corrected VAR coefficients in companion form again
         
         VAR_companion_form = zeros(nv * nlags);
-        VAR_companion_form(1:nv,:) = reshape(-ByCorrect(:,:,:), [nv, nv*nlags]);
+        VAR_companion_form(1:nv,:) = reshape(ByCorrect(:,:,:), [nv, nv*nlags]);
         VAR_companion_form((nv+1):end, 1:(nv*(nlags-1))) = eye(nv*(nlags-1));
 
         % check if stationary
         
-        if abs(eigs(VAR_companion_form,1)) < 1
+        if max(abs(eig(VAR_companion_form))) < 1
             
             indic_stat = 1;
             

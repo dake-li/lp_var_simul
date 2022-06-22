@@ -30,7 +30,7 @@ if with_shock == 1 % observe shock: w_t = (shock, \bar{w}_t)
     responseV = response_pos + 1; % location of response variable
     recursiveShock = 1; % location of impulse variable
     if normalize_with_shock_std_dev == 1
-        normalizeV = 1; % normalize with one std dev of shock
+        normalizeV = 1; % normalize with one unit of shock (shock std-dev is 1)
     else
         normalizeV = normalize_pos + 1; % location of normalization variable
     end
@@ -46,14 +46,20 @@ else % recursive: w_t = \bar{w}_t
     normalizeV = normalize_pos;
 end
 
+% estimate lag length
+
+if est_n_lag_BIC == 1 % estimate lag order via BIC
+    [BIC,~] = IC_VAR(Y,n_lags_max);
+    [~,n_lags_est] = min(BIC);
+else % estimate lag order via AIC
+    [~,AIC] = IC_VAR(Y,n_lags_max);
+    [~,n_lags_est] = min(AIC);
+end
+
 % set lag length
 
 if est_n_lag == 0 % fix lag order
     nlags = n_lags_fix;
-elseif est_n_lag_BIC == 1 % estimate lag order via BIC
-    [BIC,~] = IC_VAR(Y,n_lags_max);
-    [~,nlags] = min(BIC);
-else % estimate lag order via AIC
-    [~,AIC] = IC_VAR(Y,n_lags_max);
-    [~,nlags] = min(AIC);
+else % use estimated lag order
+    nlags = n_lags_est; 
 end
