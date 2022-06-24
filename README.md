@@ -3,7 +3,7 @@
 Matlab code for large-scale simulation studies of impulse response estimators, including Local Projections (LPs), Vector Autoregressions (VARs), and several variants of these
 
 **Reference:**
-[Li, Dake](https://github.com/dake-li), [Mikkel Plagborg-Møller](https://scholar.princeton.edu/mikkelpm), and [Christian K. Wolf](https://www.christiankwolf.com/) (2021), "Local Projections vs. VARs: Lessons From Thousands of DGPs" (:page_facing_up:[paper](Documents/lp_var_simul.pdf), :bar_chart:[supplement](Documents/lp_var_simul_supplement.pdf))
+[Li, Dake](https://github.com/dake-li), [Mikkel Plagborg-Møller](https://scholar.princeton.edu/mikkelpm), and [Christian K. Wolf](https://www.christiankwolf.com/) (2022), "Local Projections vs. VARs: Lessons From Thousands of DGPs" (:page_facing_up:[paper](Documents/lp_var_simul.pdf), :bar_chart:[supplement](Documents/lp_var_simul_supplement.pdf))
 
 Tested in: Matlab R2020a on Windows 10 PC (64-bit)
 
@@ -31,7 +31,7 @@ Tested in: Matlab R2020a on Windows 10 PC (64-bit)
 - [Reporting](DFM/Reporting): Folder with files that produces results figures and tables
   - [run_plot_dgp.m](DFM/Reporting/run_plot_dgp.m): Plots and tables of DGP summary statistics (Table 1 and Figure 3 in the paper)
   - [run_plot_loss.m](DFM/Reporting/run_plot_loss.m): Plots of bias, standard deviation, median bias, and interquartile range (Figures 4-5 and 10-11 in the paper)
-  - [run_plot_tradeoff.m](DFM/Reporting/run_plot_tradeoff.m): Plots of head-to-head loss function comparisons and best method (Figures 6-9 in the paper)
+  - [run_plot_tradeoff.m](DFM/Reporting/run_plot_tradeoff.m): Plots of head-to-head loss function comparisons and best method (Figures 6-9 and 12 in the paper)
   - [settings_shared.m](DFM/Reporting/settings_shared.m): Shared settings for plotting functions
 - [Settings](DFM/Settings): Folder with simulation settings
 - [Subroutines](DFM/Subroutines): Folder with data for calibrating the DFM and various functions for simulation and computing summary statistics
