@@ -1,4 +1,4 @@
-function varout = varest(y,var_par,smpl_par)
+function varout = varest(y,var_par,smpl_par,levels)
 
 % Computes VAR and covariance matrix of estimated parameters
 %    
@@ -53,17 +53,40 @@ trnd = (1:1:T)';
 trnd = trnd(istart:iend);
 y = y(istart:iend,:);
 x = x(istart:iend,:);
-tmp = packr([y x trnd]);
-y = tmp(:,1:ns);
-x = tmp(:,ns+1:end-1);
-trnd = tmp(:,end);
-
-betahat = x\y;
-e = y - x*betahat;
-ndf=size(x,1)-size(x,2);
-seps=(e'*e)/ndf;
 resid = NaN*zeros(T,ns);
-resid(trnd,:)=e;
+
+if levels % If data is in levels, estimate VECM
+
+    % Johansen cointegration test
+    [h,pValue,stat,cValue,mles] = jcitest(y,'Model','H*','Lags',nlag-1,'Test','maxeig');
+    coint_rank = find(h{1,1:ns}==0,1)-1; % Estimated cointegration rank based on sequential tests
+    mle = mles{1,coint_rank+1}; % MLE of the selected model
+    varout.vecm.pval = pValue;
+    varout.vecm.mle = mle;
+
+    % Collect VAR parameters
+    B_cell = cell(0);
+    for l=1:nlag-1
+        B_cell = [B_cell {mle.paramVals.(sprintf('B%d', l))}];
+    end
+    betahat_cell = vec2var(B_cell,mle.paramVals.A*mle.paramVals.B');
+    betahat = [zeros(ns,1) cell2mat(betahat_cell)]'; % Add zeros for constant, since it will be ignored below
+    seps = mle.EstCov;
+    resid(istart+nlag:iend,:) = mle.res;
+
+else % If data is differenced, do OLS
+    
+    tmp = packr([y x trnd]);
+    y = tmp(:,1:ns);
+    x = tmp(:,ns+1:end-1);
+    trnd = tmp(:,end);
+    betahat = x\y;
+    e = y - x*betahat;
+    ndf=size(x,1)-size(x,2);
+    seps=(e'*e)/ndf;
+    resid(trnd,:)=e;
+
+end
 
 if icomp > 0;
    %  

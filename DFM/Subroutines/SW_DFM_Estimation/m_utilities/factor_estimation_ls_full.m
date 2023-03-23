@@ -1,4 +1,4 @@
-function out = factor_estimation_ls_full(data, inclcode, est_par)
+function out = factor_estimation_ls_full(data, inclcode, est_par, levels)
 % 2-28-2016, mww and po
 % MODIFIFED 2/10/2018 to save residuals from UAR estimation 
 %
@@ -67,7 +67,15 @@ ntmin    = est_par.lambda.nt_min;           % minimum number of Obs
 
 % USE SUBSET OF DATA TO ESTIMATE FACTORS
 est_data = data(:,inclcode==1);
+if levels
+    est_data = [nan(1,size(est_data,2)); diff(est_data,1,1)]; % If data is in levels, estimate factors off first differences
+end
 lsout = factor_estimation_ls(est_data, est_par);
+if levels
+    lsout.fac_diff = lsout.fac;
+    lsout.fac = cumsum_nan(lsout.fac); % If data was differenced, cumulate factors
+end
+
 
 % Compute estimates of factor loadings;
 n_lc = 0;       % number of constraints placed on lambda
@@ -89,7 +97,7 @@ trend_tmp = (1:1:size(calvec,1))';
 for is = 1:n_series;
     tmp = packr([data(ismpl==1,is) lsout.fac(ismpl==1,:) trend_tmp(ismpl==1)]);
     itmp = tmp(:,end);
-    tmp = tmp(:,1:end-1);
+    tmp = tmp(:,1:end-1+levels); % Include time trend if data is in levels
     if size(tmp,1) >= ntmin;
        y = tmp(:,1);
        x = [tmp(:,2:end), ones(size(tmp,1),1)];
@@ -107,7 +115,7 @@ for is = 1:n_series;
             b = bols - tmp1*tmp2*(R*bols-r);
         end;
        end;
-       lam_mat(is,:) = b(1:end-1)';
+       lam_mat(is,:) = b(1:end-1-levels)';
        u = y - x*b;
        % Compute R-squared 
        ssr = sum(u.^2);
@@ -128,7 +136,7 @@ for is = 1:n_series;
     end;
 end;
 
-varout = varest(lsout.fac,est_par.var_par,est_par.smpl_par);
+varout = varest(lsout.fac,est_par.var_par,est_par.smpl_par,levels);
 
 % SAVE OUTPUT
 out.est_data      = est_data;
@@ -139,5 +147,9 @@ out.uar_ser_mat   = uar_ser_mat;
 out.uar_resid_mat = uar_resid_mat;
 out.varout        = varout;
 out.r2            = r2_mat;
+
+if levels
+    out.vecm = varout.vecm;
+end
 
 end

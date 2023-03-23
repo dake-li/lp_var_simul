@@ -1,4 +1,4 @@
-function DFM = DFM_est(n_factors,n_lags_fac,n_lags_uar, reorder);
+function DFM = DFM_est(n_factors,n_lags_fac,n_lags_uar, reorder, levels);
 % Function for estimating parameters in the encompassing DFM model
 % (Revised based on Mark Watson's MATLAB script)
 
@@ -55,7 +55,7 @@ est_par.n_uarlag = n_lags_uar;  % number of arlags for uniqueness
 % Matrices for storing results
 n_series = size(datain.bpdata,2);
 
-fac_est_out = factor_estimation_ls_full(datain.bpdata,datain.bpinclcode,est_par);                  % estimation
+fac_est_out = factor_estimation_ls_full(datain.bpdata,datain.bpinclcode,est_par,levels);                  % estimation
 
 % Save some output;
 % Calendar, etc;
@@ -90,6 +90,10 @@ DFM.n_lags_fac = size(DFM.Phi,1) / n_factors;
 DFM.Sigma_eta  = fac_est_out.varout.seps; % var-cov matrix for reduced-form shocks
 DFM.sigma_v    = factor_model.uar_ser_mat;
 DFM.delta      = factor_model.uar_coef_mat;
+
+if levels
+    DFM.vecm = fac_est_out.vecm;
+end
 
 DFM.bpnamevec = datain.bpnamevec; % variable name
 DFM.bplabvec_long = datain.bplabvec_long;

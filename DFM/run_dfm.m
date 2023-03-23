@@ -60,7 +60,7 @@ save_folder = fullfile(save_pre, save_mode_dir, strcat('lag', save_suff));
 
 % estimate DFM from dataset
 
-DFM_estimate = DFM_est(DF_model.n_fac, DF_model.n_lags_fac, DF_model.n_lags_uar, DF_model.reorder);
+DFM_estimate = DFM_est(DF_model.n_fac, DF_model.n_lags_fac, DF_model.n_lags_uar, DF_model.reorder, DF_model.levels);
 
 % extract and store estimated DFM parameters
 
@@ -196,8 +196,10 @@ DF_model.R0_sq = compute_invert_DFM(DF_model,settings);
 % Compute Persistence of Observables in Each DGP
 %----------------------------------------------------------------
 
-[DF_model.LRV_Cov_tr_ratio, DF_model.VAR_largest_root, DF_model.frac_coef_for_large_lags] =...
-    compute_persist_DFM(DF_model,settings);
+if DF_model.levels==0
+    [DF_model.LRV_Cov_tr_ratio, DF_model.VAR_largest_root, DF_model.frac_coef_for_large_lags] =...
+        compute_persist_DFM(DF_model,settings);
+end
 
 %----------------------------------------------------------------
 % Compute Structural Target IRFs

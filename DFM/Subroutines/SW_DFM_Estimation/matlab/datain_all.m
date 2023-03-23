@@ -85,19 +85,19 @@ for is = 1:ns_m;
       end;  
       
       xq=mtoq(x,calds_m,calds_q,aggcode(is));  % Temporally aggregated to quarterly
-      y=transx(xq,tcode(is));                  % Transform .. log, first difference, etc.
+      [y,not_diff]=transx(xq,tcode(is),levels);                  % Transform .. log, first difference, etc.
       
       y_noa=y;  % Save value of y before adjustment for outliers 
       if ioutlier==1;           % Global flag to turn outlier adjustment on and off;
         if outliercode(is)==1;
           % -- Check For Outliers  -- ;
-          ya=adjout(y,thr1,io_method);             % 4 = 1 sided median replacement ;
+          ya=adjout(y,thr1,io_method,not_diff);             % 4 = 1 sided median replacement ;
           if size(ya,1)==1; error('Error in outlier adjustment'); end;
           y=ya;
         end;
         if outliercode(is)==2;
           % -- Check For Outliers  -- ;
-          ya=adjout(y,thr2,io_method);             % 4 = 1 sided median replacement ;
+          ya=adjout(y,thr2,io_method,not_diff);             % 4 = 1 sided median replacement ;
           if size(ya,1)==1; error('Error in outlier adjustment'); end;
           y=ya;
         end;
@@ -204,19 +204,19 @@ for is = 1:ns_q;
           labvec_short(is) = cellstr(tmp);
       end;     
       
-      y=transx(x,tcode(is));
+      [y,not_diff]=transx(x,tcode(is),levels);
       
       y_noa=y;
       if ioutlier==1;           % Global flag to turn outlier adjustment on and off;
         if outliercode(is)==1;
           % -- Check For Outliers  -- ;
-          ya=adjout(y,thr1,io_method);             % 4 = 1 sided median replacement ;
+          ya=adjout(y,thr1,io_method,not_diff);             % 4 = 1 sided median replacement ;
           if size(ya,1)==1; error('Error in outlier adjustment'); end;
           y=ya;
         end;
         if outliercode(is)==2;
           % -- Check For Outliers  -- ;
-          ya=adjout(y,thr2,io_method);             % 4 = 1 sided median replacement ;
+          ya=adjout(y,thr2,io_method,not_diff);             % 4 = 1 sided median replacement ;
           if size(ya,1)==1; error('Error in outlier adjustment'); end;
           y=ya;
         end;
@@ -258,6 +258,9 @@ bpdata_trend = zeros(size(bpdata));
 bpdata_unfiltered = bpdata;
 
 % If i_demean > 0; demean series
+if levels == 1
+    i_demean = 0; % Do not de-mean if variables are in levels
+end
 
 if i_demean == 1;
  for is = 1:size(bpdata,2); 

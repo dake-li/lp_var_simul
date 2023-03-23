@@ -1,4 +1,4 @@
-function [x] = adjout(y,thr,tflag)
+function [x] = adjout(y,thr,tflag,do_diff)
 % -- Adjust for outliers using fraction of IQR
 %      
 %       y = Data series
@@ -8,8 +8,14 @@ function [x] = adjout(y,thr,tflag)
 %               2  == replace with median value
 %               3  == replace with local median (obs + or - 3 on each side)
 %               4  == replace with one-sided median (5 preceding obs)
+%       do_diff = 1: difference before removing outliers, then cumulate
 
 small = 1.0e-06;
+
+if do_diff==1
+    y_orig = y;
+    y=diff(y); % Difference first before detecting outliers
+end
 
 % -- Compute IQR 
 z = y(isnan(y)==0);
@@ -68,6 +74,10 @@ if iqr >= small;
   end;
 
 end;
+
+if do_diff
+    x = cumsum_nan(x)+y_orig(find(~isnan(y_orig),1)); % If series was differenced first before adjusting, cumulate it again
+end
 
 
 end
