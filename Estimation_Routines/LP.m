@@ -1,4 +1,4 @@
-function [Bc,Br,Bx,By,Sigma,Sxx] = LP(Y,recurShock,respV,nlags,horizon)
+function [Bc,Br,Bx,By,Sigma,Sxx,w] = LP(Y,recurShock,respV,nlags,horizon)
 % Function for h-step ahead LP
 
 nv = size(Y,2);

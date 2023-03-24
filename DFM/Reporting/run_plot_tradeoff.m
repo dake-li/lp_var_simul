@@ -28,9 +28,9 @@ lags_select    = 2; % options: 1 (AIC), 2 (4 lags), 3 (8 lags)
 exper_select_group = {[2,5], [1,4], [3,6]}; % combine G and MP for observed shock, recursive, and IV
 
 % select estimation methods for each experiment
-methods_iv_select        = [1 2 3 4 5 6 7];
-methods_obsshock_select  = [1 2 3 4 5 6];
-methods_recursive_select = [1 2 3 4 5 6];
+methods_iv_select        = [1 2 3 4 5 6 7 8];
+methods_obsshock_select  = [1 2 3 4 5 6 7];
+methods_recursive_select = [1 2 3 4 5 6 7];
 
 % select a subset of DGPs
 select_DGP = 0; % if select a subset of DGPs?
@@ -63,8 +63,8 @@ choice_averaging = 1;
 % lines
 
 lines_plot = lines;
-lines_plot = lines_plot(1:7,:);
-lines_plot = lines_plot([4 3 1 2 5 6 7],:);
+lines_plot = [lines_plot(1:7,:); 0.5 0.5 0.5];
+lines_plot = lines_plot([4 3 1 2 8 5 6 7],:);
 
 %----------------------------------------------------------------
 % Colors

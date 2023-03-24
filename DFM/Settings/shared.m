@@ -66,7 +66,7 @@ settings.simul.T_burn = 100; % burn-in
 
 % set of estimation methods
 
-settings.est.methods_name    = {'svar','svar_corrbias','bvar','lp','lp_penalize','var_avg'};
+settings.est.methods_name    = {'svar','svar_corrbias','bvar','lp','lp_corrbias','lp_penalize','var_avg'};
 
 % lag specification
 

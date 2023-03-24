@@ -46,13 +46,13 @@ exper_names   = exper_names_list(exper_select);
 
 % select estimation methods for each experiment
 
-methods_iv_fields       = {'svar','svar_corrbias','bvar','lp','lp_penalize','var_avg','svar_iv'};
-methods_obsshock_fields       = {'svar','svar_corrbias','bvar','lp','lp_penalize','var_avg'};
-methods_recursive_fields       = {'svar','svar_corrbias','bvar','lp','lp_penalize','var_avg'};
+methods_obsshock_fields  = {'svar','svar_corrbias','bvar','lp','lp_corrbias','lp_penalize','var_avg'};
+methods_recursive_fields = methods_obsshock_fields;
+methods_iv_fields        = [methods_obsshock_fields {'svar_iv'}];
 
-methods_iv_names        = {'VAR','BC VAR','BVAR','LP','Pen LP','VAR Avg','SVAR-IV'};
-methods_obsshock_names  = {'VAR','BC VAR','BVAR','LP','Pen LP','VAR Avg'};
-methods_recursive_names = {'VAR','BC VAR','BVAR','LP','Pen LP','VAR Avg'};
+methods_obsshock_names  = {'VAR','BC VAR','BVAR','LP','BC LP','Pen LP','VAR Avg'};
+methods_recursive_names = methods_obsshock_names;
+methods_iv_names        = [methods_obsshock_names {'SVAR-IV'}];
 
 methods_select = {methods_iv_select,methods_obsshock_select,methods_recursive_select,...
                     methods_iv_select,methods_obsshock_select,methods_recursive_select};

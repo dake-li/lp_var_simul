@@ -3,13 +3,14 @@ function plot_loss(horzs, results, add_line, plot_name, plot_legend, font_size, 
 
     % settings
 
-    line_colors = repmat(lines(7),2,1);
-    colors_indx = [4 3 1 2 5 6 7];
+    line_colors = repmat([lines(7); 0.5 0.5 0.5],2,1);
+    colors_indx = [4 3 1 2 8 5 6 7];
     line_colors = line_colors(colors_indx,:);
-    line_styles = {'-', '--', '-x', '-', '-.', '-o', ':'};
+    line_styles = {'-', '--', '-x', '-', '.-', '-.', '-o', ':'};
     line_width  = repmat(2,14,1);
     line_width(1) = 5;
     line_width(4) = 5;
+    line_width(5) = 1;
     
     % figures
     

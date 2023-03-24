@@ -306,7 +306,11 @@ parfor i_MC = 1:settings.simul.n_MC
 
                 case 'lp' % LP
                     [temp_irf(i_method,:,i_spec),temp_n_lags(i_method,i_spec)]...
-                        = LP_est(data_sim_select,settings);
+                        = LP_est(data_sim_select,settings,0);
+
+                case 'lp_corrbias' % bias-corrected LP
+                    [temp_irf(i_method,:,i_spec),temp_n_lags(i_method,i_spec)]...
+                        = LP_est(data_sim_select,settings,1);
 
                 case 'lp_penalize' % shrinkage LP
                     [temp_irf(i_method,:,i_spec),temp_n_lags(i_method,i_spec), temp_lambda_lp_penalize(i_spec)]...
