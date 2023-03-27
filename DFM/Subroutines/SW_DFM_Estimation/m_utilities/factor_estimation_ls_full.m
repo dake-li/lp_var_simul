@@ -92,6 +92,7 @@ ismpl = smpl(calvec,nfirst,nlast,nper);
 uar_coef_mat = NaN(n_series,n_uarlag);
 uar_ser_mat = NaN(n_series,1);
 uar_resid_mat = NaN(n_series,size(calvec,1));
+res_mat = NaN(n_series,size(calvec,1));
 r2_mat = NaN(n_series,1);                              % R-squared value
 trend_tmp = (1:1:size(calvec,1))';
 for is = 1:n_series;
@@ -133,6 +134,7 @@ for is = 1:n_series;
        uar_coef_mat(is,:) = arcoef'; 
        uar_ser_mat(is,1) = ser;
        uar_resid_mat(is,itmp) = ar_resid';
+       res_mat(is,itmp) = u';
     end;
 end;
 
@@ -145,6 +147,7 @@ out.lam_mat       = lam_mat;
 out.uar_coef_mat  = uar_coef_mat;
 out.uar_ser_mat   = uar_ser_mat;
 out.uar_resid_mat = uar_resid_mat;
+out.res_mat       = res_mat;
 out.varout        = varout;
 out.r2            = r2_mat;
 

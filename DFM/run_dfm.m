@@ -31,6 +31,7 @@ mode_type = 1; % robustness check mode:
                % 1 (baseline), 2 (cumulative IRF), 
                % 3 (persistent DGP), 4 (persistent DGP with MN prior), 
                % 5 (small sample), 6 (salient series)
+estim_diagn = 0; % =1: show DFM estimation diagnostics
 
 %% SETTINGS
 
@@ -61,6 +62,9 @@ save_folder = fullfile(save_pre, save_mode_dir, strcat('lag', save_suff));
 % estimate DFM from dataset
 
 DFM_estimate = DFM_est(DF_model.n_fac, DF_model.n_lags_fac, DF_model.n_lags_uar, DF_model.reorder, DF_model.levels);
+if estim_diagn == 1
+    run_estim_diagn;
+end
 
 % extract and store estimated DFM parameters
 
