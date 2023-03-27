@@ -73,7 +73,7 @@ end
 lsout = factor_estimation_ls(est_data, est_par);
 if levels
     lsout.fac_diff = lsout.fac;
-    lsout.fac = cumsum_nan(lsout.fac); % If data was differenced, cumulate factors
+    lsout.fac = cumsum_nan(lsout.fac(2:end,:)); % If data was differenced, cumulate factors
 end
 
 
