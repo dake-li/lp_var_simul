@@ -20,7 +20,7 @@ mode_type = 1; % robustness check mode:
 
 % Select methods
 
-methods_select = 1:6; % choose index from ('VAR','BC VAR','BVAR','LP','Pen LP','VAR Avg','SVAR-IV')
+methods_select = 1:7; % choose index from ('VAR','BC VAR','BVAR','LP','BC LP','Pen LP','VAR Avg','SVAR-IV')
 
 % Plot settings
 
@@ -57,8 +57,8 @@ res = load(filename);
 n_estimate_used = min(n_estimate_randomly_select, res.settings.simul.n_MC); % number of estimates finally used
 MC_idx_set = randsample(1:res.settings.simul.n_MC, n_estimate_used); % which Monte Carlo estimates to plot
 
-methods_fields       = {'svar','svar_corrbias','bvar','lp','lp_penalize','var_avg','svar_iv'};
-methods_names        = {'VAR','BC VAR','BVAR','LP','Pen LP','VAR Avg','SVAR-IV'};
+methods_fields       = {'svar','svar_corrbias','bvar','lp','lp_corrbias','lp_penalize','var_avg','svar_iv'};
+methods_names        = {'VAR','BC VAR','BVAR','LP','BC LP','Pen LP','VAR Avg','SVAR-IV'};
 
 for i_method = methods_select
     
