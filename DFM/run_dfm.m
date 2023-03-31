@@ -63,7 +63,7 @@ save_folder = fullfile(save_pre, save_mode_dir, strcat('lag', save_suff));
 
 DFM_estimate = DFM_est(DF_model.n_fac, DF_model.n_lags_fac, DF_model.n_lags_uar, DF_model.reorder, DF_model.levels);
 if estim_diagn == 1
-    run_estim_diagn;
+    run_estim_diagn; % Display several estimation diagnostics
 end
 
 % extract and store estimated DFM parameters

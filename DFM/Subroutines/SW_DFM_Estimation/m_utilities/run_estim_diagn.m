@@ -21,7 +21,7 @@ disp('Factors: innovation var-cov eigenvalues');
 disp(sort(abs(eig(DFM_estimate.Sigma_eta)),'descend')');
 
 disp('Factors: std dev');
-disp(std(DFM_estimate.fac,'omitmissing'));
+disp(std(DFM_estimate.fac,'omitnan'));
 
 disp('Factors: quantiles of R^2, in levels');
 disp(quantile(DFM_estimate.r2,quants));
