@@ -49,11 +49,12 @@ for i_spec = 1:n_spec
     %% Reduced-form summary statistics
 
     % Largest root of reduced-form VAR
-    comp_form = [cell2mat(red_form.coef); eye(n_var*(settings.est.VAR_infinity_truncate-1)) zeros(n_var*(settings.est.VAR_infinity_truncate-1), n_var)]; % Companion form
+    nlag_comp = settings.est.VAR_infinity_truncate_comp; % # lags to include in companion matrix
+    comp_form = [cell2mat(red_form.coef(1:nlag_comp)); eye(n_var*(nlag_comp-1)) zeros(n_var*(nlag_comp-1), n_var)]; % Companion matrix
     model.VAR_largest_root(i_spec) = max(abs(eig(comp_form)));
 
     % tr(LRV)/tr(Var) ratio
-    if model.VAR_largest_root(i_spec)<1-eps
+    if model.VAR_largest_root(i_spec)<0.999
         [cov, lrv] = cov_lrv(ABCD_small);
         model.LRV_Cov_tr_ratio(i_spec) = trace(lrv)/trace(cov);
     end

@@ -48,5 +48,9 @@ function out = reduced_form_VAR(ABCD,num_lag)
         out.coef{i} = aux*K; % VAR coefs at lag i
         aux = aux*AmKC;
     end
+    AmKC_largest_eigval = max(abs(eig(AmKC)));
+    if AmKC_largest_eigval^num_lag > 0.01
+        warning('Reduced-form VAR coefficients decay slowly. Largest eigenvalue of A-K*C equals %6.4f. Choose larger max lag.', AmKC_largest_eigval);
+    end
 
 end

@@ -43,7 +43,8 @@ settings.est.IRF_select           = 1:settings.est.IRF_hor; % which IRFs to stud
 
 % compute largest root and VAR(p) fit in population using truncated infinite-order VAR 
 
-settings.est.VAR_infinity_truncate = 50; % truncation horizon for VAR(infty)
+settings.est.VAR_infinity_truncate = 1000; % truncation horizon for VAR(infinity)
+settings.est.VAR_infinity_truncate_comp = 200; % use only this many lags to construct companion matrix of VAR(infinity)
 
 % number of Monte Carlo draws
 
