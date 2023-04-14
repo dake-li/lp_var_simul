@@ -40,10 +40,6 @@ settings.est.manual_shock_pos         = 1; % if loading is not estimated, we jus
 settings.est.IRF_hor              = 21; % maximal horizon (include contemporary)
 settings.est.IRF_select           = 1:settings.est.IRF_hor; % which IRFs to study
 
-% compute R0_sq using VMA representation
-
-settings.est.VMA_nlags = 50; % number of lags in VMA representation
-
 % compute largest root and VAR(p) fit in population using truncated infinite-order VAR 
 
 settings.est.VAR_infinity_truncate = 50; % truncation horizon for VAR(infty)
