@@ -39,7 +39,7 @@ function out = reduced_form_VAR(ABCD,num_lag)
     out.innov_ABCD.D = eye(size(C,1));
 
     % Compute coefficients in VAR(infinity) representation
-    % See Hansen & Sargent (2014 book), chapter 8.6
+    % See Hansen & Sargent (2013 book), chapter 8.6
 
     out.coef = cell(1,num_lag);
     AmKC = A-K*C;
