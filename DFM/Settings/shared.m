@@ -2,7 +2,6 @@
 
 % take DFM dimensions from Stock-Watson (2016)
 
-DF_model.n_y        = 207; % number of observables
 DF_model.reorder    = [1:76, 87:94, 77:86, 95:171, 181:195, 172:180, 196:207]; % index to reorder data to match variable list in Stock-Watson (2016)
 
 DF_model.n_fac      = 6; % number of factors
@@ -34,9 +33,7 @@ settings.specifications.manual_var_select     = [1 142; 1 97]; % if manual selec
 % preliminary structural shock settings for observed shock and IV
 
 settings.est.estimate_shock_weight    = 1; % do we estimate the loading of the structural shock on the reduced-form shocks?
-settings.est.shock_weight_calibrate   = 0; % if shock weight is estimated: 0 to maximize spending/rate IRF, 1 to calibrate to external shocks
-
-settings.est.manual_shock_pos         = 1; % if loading is not estimated, we just mechanically choose the xth shock in the factor VAR
+settings.est.manual_shock_pos         = 1; % if loading is not estimated, we just mechanically choose the xth shock in the state equation
 
 % IRFs of interest
 

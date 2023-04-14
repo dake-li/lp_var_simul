@@ -87,33 +87,31 @@ if DF_model.fac_persist.scale == 1
 end
 
 %----------------------------------------------------------------
-% Calibrate IV Persistence and Strength
-%----------------------------------------------------------------
-
-% extract reduced-form factor innovations and external structural shock series
-
-DFM_estimate.fac_shock                 = DFM_estimate.fac_res / chol(DFM_estimate.Sigma_eta);
-external_shock_data                    = readtable(strcat('external_shock_series_', dgp_type, '.csv'));
-DFM_estimate.external_shock            = external_shock_data{:,2};
-DFM_estimate.external_shock_time_range = [external_shock_data{1,1}, external_shock_data{end,1}, 4];
-
-clear external_shock_data;
-
-% regress external shock series on factor shock series to calibrate IV strength
-
-DFM_estimate.calibrate_out       = calibrateIV(DFM_estimate);
-DF_model.calibrated_shock_weight = DFM_estimate.calibrate_out.weight;
-
-%----------------------------------------------------------------
 % Set Up IV DGP
 %----------------------------------------------------------------
 
 if strcmp(estimand_type, 'IV')
+
+    % extract reduced-form factor innovations and external structural shock series
+
+    DFM_estimate.fac_shock                 = DFM_estimate.fac_res / chol(DFM_estimate.Sigma_eta);
+    external_shock_data                    = readtable(strcat('external_shock_series_', dgp_type, '.csv'));
+    DFM_estimate.external_shock            = external_shock_data{:,2};
+    DFM_estimate.external_shock_time_range = [external_shock_data{1,1}, external_shock_data{end,1}, 4];
+    
+    clear external_shock_data;
+    
+    % regress external shock series on factor shock series to calibrate IV strength
+    
+    DFM_estimate.calibrate_out       = calibrateIV(DFM_estimate);
+
     if settings.est.IV.IV_persistence_calibrate==1
         DF_model.IV.rho = DFM_estimate.calibrate_out.rho;
     else
         DF_model.IV.rho = DF_model.IV.manual_rho;
     end
+
+    % set parameters
     
     DF_model.IV.rho_grid = DF_model.IV.rho * settings.est.IV.IV_persistence_scale;
     
@@ -124,19 +122,30 @@ if strcmp(estimand_type, 'IV')
         DF_model.IV.alpha = DF_model.IV.manual_alpha;
         DF_model.IV.sigma_v = DF_model.IV.manual_sigma_v;
     end
+
 end
 
 %----------------------------------------------------------------
-% Represent as Model in ABCDEF Form
+% Represent as Model in ABCD Form
 %----------------------------------------------------------------
 
-DF_model.n_s   = size(DF_model.Phi,2);
-DF_model.n_eps = size(DF_model.Sigma_eta,2);
-DF_model.n_y   = size(DF_model.Lambda,1);
-DF_model.n_w   = size(DF_model.delta,1); % Warning: n_w stands for the dim of \omega_t
-DF_model.n_e   = DF_model.n_w * DF_model.n_lags_uar;
-
+[DF_model.n_y,DF_model.n_fac] = size(DF_model.Lambda);
 DF_model.ABCD  = ABCD_fun_DFM(DF_model);
+
+%----------------------------------------------------------------
+% Shock Weights
+%----------------------------------------------------------------
+
+shock_weight = zeros(DF_model.n_fac+DF_model.n_y,1);
+if settings.est.estimate_shock_weight==1 % if want to estimate the optimal shock weight to maximize impact response
+    shock_weight(1:DF_model.n_fac) = DF_model.ABCD.D(settings.est.shock_optimize_var_IRF,1:DF_model.n_fac); % optimal weight is in the same direction as impulse response
+    shock_weight = shock_weight/sqrt(shock_weight'*shock_weight); % normalize weight
+else
+    shock_weight = zeros(n_eps, 1); % manually choose shock
+    shock_weight(settings.est.manual_shock_pos) = 1;
+end
+settings.est.shock_weight = shock_weight;
+clear shock_weight;
 
 %% PREPARATION
 
@@ -178,54 +187,9 @@ results_submodel_irf_var_avg = NaN(2*settings.est.n_lags_max,settings.est.IRF_ho
 results_F_stat_svar_iv = NaN(settings.simul.n_MC,settings.specifications.n_spec); % VAR-IV F statistic: size n_MC*n_spec
 results_F_pvalue_svar_iv = NaN(settings.simul.n_MC,settings.specifications.n_spec); % VAR-IV F p value: size n_MC*n_spec
 
-%% PRELIMINARY COMPUTATIONS: STRUCTURAL ESTIMANDS
+%% STRUCTURAL ESTIMANDS AND DGP SUMMARIES
 
-%----------------------------------------------------------------
-% Compute True IRFs in Encompassing DFM
-%----------------------------------------------------------------
-
-[DF_model.irf, settings.est.shock_weight] = compute_irfs(DF_model,settings);
-
-%----------------------------------------------------------------
-% Compute Degree of Invertibility in Each DGP
-%----------------------------------------------------------------
-
-DF_model.R0_sq = compute_invert_DFM(DF_model,settings);
-
-%----------------------------------------------------------------
-% Compute Persistence of Observables in Each DGP
-%----------------------------------------------------------------
-
-[DF_model.LRV_Cov_tr_ratio, DF_model.VAR_largest_root, DF_model.frac_coef_for_large_lags] =...
-    compute_persist_DFM(DF_model,settings);
-
-%----------------------------------------------------------------
-% Compute Structural Target IRFs
-%----------------------------------------------------------------
-
-switch estimand_type
-    
-    case 'ObsShock'
-        DF_model.normalized_irf = compute_normalized_irfs(DF_model,settings);
-        DF_model.target_irf = DF_model.normalized_irf(settings.est.IRF_select, :);
-        
-    case 'Recursive'
-        DF_model.VAR_irf = compute_VARirfs_DFM(DF_model,settings);
-        DF_model.target_irf = DF_model.VAR_irf(settings.est.IRF_select, :);
-        
-    case 'IV'
-        DF_model.normalized_irf = compute_normalized_irfs(DF_model,settings);
-        DF_model.target_irf = DF_model.normalized_irf(settings.est.IRF_select, :);
-
-end
-
-%----------------------------------------------------------------
-% Compute Population IV Strengths
-%----------------------------------------------------------------
-
-if strcmp(estimand_type, 'IV')
-    DF_model.IV_strength = compute_IVstrength_DFM(DF_model, settings);
-end
+DF_model = dgp_irfs_stats(DF_model, settings, estimand_type);
 
 %% MONTE CARLO ANALYSIS
 
