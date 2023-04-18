@@ -53,6 +53,9 @@ for i_spec = 1:n_spec
     comp_form = [cell2mat(red_form.coef(1:nlag_comp)); eye(n_var*(nlag_comp-1)) zeros(n_var*(nlag_comp-1), n_var)]; % Companion matrix
     model.VAR_largest_root(i_spec) = max(abs(eig(comp_form)));
 
+    % 75th percentile of reduced-form VAR roots
+    model.VAR_75pctl_root(i_spec) = prctile(abs(eig(comp_form)),0.75);
+
     % tr(LRV)/tr(Var) ratio
     if model.VAR_largest_root(i_spec)<0.999
         [cov, lrv] = cov_lrv(ABCD_small);
