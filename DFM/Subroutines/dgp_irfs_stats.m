@@ -60,6 +60,9 @@ for i_spec = 1:n_spec
     if model.VAR_largest_root(i_spec)<0.999
         [cov, lrv] = cov_lrv(ABCD_small);
         model.LRV_Cov_tr_ratio(i_spec) = trace(lrv)/trace(cov);
+    else
+        [dcov, dlrv] = dcov_dlrv(ABCD_small,settings);
+        model.dLRV_dCov_tr_ratio(i_spec) = trace(dlrv)/trace(dcov);
     end
 
     % Fraction of VAR coefficients at long lags
