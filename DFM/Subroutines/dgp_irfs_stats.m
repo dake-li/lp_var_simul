@@ -7,6 +7,7 @@ var_select = settings.specifications.var_select;
 [n_spec,n_var] = size(var_select);
 
 model.LRV_Cov_tr_ratio = nan(n_spec,1);
+model.dLRV_dCov_tr_ratio = nan(n_spec,1);
 model.VAR_largest_root = nan(n_spec,1);
 model.frac_coef_for_large_lags = nan(n_spec,1);
 model.R0_sq = nan(n_spec,1);
@@ -61,7 +62,7 @@ for i_spec = 1:n_spec
         [cov, lrv] = cov_lrv(ABCD_small);
         model.LRV_Cov_tr_ratio(i_spec) = trace(lrv)/trace(cov);
     else
-        [dcov, dlrv] = dcov_dlrv(ABCD_small,settings);
+        [dcov, dlrv] = dcov_dlrv(ABCD_small);
         model.dLRV_dCov_tr_ratio(i_spec) = trace(dlrv)/trace(dcov);
     end
 
