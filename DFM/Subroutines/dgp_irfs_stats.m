@@ -62,7 +62,8 @@ for i_spec = 1:n_spec
         [cov, lrv] = cov_lrv(ABCD_small);
         model.LRV_Cov_tr_ratio(i_spec) = trace(lrv)/trace(cov);
     else
-        [dcov, dlrv] = dcov_dlrv(ABCD_small);
+        dABCD = ABCD_diff(ABCD_small); % ABCD representation of first differences
+        [dcov, dlrv] = cov_lrv(dABCD);
         model.dLRV_dCov_tr_ratio(i_spec) = trace(dlrv)/trace(dcov);
     end
 
