@@ -41,10 +41,11 @@ settings.est.manual_shock_pos         = 1; % if loading is not estimated, we jus
 settings.est.IRF_hor              = 21; % maximal horizon (include contemporary)
 settings.est.IRF_select           = 1:settings.est.IRF_hor; % which IRFs to study
 
-% compute largest root and VAR(p) fit in population using truncated infinite-order VAR 
+% compute roots and VAR(p) fit in population using truncated infinite-order VAR 
 
 settings.est.VAR_infinity_truncate = 1000; % truncation horizon for VAR(infinity)
 settings.est.VAR_infinity_truncate_comp = 200; % use only this many lags to construct companion matrix of VAR(infinity)
+settings.est.VAR_root_quant = 0.75; % store this quantile of the roots of the companion matrix (in addition to largest)
 
 % number of Monte Carlo draws
 
