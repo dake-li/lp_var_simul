@@ -9,6 +9,7 @@ var_select = settings.specifications.var_select;
 model.LRV_Cov_tr_ratio = nan(n_spec,1);
 model.dLRV_dCov_tr_ratio = nan(n_spec,1);
 model.VAR_largest_root = nan(n_spec,1);
+model.VAR_quant_root = nan(n_spec,1);
 model.frac_coef_for_large_lags = nan(n_spec,1);
 model.R0_sq = nan(n_spec,1);
 model.IV_strength = nan(n_spec,1);
@@ -49,13 +50,12 @@ for i_spec = 1:n_spec
 
     %% Reduced-form summary statistics
 
-    % Largest root of reduced-form VAR
+    % Roots of reduced-form VAR
     nlag_comp = settings.est.VAR_infinity_truncate_comp; % # lags to include in companion matrix
     comp_form = [cell2mat(red_form.coef(1:nlag_comp)); eye(n_var*(nlag_comp-1)) zeros(n_var*(nlag_comp-1), n_var)]; % Companion matrix
-    model.VAR_largest_root(i_spec) = max(abs(eig(comp_form)));
-
-    % 75th percentile of reduced-form VAR roots
-    model.VAR_75pctl_root(i_spec) = prctile(abs(eig(comp_form)),0.75);
+    roots = abs(eig(comp_form));
+    model.VAR_largest_root(i_spec) = max(roots); % Max
+    model.VAR_quant_root(i_spec) = quantile(roots,settings.est.VAR_root_quant); % Percentile
 
     % tr(LRV)/tr(Var) ratio
     if model.VAR_largest_root(i_spec)<0.999

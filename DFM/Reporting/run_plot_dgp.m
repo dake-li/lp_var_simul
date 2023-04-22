@@ -32,7 +32,7 @@ select_DGP_fn = @(i_dgp, res) res.DF_model.VAR_largest_root(i_dgp) > median(res.
 settings_shared;
 
 % Summary statistics for table
-tab_stat = {'LRV_Cov_tr_ratio', 'VAR_largest_root', 'frac_coef_for_large_lags', 'R0_sq'}; % Summary stats to copy (in addition to IRF stats defined below)
+tab_stat = {'LRV_Cov_tr_ratio', 'dLRV_dCov_tr_ratio', 'VAR_largest_root', 'VAR_quant_root', 'frac_coef_for_large_lags', 'R0_sq'}; % Summary stats to copy (in addition to IRF stats defined below)
 tab_quants = [0.1 0.25 0.5 0.75 0.9]; % Quantiles to report across specifications
 
 % Table with model specification tests
@@ -158,6 +158,11 @@ for n_mode=1:length(mode_folders) % For each robustness check mode...
             histogram(res.DF_model.VAR_largest_root, 'Normalization', 'probability');
             title(strjoin({exper_plotname, ': largest VAR root'}), 'Interpreter', 'none');
             plot_save(fullfile(output_folder, 'dgp_largroot'), output_suffix);
+
+            figure;
+            histogram(res.DF_model.VAR_quant_root, 'Normalization', 'probability');
+            title(strjoin({exper_plotname, ': quantile of VAR roots'}), 'Interpreter', 'none');
+            plot_save(fullfile(output_folder, 'dgp_quantroot'), output_suffix);
             
             figure;
             histogram(res.DF_model.frac_coef_for_large_lags, 'Normalization', 'probability');

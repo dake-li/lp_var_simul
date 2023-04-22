@@ -73,7 +73,7 @@ end
 for i = 1:length(first_tier)
 
     % decide which dim to concatenate
-    if any(strcmp(first_tier{i},{'R0_sq','LRV_Cov_tr_ratio','VAR_largest_root','frac_coef_for_large_lags','IV_strength'}))
+    if any(strcmp(first_tier{i},{'LRV_Cov_tr_ratio','dLRV_dCov_tr_ratio','VAR_largest_root','VAR_quant_root','frac_coef_for_large_lags','R0_sq','IV_strength'}))
         concatenate_dim = 1;
     elseif any(strcmp(first_tier{i},{'VAR_irf','normalized_irf','target_irf'}))
         concatenate_dim = 2;
