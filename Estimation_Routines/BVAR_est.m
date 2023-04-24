@@ -1,4 +1,4 @@
-function [IRF,n_lags_est] = BVAR_est(data_sim,settings);
+function [IRF,n_lags_est,GLP_hyper_est] = BVAR_est(data_sim,settings);
 % Function for estimating IRFs using a Bayesian VAR approach
 
 % preparations
@@ -35,6 +35,10 @@ if settings.est.bvar_glp == 1 % If Giannone, Lenza & Primiceri procedure
         IRF_draws(:,:,j) = IRF_SVAR(reshape(beta_draws(2:end,:,j)',n_Y,n_Y,nlags),ShockVector,IRF_hor - 1);
     end
 
+    % hyperparameters
+
+    GLP_hyper_est = [r.postmax.lambda;r.postmax.theta;r.postmax.miu];
+
 else % Otherwise, basic MN prior with fixed hyper-parameters
 
     if ndraw == 0 % only use posterior mean of VAR coef
@@ -52,6 +56,8 @@ else % Otherwise, basic MN prior with fixed hyper-parameters
     else % compute posterior mean of IRF based on posterior draws
         IRF_draws = IRF_BVAR(VAR_coef_post_mean,VAR_coef_post_vce_inv,ShockVector,IRF_hor - 1,ndraw); % IRF draws
     end
+
+    GLP_hyper_est = NaN;
 
 end
 

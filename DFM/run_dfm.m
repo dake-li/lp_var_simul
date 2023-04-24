@@ -183,6 +183,7 @@ results_Hausman_stat_svar = NaN(settings.simul.n_MC,settings.specifications.n_sp
 results_Hausman_pvalue_svar = NaN(settings.simul.n_MC,settings.specifications.n_spec); % LM p value: size n_MC*n_spec
 results_Granger_stat_svar = NaN(settings.simul.n_MC,settings.specifications.n_spec); % Granger statistic: size n_MC*n_spec
 results_Granger_pvalue_svar = NaN(settings.simul.n_MC,settings.specifications.n_spec); % Granger p value: size n_MC*n_spec
+results_GLP_hyper_bvar = NaN(3,settings.simul.n_MC,settings.specifications.n_spec); % GLP hyperparameters: size 3*n_MC*n_spec
 results_lambda_lp_penalize = NaN(settings.simul.n_MC,settings.specifications.n_spec); % pen. LP lambda: size n_MC*n_spec
 results_weight_var_avg = NaN(2*settings.est.n_lags_max,length(settings.est.average_store_weight),...
     settings.simul.n_MC,settings.specifications.n_spec); % weights in VAR averaging: size n_models*n_horizon*n_MC*n_spec
@@ -231,6 +232,7 @@ parfor i_MC = 1:settings.simul.n_MC
     temp_Hausman_pvalue_svar = NaN(1,settings.specifications.n_spec);
     temp_Granger_stat_svar = NaN(1,settings.specifications.n_spec);
     temp_Granger_pvalue_svar = NaN(1,settings.specifications.n_spec);
+    temp_GLP_hyper_bvar = NaN(3,1,settings.specifications.n_spec);
     temp_lambda_lp_penalize = NaN(1,settings.specifications.n_spec);
     temp_weight_var_avg = NaN(2*settings.est.n_lags_max,...
         length(settings.est.average_store_weight),settings.specifications.n_spec);
@@ -267,7 +269,7 @@ parfor i_MC = 1:settings.simul.n_MC
                         = SVAR_est(data_sim_select,settings,1);
 
                 case 'bvar' % Bayesian VAR
-                    [temp_irf(i_method,:,i_spec),temp_n_lags(i_method,i_spec)]...
+                    [temp_irf(i_method,:,i_spec),temp_n_lags(i_method,i_spec),temp_GLP_hyper_bvar(:,1,i_spec)]...
                         = BVAR_est(data_sim_select,settings);
 
                 case 'lp' % LP
@@ -311,6 +313,7 @@ parfor i_MC = 1:settings.simul.n_MC
     results_Hausman_pvalue_svar(i_MC,:) = temp_Hausman_pvalue_svar;
     results_Granger_stat_svar(i_MC,:) = temp_Granger_stat_svar;
     results_Granger_pvalue_svar(i_MC,:) = temp_Granger_pvalue_svar;
+    results_GLP_hyper_bvar(:,i_MC,:) = temp_GLP_hyper_bvar;
     results_lambda_lp_penalize(i_MC,:) = temp_lambda_lp_penalize;
     results_weight_var_avg(:,:,i_MC,:) = temp_weight_var_avg;
     results_submodel_irf_var_avg(:,:,i_MC,:) = temp_submodel_irf_var_avg;
@@ -352,6 +355,14 @@ if any(strcmp(settings.est.methods_name, 'svar'))
     if strcmp(estimand_type, 'IV')
         results.Granger_stat.svar = results_Granger_stat_svar;
         results.Granger_pvalue.svar = results_Granger_pvalue_svar;
+    end
+end
+
+if any(strcmp(settings.est.methods_name, 'bvar'))
+    if settings.est.bvar_glp == 1
+        results.GLP_hyper.lambda = squeeze(results_GLP_hyper_bvar(1,:,:));
+        results.GLP_hyper.theta = squeeze(results_GLP_hyper_bvar(2,:,:));
+        results.GLP_hyper.miu = squeeze(results_GLP_hyper_bvar(3,:,:));
     end
 end
 
