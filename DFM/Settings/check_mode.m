@@ -2,39 +2,28 @@
 
 % set up directory for robustness-check modes
 
-mode_list   = {'baseline', 'cumulative', 'persistent', 'persistent_BVAR_MN_prior' , 'small', 'salient'};
+mode_list   = {'baseline', 'small', 'salient', 'diff', 'diff_cumulative', 'diff_small', 'diff_salient'};
 save_mode_dir = mode_list{mode_type};
 
 % rewrite some baseline settings in "shared.m" for different robustness check modes
 
+if mode_type >= 4
+
+    % data in first differences
+
+    DF_model.levels = 0;
+    settings.est.bvar_glp = 0; % use simple BVAR procedure
+    settings.est.prior.towards_random_walk = 0; % shrink towards white noise
+
+end
+
 switch mode_type
 
-    case 1 % baseline
+    case {1, 4} % baseline (either levels or first differences)
         
         % rewrite nothing and use all the settings in "shared.m"
 
-    case 2 % cumulative IRF
-        
-        % rewrite nothing and use all the settings in "shared.m"
-        % cumulative IRF will be imputed in "run_combine.m"
-
-    case 3 % persistent DGP
-        
-        % scale up calibrated persistency of factors
-
-        DF_model.fac_persist.scale = 1; % scale calibrated persistence of factors?
-
-    case 4 % persistent DGP with MN prior
-
-        % scale up calibrated persistency of factors
-
-        DF_model.fac_persist.scale = 1; % scale calibrated persistence of factors?
-
-        % BVAR prior
-
-        settings.est.prior.towards_random_walk = 1; % prior shrinking towards random walk? otherwise towards zero
-
-    case 5 % small sample
+    case {2, 6} % small sample
 
         % sample settings
 
@@ -44,10 +33,15 @@ switch mode_type
 
         settings.est.n_lags_max     = 12; % maximal lag length for info criteria
 
-    case 6 % salient series
+    case {3, 7} % salient series
 
         % selection of DGPs from encompassing model
 
         settings.specifications.random_from_key_series = 1; % randomly select from some key series in DFM list?
+
+    case 5 % cumulative IRF
+        
+        % rewrite nothing and use all the settings in "shared.m"
+        % cumulative IRF will be imputed in "run_combine.m"
 
 end

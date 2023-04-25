@@ -11,7 +11,9 @@ addpath(genpath(fullfile('..', 'Subroutines')))
 %% SETTINGS
 
 % select robustness check mode
-mode_select    = 1; % options: 1 (baseline), 2 (cumulative IRF), 3 (persistent DGP), 4 (persistent DGP with MN prior), 5 (small sample), 6 (salient series)
+mode_select    = 1; % options: 1 (baseline), 2 (small sample), 3 (salient series),
+                    % 4 (first diff), 5 (first diff + cumulative IRF),
+                    % 6 (first diff + small sample), 7 (first diff + salient series)
 
 % select lag length specifications
 lags_select    = 2; % options: 1 (AIC), 2 (4 lags), 3 (8 lags)
@@ -222,16 +224,18 @@ for n_mode=1:length(mode_folders) % For each robustness check mode...
             plot_save(fullfile(output_folder, 'dgp_lambda'), output_suffix);
 
             % Giannone, Lenza & Primiceri BVAR hyper-parameters
-            the_GLP = res.results.GLP_hyper;
-            the_fields = fieldnames(the_GLP);
-            figure;
-            for nj = 1:length(the_fields)
-                subplot(1,3,nj);
-                histogram(the_GLP.(the_fields{nj})(median_idx,:), 'Normalization', 'probability');
-                title(the_fields{nj}, 'Interpreter', 'none');
+            if isfield(res.results,'GLP_hyper')
+                the_GLP = res.results.GLP_hyper;
+                the_fields = fieldnames(the_GLP);
+                figure;
+                for nj = 1:length(the_fields)
+                    subplot(1,3,nj);
+                    histogram(the_GLP.(the_fields{nj})(median_idx,:), 'Normalization', 'probability');
+                    title(the_fields{nj}, 'Interpreter', 'none');
+                end
+                sgtitle(strjoin({exper_plotname, ': median GLP hyper-param (across specs)'}), 'FontSize', 11, 'FontWeight', 'bold', 'Interpreter', 'none');
+                plot_save(fullfile(output_folder, 'dgp_glphyper'), output_suffix);
             end
-            sgtitle(strjoin({exper_plotname, ': median GLP hyper-param (across specs)'}), 'FontSize', 11, 'FontWeight', 'bold', 'Interpreter', 'none');
-            plot_save(fullfile(output_folder, 'dgp_glphyper'), output_suffix);
             
             % Model-averaging weights
             if isfield(res.results, 'weight')

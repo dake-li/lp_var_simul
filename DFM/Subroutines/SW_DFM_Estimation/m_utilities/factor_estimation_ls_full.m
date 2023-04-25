@@ -1,4 +1,4 @@
-function out = factor_estimation_ls_full(data, inclcode, est_par, levels)
+function out = factor_estimation_ls_full(data, inclcode, est_par, levels, coint_rank)
 % 2-28-2016, mww and po
 % MODIFIFED 2/10/2018 to save residuals from UAR estimation 
 %
@@ -145,7 +145,7 @@ for is = 1:n_series;
     end;
 end;
 
-varout = varest(lsout.fac,est_par.var_par,est_par.smpl_par,levels);
+varout = varest(lsout.fac,est_par.var_par,est_par.smpl_par,levels,coint_rank);
 
 % SAVE OUTPUT
 out.est_data      = est_data;

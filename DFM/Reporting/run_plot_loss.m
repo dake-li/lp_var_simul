@@ -14,7 +14,9 @@ addpath(genpath(fullfile('..', 'Subroutines')))
 %% SETTINGS
 
 % select robustness check mode
-mode_select    = 1; % options: 1 (baseline), 2 (cumulative IRF), 3 (persistent DGP), 4 (persistent DGP with MN prior), 5 (small sample), 6 (salient series)
+mode_select    = 1; % options: 1 (baseline), 2 (small sample), 3 (salient series),
+                    % 4 (first diff), 5 (first diff + cumulative IRF),
+                    % 6 (first diff + small sample), 7 (first diff + salient series)
 
 % select lag length specifications
 lags_select    = 2; % options: 1 (AIC), 2 (4 lags), 3 (8 lags)

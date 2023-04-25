@@ -1,4 +1,4 @@
-function DFM = DFM_est(n_factors,n_lags_fac,n_lags_uar, reorder, levels);
+function DFM = DFM_est(n_factors,n_lags_fac,n_lags_uar, reorder, levels, coint_rank);
 % Function for estimating parameters in the encompassing DFM model
 % (Revised based on Mark Watson's MATLAB script)
 
@@ -55,7 +55,7 @@ est_par.n_uarlag = n_lags_uar;  % number of arlags for uniqueness
 % Matrices for storing results
 n_series = size(datain.bpdata,2);
 
-fac_est_out = factor_estimation_ls_full(datain.bpdata,datain.bpinclcode,est_par,levels);                  % estimation
+fac_est_out = factor_estimation_ls_full(datain.bpdata,datain.bpinclcode,est_par,levels,coint_rank);                  % estimation
 
 % Save some output;
 % Calendar, etc;

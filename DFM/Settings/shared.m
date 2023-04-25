@@ -4,16 +4,11 @@
 
 DF_model.reorder    = [1:76, 87:94, 77:86, 95:171, 181:195, 172:180, 196:207]; % index to reorder data to match variable list in Stock-Watson (2016)
 
-DF_model.levels     = 1; % =1: variables in levels, 0=: differenced
+DF_model.levels     = 1; % =1: variables in levels, 0=: first differences
 DF_model.n_fac      = 6; % number of factors
-DF_model.n_lags_fac = 2; % lag order of factors
-DF_model.n_lags_uar = 2; % lag order of measurement error
-
-% scale up calibrated persistency of factors
-
-DF_model.fac_persist.scale = 0; % scale calibrated persistence of factors?
-DF_model.fac_persist.target_largest_root = 0.95; % match the targeted largest root in factor equation
-DF_model.fac_persist.keep_fac_variation = 1; % adjust factor innovation scale to keep factor variation?
+DF_model.coint_rank = 2; % cointegration rank in factor process (for levels specification); []: estimate using Johansen test
+DF_model.n_lags_fac = 4; % lag order of factors
+DF_model.n_lags_uar = 4; % lag order of measurement error
 
 %% PREPARATIONS FOR STRUCTURAL ESTIMANDS
 
@@ -74,7 +69,7 @@ settings.est.res_autocorr_nlags = 2; % check autocorr of VAR(p) residuals up to 
 
 % BVAR prior
 
-settings.est.bvar_glp                  = 1; % use Giannone, Lenza & Primiceri (2015) BVAR procedure?
+settings.est.bvar_glp                  = DF_model.levels; % use Giannone, Lenza & Primiceri (2015) BVAR procedure?
                                             % otherwise use basic BVAR with default MN prior (see settings below)
 settings.est.prior.towards_random_walk = DF_model.levels; % prior shrinking towards random walk? otherwise towards zero
 settings.est.prior.tight_overall       = 0.04;

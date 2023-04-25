@@ -28,9 +28,10 @@ dgp_type = 'G'; % structural shock: either 'G' or 'MP'
 estimand_type = 'ObsShock'; % structural estimand: either 'ObsShock', 'Recursive', or 'IV'
 lag_type = 4; % No. of lags to impose in estimation, or NaN (= AIC)
 mode_type = 1; % robustness check mode:
-               % 1 (baseline), 2 (cumulative IRF), 
-               % 3 (persistent DGP), 4 (persistent DGP with MN prior), 
-               % 5 (small sample), 6 (salient series)
+               % 1 (baseline), 2 (small sample), 3 (salient series),
+               % 4 (first diff), 5 (first diff + cumulative IRF),
+               % 6 (first diff + small sample), 7 (first diff + salient series)
+
 estim_diagn = 0; % =1: show DFM estimation diagnostics
 
 %% SETTINGS
@@ -61,7 +62,7 @@ save_folder = fullfile(save_pre, save_mode_dir, strcat('lag', save_suff));
 
 % estimate DFM from dataset
 
-DFM_estimate = DFM_est(DF_model.n_fac, DF_model.n_lags_fac, DF_model.n_lags_uar, DF_model.reorder, DF_model.levels);
+DFM_estimate = DFM_est(DF_model.n_fac, DF_model.n_lags_fac, DF_model.n_lags_uar, DF_model.reorder, DF_model.levels, DF_model.coint_rank);
 if estim_diagn == 1
     run_estim_diagn; % Display several estimation diagnostics
 end
@@ -81,14 +82,6 @@ DF_model.variable_name_long = DFM_estimate.bplabvec_long;
 DF_model.trans_code = DFM_estimate.bptcodevec; % transformation code
 % (1) y = x, (2) y = (1-L)x, (3) y = (1-L)^2 x,
 % (4) y = ln(x), (5) y = (1-L)ln(x), (6) y = (1-L)^2 ln(x)
-
-%----------------------------------------------------------------
-% Scale up Factor Persistence
-%----------------------------------------------------------------
-
-if DF_model.fac_persist.scale == 1
-    DF_model = scale_fac_persist(DF_model);
-end
 
 %----------------------------------------------------------------
 % Set Up IV DGP

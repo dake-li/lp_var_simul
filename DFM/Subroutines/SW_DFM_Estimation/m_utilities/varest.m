@@ -1,4 +1,4 @@
-function varout = varest(y,var_par,smpl_par,levels)
+function varout = varest(y,var_par,smpl_par,levels,coint_rank)
 
 % Computes VAR and covariance matrix of estimated parameters
 %    
@@ -59,7 +59,9 @@ if levels % If data is in levels, estimate VECM
 
     % Johansen cointegration test
     [h,pValue,stat,cValue,mles] = jcitest(y,'Model','H*','Lags',nlag-1,'Test','maxeig');
-    coint_rank = find(h{1,1:ns}==0,1)-1; % Estimated cointegration rank based on sequential tests
+    if isempty(coint_rank)
+        coint_rank = find(h{1,1:ns}==0,1)-1; % Estimated cointegration rank based on sequential tests
+    end
     mle = mles{1,coint_rank+1}; % MLE of the selected model
     varout.vecm.pval = pValue;
     varout.vecm.mle = mle;

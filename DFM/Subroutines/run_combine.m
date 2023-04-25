@@ -14,9 +14,9 @@ dgp_type = 'G'; % Either 'G' or 'MP'
 estimand_type = 'ObsShock'; % Either 'ObsShock', 'Recursive', or 'IV'
 lag_type = 4; % No. of lags to impose in estimation, or NaN (meaning AIC)
 mode_type = 1; % robustness check mode:
-               % 1 (baseline), 2 (cumulative IRF), 
-               % 3 (persistent DGP), 4 (persistent DGP with MN prior), 
-               % 5 (small sample), 6 (salient series)
+               % 1 (baseline), 2 (small sample), 3 (salient series),
+               % 4 (first diff), 5 (first diff + cumulative IRF),
+               % 6 (first diff + small sample), 7 (first diff + salient series)
 
 % Cumulative IRF for certain variables
 
@@ -24,7 +24,7 @@ cum_irf_by_trans_code = [0,0,0,0,0,0]; % cumulative IRF or not for each transfor
 % (1) y = x, (2) y = (1-L)x, (3) y = (1-L)^2 x,
 % (4) y = ln(x), (5) y = (1-L)ln(x), (6) y = (1-L)^2 ln(x)
 
-if mode_type == 2 % rewrite settings for cumulative IRF
+if mode_type == 5 % rewrite settings for cumulative IRF
     cum_irf_by_trans_code = [0,1,1,0,1,1]; % cumulative IRF for some transformation codes
 end
 
@@ -39,7 +39,7 @@ summ_option.summ_stat_name = [{'mean','std','winsorized_mean','winsorized_std'},
 
 save_pre = fullfile('..', 'Results');
 
-mode_list   = {'baseline', 'cumulative', 'persistent', 'persistent_BVAR_MN_prior' , 'small', 'salient'};
+mode_list   = {'baseline', 'small', 'salient', 'diff', 'diff_cumulative', 'diff_small', 'diff_salient'};
 save_mode_dir = mode_list{mode_type}; % set up directory for robustness-check modes
 
 if isnan(lag_type)
