@@ -360,9 +360,9 @@ end
 
 if any(strcmp(settings.est.methods_name, 'bvar'))
     if settings.est.bvar_glp == 1
-        results.GLP_hyper.lambda = squeeze(results_GLP_hyper_bvar(1,:,:));
-        results.GLP_hyper.theta = squeeze(results_GLP_hyper_bvar(2,:,:));
-        results.GLP_hyper.miu = squeeze(results_GLP_hyper_bvar(3,:,:));
+        results.GLP_hyper.lambda = squeeze(results_GLP_hyper_bvar(1,:,:)); % Std dev of MN prior
+        results.GLP_hyper.delta = squeeze(results_GLP_hyper_bvar(2,:,:)); % Std dev of dummy-initial-observation prior
+        results.GLP_hyper.mu = squeeze(results_GLP_hyper_bvar(3,:,:)); % Std dev of sum-of-coefficients prior
     end
 end
 

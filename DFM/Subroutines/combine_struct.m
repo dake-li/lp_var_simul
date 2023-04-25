@@ -183,7 +183,7 @@ for i = 1:length(first_tier)
             summarize_dim = 2;
         elseif any(strcmp(first_tier{i},{'weight','submodel_irf'}))
             summarize_dim = 3;
-        elseif any(strcmp(first_tier{i},{'n_lags','largest_root','LM_stat','LM_pvalue','Hausman_stat','Hausman_pvalue','Granger_stat','Granger_pvalue','F_stat','F_pvalue','lambda'}))
+        elseif any(strcmp(first_tier{i},{'n_lags','largest_root','LM_stat','LM_pvalue','Hausman_stat','Hausman_pvalue','Granger_stat','Granger_pvalue','F_stat','F_pvalue','lambda','GLP_hyper'}))
             summarize_dim = 1;
         else
             summarize_dim = NaN;
@@ -203,7 +203,7 @@ for i = 1:length(first_tier)
             concatenate_dim = 3;
         elseif any(strcmp(first_tier{i},{'weight','submodel_irf'}))
             concatenate_dim = 4;
-        elseif any(strcmp(first_tier{i},{'n_lags','largest_root','LM_stat','LM_pvalue','Hausman_stat','Hausman_pvalue','Granger_stat','Granger_pvalue','F_stat','F_pvalue','lambda','MSE','BIAS2','VCE'}))
+        elseif any(strcmp(first_tier{i},{'n_lags','largest_root','LM_stat','LM_pvalue','Hausman_stat','Hausman_pvalue','Granger_stat','Granger_pvalue','F_stat','F_pvalue','lambda','GLP_hyper','MSE','BIAS2','VCE'}))
             concatenate_dim = 2;
         else
             concatenate_dim = NaN;

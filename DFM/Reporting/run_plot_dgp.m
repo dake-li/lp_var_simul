@@ -220,6 +220,18 @@ for n_mode=1:length(mode_folders) % For each robustness check mode...
             set(gca, 'xscale','log'); % Log scale for x axis
             title(strjoin({exper_plotname, ': median shrinkage penalty (across specs)'}), 'Interpreter', 'none');
             plot_save(fullfile(output_folder, 'dgp_lambda'), output_suffix);
+
+            % Giannone, Lenza & Primiceri BVAR hyper-parameters
+            the_GLP = res.results.GLP_hyper;
+            the_fields = fieldnames(the_GLP);
+            figure;
+            for nj = 1:length(the_fields)
+                subplot(1,3,nj);
+                histogram(the_GLP.(the_fields{nj})(median_idx,:), 'Normalization', 'probability');
+                title(the_fields{nj}, 'Interpreter', 'none');
+            end
+            sgtitle(strjoin({exper_plotname, ': median GLP hyper-param (across specs)'}), 'FontSize', 11, 'FontWeight', 'bold', 'Interpreter', 'none');
+            plot_save(fullfile(output_folder, 'dgp_glphyper'), output_suffix);
             
             % Model-averaging weights
             if isfield(res.results, 'weight')
