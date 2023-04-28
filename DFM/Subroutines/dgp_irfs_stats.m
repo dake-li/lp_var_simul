@@ -22,7 +22,8 @@ if any(strcmp(estimand_type, {'ObsShock', 'IV'})) % Observed shock and IV
     model.normalized_irf = compute_normalized_irfs(model,settings);
     model.target_irf = model.normalized_irf(settings.est.IRF_select, :);
 else % Recursive
-    model.target_irf = nan(settings.est.IRF_hor,n_spec); % To be computed below
+    model.VAR_irf = nan(length(settings.est.IRF_select),n_spec); % To be computed below
+    model.target_irf = nan(length(settings.est.IRF_select),n_spec);
 end
 
 % Loop over DGPs
@@ -45,7 +46,8 @@ for i_spec = 1:n_spec
     if strcmp(estimand_type, 'Recursive')
         G = chol(red_form.innov_var, 'lower');
         chol_irfs = compute_irfs(red_form.innov_ABCD,G(:,settings.est.recursive_shock_pos),settings.est.IRF_hor);
-        model.target_irf(:,i_spec) = chol_irfs(:,settings.est.IRF_response_var_pos)/chol_irfs(1,settings.est.est_normalize_var_pos);
+        model.VAR_irf(:,i_spec) = chol_irfs(settings.est.IRF_select,settings.est.IRF_response_var_pos);
+        model.target_irf(:,i_spec) = model.VAR_irf(:,i_spec)/chol_irfs(1,settings.est.est_normalize_var_pos);
     end
 
     %% Reduced-form summary statistics
