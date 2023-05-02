@@ -157,13 +157,13 @@ function specifications = pick_var_fn(model, settings, spec_id)
 
             if random_exhaust_key_series == 0
 
-                if (spec_id-1) * random_n_spec >= n_spec_exhaust
+                if random_n_spec >= n_spec_exhaust
                     error("spec_id is too large when exhausting DGPs")
                 end
 
                 % use spec_id to indicate which random_n_spec DGPs to draw
 
-                var_select = var_select(((spec_id-1) * random_n_spec + 1):min(spec_id * random_n_spec, n_spec_exhaust), :);
+                var_select = var_select(1:min(random_n_spec, n_spec_exhaust), :);
 
             end
 

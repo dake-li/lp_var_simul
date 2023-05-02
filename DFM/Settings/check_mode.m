@@ -38,6 +38,7 @@ switch mode_type
         % selection of DGPs from encompassing model
 
         settings.specifications.random_from_key_series = 1; % randomly select from some key series in DFM list?
+        settings.specifications.random_exhaust_key_series = 1; % exhaust all the combinations from key series, or have only random_n_spec draws?
 
     case 5 % cumulative IRF
         
