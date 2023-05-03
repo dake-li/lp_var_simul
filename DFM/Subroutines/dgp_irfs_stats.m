@@ -70,8 +70,10 @@ for i_spec = 1:n_spec
     end
 
     % Fraction of VAR coefficients at long lags
-    norms = cellfun(@(x) norm(x,'fro'), red_form.coef); % Frobenius norm of each VAR coefficient matrix at lags 1,2,...
-    model.frac_coef_for_large_lags(i_spec) = 1-sum(norms(1:settings.est.n_lags_fix))/sum(norms);
+    if ~isnan(settings.est.n_lags_fix)
+        norms = cellfun(@(x) norm(x,'fro'), red_form.coef); % Frobenius norm of each VAR coefficient matrix at lags 1,2,...
+        model.frac_coef_for_large_lags(i_spec) = 1-sum(norms(1:settings.est.n_lags_fix))/sum(norms);
+    end
 
     %% Shock and IV summary statistics
 
