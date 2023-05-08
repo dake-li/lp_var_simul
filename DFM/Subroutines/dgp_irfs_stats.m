@@ -86,7 +86,8 @@ for i_spec = 1:n_spec
 
     % IV strength
     if strcmp(estimand_type, 'IV')
-        model.IV_strength(i_spec) = IV_strength(ABCD_obs, model.IV, settings, i_spec);
+        model.IV_strength(i_spec) = IV_strength(ABCD_obs, model.IV, settings.specifications.sigma_v_select(i_spec), ...
+            settings.est.shock_weight, settings.est.VAR_infinity_truncate, settings.est.est_normalize_var_pos);
     end
 
 end

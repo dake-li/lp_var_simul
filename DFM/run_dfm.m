@@ -89,36 +89,8 @@ DF_model.trans_code = DFM_estimate.bptcodevec; % transformation code
 
 if strcmp(estimand_type, 'IV')
 
-    % extract reduced-form factor innovations and external structural shock series
-
-    DFM_estimate.fac_shock                 = DFM_estimate.fac_res / chol(DFM_estimate.Sigma_eta);
-    external_shock_data                    = readtable(strcat('external_shock_series_', dgp_type, '.csv'));
-    DFM_estimate.external_shock            = external_shock_data{:,2};
-    DFM_estimate.external_shock_time_range = [external_shock_data{1,1}, external_shock_data{end,1}, 4];
-    
-    clear external_shock_data;
-    
-    % regress external shock series on factor shock series to calibrate IV strength
-    
-    DFM_estimate.calibrate_out       = calibrateIV(DFM_estimate);
-
-    if settings.est.IV.IV_persistence_calibrate==1
-        DF_model.IV.rho = DFM_estimate.calibrate_out.rho;
-    else
-        DF_model.IV.rho = DF_model.IV.manual_rho;
-    end
-
-    % set parameters
-    
     DF_model.IV.rho_grid = DF_model.IV.rho * settings.est.IV.IV_persistence_scale;
-    
-    if settings.est.IV.IV_strength_calibrate==1
-        DF_model.IV.alpha = DFM_estimate.calibrate_out.alpha;
-        DF_model.IV.sigma_v = DFM_estimate.calibrate_out.sigma_v;
-    else
-        DF_model.IV.alpha = DF_model.IV.manual_alpha;
-        DF_model.IV.sigma_v = DF_model.IV.manual_sigma_v;
-    end
+    DF_model.IV.sigma_v_grid = DF_model.IV.sigma_v * settings.est.IV.IV_strength_scale;
 
 end
 
