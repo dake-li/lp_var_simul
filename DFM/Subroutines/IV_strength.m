@@ -1,7 +1,10 @@
-function IV_strength = IV_strength(ABCD, IV, settings)
+function IV_strength = IV_strength(ABCD, IV, settings, i_spec)
 
 % R^2 in regression of normalization variable i_t on IV z_t
 % after controlling for lagged observables
+
+% get correct sigma_v
+sigma_v = settings.specifications.sigma_v_select(i_spec);
 
 % Augment ABCD representation with (residualized) IV tilde{z}_t = z_t-rho*z_{t-1}
 [n_y,n_s] = size(ABCD.C);
@@ -10,7 +13,7 @@ ABCD_withIV.A = ABCD.A;
 ABCD_withIV.B = [ABCD.B zeros(n_s,1)]; % Add IV measurement error in last column
 ABCD_withIV.C = [ABCD.C; zeros(1,n_s)]; % Add IV in bottom row
 ABCD_withIV.D = [ABCD.D zeros(n_y,1);
-                 IV.alpha*shock_weight' IV.sigma_v]; % Add IV in bottom row and measurement error in last column
+                 IV.alpha*shock_weight' sigma_v]; % Add IV in bottom row and measurement error in last column
 
 % VAR(infinity) representation with IV
 ABCD_withIV_small = ABCD_reduce(ABCD_withIV); % Reduce dimensionality

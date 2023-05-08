@@ -23,13 +23,13 @@ D = model.ABCD.D;
 with_IV = settings.est.with_IV;
 
 if with_IV == 1
-    rho_grid = model.IV.rho_grid;
-    alpha    = model.IV.alpha;
-    sigma_v  = model.IV.sigma_v;
+    rho_grid      = model.IV.rho_grid;
+    alpha         = model.IV.alpha;
+    sigma_v_grid  = model.IV.sigma_v_grid;
 else % meaningless placeholders in the case of no IV
     rho_grid = 0.1;
     alpha = 1;
-    sigma_v = 1;
+    sigma_v_grid = 1;
 end
 
 shock_weight = settings.est.shock_weight;
@@ -52,12 +52,14 @@ end
 data_y = data_s(T_burn:end-1,:)*C' + data_e(T_burn+1:end,:)*D';
 
 % simulate IV
-z = NaN(T+T_burn, length(rho_grid)); % multiple IV persistence setups
+z = NaN(T+T_burn, length(rho_grid), length(sigma_v_grid)); % multiple IV persistence/strength setups
 for idx = 1:length(rho_grid)
-    z(:,idx) = filter(1, [1 -rho_grid(idx)], alpha * data_e * shock_weight + sigma_v * randn(T+T_burn,1));
+    for iidx = 1:length(sigma_v_grid)
+        z(:,idx,iidx) = filter(1, [1 -rho_grid(idx)], alpha * data_e * shock_weight + sigma_v_grid(iidx) * randn(T+T_burn,1));
+    end
 end
 
-data_z = z(T_burn+1:end,:);
+data_z = z(T_burn+1:end,:,:);
 
 % collect results and shift timing
 

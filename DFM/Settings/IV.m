@@ -8,7 +8,8 @@ DF_model.IV.manual_sigma_v = 1; % manually set up IV noise
 
 settings.est.IV.IV_persistence_calibrate = 0; % use calibrated baseline IV persistence
 settings.est.IV.IV_persistence_scale = [0 1 2]; % scale up or down baseline persistence by this factor (use 1 if only want baseline persistence)
-settings.est.IV.IV_strength_calibrate = 1; % use calibrated IV strength (alpha = 1, sigma_v will be changed)
+settings.est.IV.IV_strength_calibrate = 0; % use calibrated IV strength (alpha = 1, sigma_v will be changed)
+settings.est.IV.IV_strength_scale = [0.5 1 2]; % scale up or down baseline IV strength by this factor (use 1 if only want baseline strength)
 
 % estimation methods
 

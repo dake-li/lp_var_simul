@@ -10,12 +10,15 @@ with_IV = settings.est.with_IV;
 if with_IV == 1
     rho_select_grid_idx = settings.specifications.rho_select_grid_idx;
     this_rho_grid_idx = rho_select_grid_idx(i_spec);
+    sigma_v_select_grid_idx = settings.specifications.sigma_v_select_grid_idx;
+    this_sigma_v_grid_idx = sigma_v_select_grid_idx(i_spec);
 else
     this_rho_grid_idx = 1;
+    this_sigma_v_grid_idx = 1;
 end
 
 data_sim_select.data_y = data_sim_all.data_y(:,var_select(i_spec,:));
-data_sim_select.data_z = data_sim_all.data_z(:,this_rho_grid_idx);
+data_sim_select.data_z = data_sim_all.data_z(:,this_rho_grid_idx,this_sigma_v_grid_idx);
 data_sim_select.data_shock = data_sim_all.data_shock;
 
 end

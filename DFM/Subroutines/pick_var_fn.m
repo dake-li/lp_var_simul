@@ -12,8 +12,8 @@ function specifications = pick_var_fn(model, settings, spec_id)
     with_IV = settings.est.with_IV;
     
     if with_IV == 1
-        rho = model.IV.rho;
         rho_grid = model.IV.rho_grid;
+        sigma_v_grid = model.IV.sigma_v_grid;
     end
     
     manual_var_select = specifications.manual_var_select;
@@ -27,12 +27,14 @@ function specifications = pick_var_fn(model, settings, spec_id)
 
         var_select = manual_var_select;
         
-        % draw IV persistency
+        % draw IV persistence and strength
 
         if with_IV == 1
             rng(spec_id, 'twister');
-            rho_select_grid_idx = randi(length(rho_grid)) * ones(size(var_select, 1), 1); % arbitrarily pick one if there's multiple IV persitence levels
+            rho_select_grid_idx = randi(length(rho_grid)) * ones(size(var_select, 1), 1); % arbitrarily pick one if there's multiple IV persistence levels
             rho_select = reshape(rho_grid(rho_select_grid_idx), [],1);
+            sigma_v_select_grid_idx = randi(length(sigma_v_grid)) * ones(size(var_select, 1), 1); % arbitrarily pick one if there's multiple IV strength levels
+            sigma_v_select = reshape(sigma_v_grid(sigma_v_select_grid_idx), [],1);
         end
 
     else
@@ -173,14 +175,16 @@ function specifications = pick_var_fn(model, settings, spec_id)
 
         var_select(:, [1 random_fixed_pos]) = var_select(:, [random_fixed_pos 1]); % put fixed var at fixed position
         
-        % draw IV persistency
+        % draw IV persistence and strength
 
         if with_IV == 1
             if random_from_key_series == 1
-                rng(spec_id, 'twister'); % revert back to specified seed for drawing IV persistence after exhaust from key series
+                rng(spec_id, 'twister'); % revert back to specified seed for drawing IV persistence/strength after exhaust from key series
             end
             rho_select_grid_idx = randi(length(rho_grid), [random_n_spec, 1]); % index of rho from rho_grid
             rho_select = reshape(rho_grid(rho_select_grid_idx), [],1); % value of rho
+            sigma_v_select_grid_idx = randi(length(sigma_v_grid), [random_n_spec, 1]); % index of sigma_v from sigma_v_grid
+            sigma_v_select = reshape(sigma_v_grid(sigma_v_select_grid_idx), [],1); % value of sigma_v
         end
         
     end
@@ -197,6 +201,8 @@ function specifications = pick_var_fn(model, settings, spec_id)
     if with_IV == 1
         specifications.rho_select = rho_select;
         specifications.rho_select_grid_idx = rho_select_grid_idx;
+        specifications.sigma_v_select = sigma_v_select;
+        specifications.sigma_v_select_grid_idx = sigma_v_select_grid_idx;
     end
 
 end
