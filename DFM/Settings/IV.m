@@ -7,7 +7,7 @@ DF_model.IV.alpha   = 1; % IV shock coefficient
 DF_model.IV.sigma_v = 1; % baseline IV noise
 
 settings.est.IV.IV_persistence_scale = [0 1 2]; % scale up or down baseline persistence by this factor (use 1 if only want baseline persistence)
-settings.est.IV.IV_strength_scale = [0.5 1 2]; % scale up or down baseline IV strength by this factor (use 1 if only want baseline strength)
+settings.est.IV.IV_strength_scale = [1.1 1.5 2.3]; % scale up or down baseline IV strength by this factor (use 1 if only want baseline strength)
 
 % estimation methods
 
