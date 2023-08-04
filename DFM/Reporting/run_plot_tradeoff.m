@@ -27,7 +27,7 @@ mode_select    = 1; % options: 1 (baseline), 2 (small sample), 3 (salient series
 lags_select    = 2; % options: 1 (AIC), 2 (4 lags), 3 (8 lags)
 
 % select and group experiments
-exper_select_group = {[2,5], [1,4], [3,6]}; % combine G and MP for observed shock, recursive, and IV
+exper_select_group = {[2,5], [3,6], [1,4]}; % combine G and MP for observed shock, recursive, and IV
 
 % select estimation methods for each experiment
 methods_iv_select        = [1 2 3 4 5 6 7 8];
@@ -83,11 +83,14 @@ cmap(3,:) = [0 0 0];
 
 cmap = interp2(X([1,25,50],:),Y([1,25,50],:),cmap,X,Y);
 
-cmap_inv(1,:) = [0 0 0];
-cmap_inv(2,:) = [0.5 0.5 0.5];
-cmap_inv(3,:) = [1 1 1];
+% turn to coarse grid
 
-cmap_inv = interp2(X([1,25,50],:),Y([1,25,50],:),cmap_inv,X,Y);
+n_bin = 5;
+length_bin = 50/n_bin;
+
+for i_bin = 1:n_bin
+    cmap(1+(i_bin-1)*length_bin:i_bin*length_bin,:) = repmat(cmap(1+(i_bin-1)*length_bin,:),length_bin,1);
+end
 
 %% FIGURES
 

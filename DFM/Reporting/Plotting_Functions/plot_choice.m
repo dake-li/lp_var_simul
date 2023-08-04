@@ -7,9 +7,10 @@ colormap(cmap)
 set(gca,'TickLabelInterpreter','latex')
 set(gca,'FontSize',7/8*font_size)
 xlim([min(horzs) max(horzs)])
-ylim([0 1])
+ylim([0.5 1])
 set(gca,'XTick',horzs(mod(horzs,2) == 0));
-set(gca,'YTick',[0:0.2:1]);
+% set(gca,'YTick',[0:0.2:1]);
+set(gca,'YTick',[0.5:0.1:1]);
 set(gca,'ydir','normal')
 set(gca,'TickLength',[0 0])
 xlabel('Horizon','interpreter','latex','FontSize',font_size);
@@ -38,6 +39,9 @@ else
     legend(hidden_h, plot_legend, 'Location', 'eastoutside', 'NumColumns', 1, 'interpreter', 'latex','FontSize',font_size);
 
 end
+
+% text(21.25,0.51,'{\it mean squared error}','interpreter','latex','FontSize',font_size)
+% text(21.25,0.99,'{\it only bias}','interpreter','latex','FontSize',font_size)
 
 pos = get(gcf, 'Position');
 set(gcf, 'Position', [pos(1) pos(2) 1.4*pos(3) 1*pos(4)]);

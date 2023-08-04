@@ -7,9 +7,9 @@ colormap(cmap)
 set(gca,'TickLabelInterpreter','latex')
 set(gca,'FontSize',7/8*font_size)
 xlim([min(horzs) max(horzs)])
-ylim([0 1])
+ylim([0.5 1])
 set(gca,'XTick',horzs(mod(horzs,2) == 0));
-set(gca,'YTick',[0:0.2:1]);
+set(gca,'YTick',[0.5:0.1:1]);
 set(gca,'ydir','normal')
 set(gca,'TickLength',[0 0])
 xlabel('Horizon','interpreter','latex','FontSize',font_size);
@@ -18,6 +18,6 @@ ylabel('Bias Weight','interpreter','latex','FontSize',font_size);
 cbh = colorbar();
 caxis([0,1])
 set(cbh, 'YTick', [0:0.2:1], ...
-    'YTickLabel', [0:0.2:1],'TickLabelInterpreter','latex')
+    'YTickLabel', [0:0.2:1],'TickLabelInterpreter','latex','TickLength',0)
 
 end
