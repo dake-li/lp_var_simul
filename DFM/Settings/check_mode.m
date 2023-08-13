@@ -12,6 +12,8 @@ if mode_type >= 4
     % data in first differences
 
     DF_model.levels = 0;
+    DF_model.n_lags_fac = 2; % 2 lags in factor process, as in Stock & Watson
+    DF_model.n_lags_uar = 2; % 2 lags in idiosyncratic disturbance processes, as in S&W
     settings.est.bvar_glp = 0; % use simple BVAR procedure
     settings.est.prior.towards_random_walk = 0; % shrink towards white noise
 
