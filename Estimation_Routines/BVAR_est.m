@@ -11,11 +11,16 @@ run('Estimation_Setup'); % common setup for all estimation methods
 
 if settings.est.bvar_glp == 1 % If Giannone, Lenza & Primiceri procedure
 
+    n_Y = size(Y,2);
+
     % Estimate BVAR
-    r = bvarGLP(Y,nlags,'MNpsi',0,'Fcast',0);
+    if settings.est.prior.towards_random_walk % Random walk prior
+        r = bvarGLP(Y,nlags,'MNpsi',0,'Fcast',0);
+    else % White noise prior
+        r = bvarGLP(Y,nlags,'MNpsi',0,'Fcast',0,'sur',0,'noc',0,'posi',1:n_Y);
+    end
 
     % Posterior draws of parameters
-    n_Y = size(Y,2);
     if ndraw == 0 % only use posterior means
         beta_draws = r.postmax.betahat;
         sigma_draws = r.postmax.sigmahat;

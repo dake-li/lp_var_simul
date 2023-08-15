@@ -69,9 +69,9 @@ settings.est.res_autocorr_nlags = 2; % check autocorr of VAR(p) residuals up to 
 
 % BVAR prior
 
+settings.est.prior.towards_random_walk = 1; % prior shrinking towards random walk? otherwise towards zero
 settings.est.bvar_glp                  = 1; % use Giannone, Lenza & Primiceri (2015) BVAR procedure?
                                             % otherwise use basic BVAR with default MN prior (see settings below)
-settings.est.prior.towards_random_walk = 1; % prior shrinking towards random walk? otherwise towards zero
 settings.est.prior.tight_overall       = 0.04;
 settings.est.prior.tight_nonown_lag    = 0.25;
 settings.est.prior.decay_power         = 2;

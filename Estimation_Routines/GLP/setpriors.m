@@ -77,7 +77,11 @@
 
 if numarg>2
     for ii=1:2:size(varargin,2)
-        eval([varargin{ii},'=', num2str(varargin{ii+1}),';']);
+        if strcmp(varargin{ii},'posi')
+            posi = varargin{ii+1};
+        else
+            eval([varargin{ii},'=', num2str(varargin{ii+1}),';']);
+        end
     end
 end
 
