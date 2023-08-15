@@ -15,9 +15,14 @@ set(gca,'TickLength',[0 0])
 xlabel('Horizon','interpreter','latex','FontSize',font_size);
 ylabel('Bias Weight','interpreter','latex','FontSize',font_size);
 
+% cbh = colorbar();
+% caxis([0,1])
+% set(cbh, 'YTick', [0:0.2:1], ...
+%     'YTickLabel', [0:0.2:1],'TickLabelInterpreter','latex','TickLength',0)
+
 cbh = colorbar();
 caxis([0,1])
-set(cbh, 'YTick', [0:0.2:1], ...
-    'YTickLabel', [0:0.2:1],'TickLabelInterpreter','latex','TickLength',0)
+set(cbh, 'YTick', [0.1:0.2:0.9], ...
+    'YTickLabel', {'0-20\%','20-40\%','40-60\%','60-80\%','80-100\%'},'TickLabelInterpreter','latex','TickLength',0)
 
 end
