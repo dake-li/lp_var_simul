@@ -38,10 +38,10 @@ tab_stat = {'LRV_Cov_tr_ratio', 'dLRV_dCov_tr_ratio', 'VAR_largest_root', 'VAR_q
 tab_quants = [0.1 0.25 0.5 0.75 0.9]; % Quantiles to report across specifications
 
 % Table with model specification tests
-spec_lags_cutoff = 2; % Report how often quantiles of lag length exceeds this number
+spec_lags_cutoff = 2; % Report how often quantiles of lag length strictly exceeds this number
 spec_lags_quants = [0.5 0.75 0.9]; % Quantiles of lag length to report
-spec_lm_power = 0.25; % Report fraction of DGPs with at least this power of LM test
-spec_lm_signifs = [0.05 0.1 0.25]; % Significance levels for LM test
+spec_lm_powers = [0.1 0.25 0.5]; % Report fraction of DGPs with at least this power of LM test
+spec_lm_signif = 0.1; % Significance level for LM test
 
 % IRF examples to plot
 spec_select = [10 20 30 3010 3020 3030];
@@ -125,13 +125,13 @@ for n_mode=1:length(mode_folders) % For each robustness check mode...
             % Number of lags
             for ii=1:length(spec_lags_quants)
                 tab_spec.(sprintf('%s%02d', 'nlag_exceed_q', round(100*spec_lags_quants(ii)))) ...
-                    = mean(res.results.n_lags.svar(stat_index(spec_lags_quants(ii), res.settings),:)>=spec_lags_cutoff);
+                    = mean(res.results.n_lags.svar(stat_index(spec_lags_quants(ii), res.settings),:)>spec_lags_cutoff);
             end
             
             % Power of LM test
-            for ii=1:length(spec_lm_signifs)
-                tab_spec.(sprintf('%s%02d', 'lm_power_', round(100*spec_lm_signifs(ii)))) ...
-                    = mean(res.results.LM_pvalue.svar(stat_index(spec_lm_power, res.settings),:)<spec_lm_signifs(ii));
+            for ii=1:length(spec_lm_powers)
+                tab_spec.(sprintf('%s%02d', 'lm_power_', round(100*spec_lm_powers(ii)))) ...
+                    = mean(res.results.LM_pvalue.svar(stat_index(spec_lm_powers(ii), res.settings),:)<spec_lm_signif);
             end
             
             % Write to file
@@ -155,6 +155,11 @@ for n_mode=1:length(mode_folders) % For each robustness check mode...
             histogram(res.DF_model.LRV_Cov_tr_ratio, 'Normalization', 'probability');
             title(strjoin({exper_plotname, ': LRV to Var ratio'}), 'Interpreter', 'none');
             plot_save(fullfile(output_folder, 'dgp_LRVVar'), output_suffix);
+
+            figure;
+            histogram(res.DF_model.dLRV_dCov_tr_ratio, 'Normalization', 'probability');
+            title(strjoin({exper_plotname, ': LRV to Var ratio, first differences'}), 'Interpreter', 'none');
+            plot_save(fullfile(output_folder, 'dgp_dLRVdVar'), output_suffix);
             
             figure;
             histogram(res.DF_model.VAR_largest_root, 'Normalization', 'probability');
