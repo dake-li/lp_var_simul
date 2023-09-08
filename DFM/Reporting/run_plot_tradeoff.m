@@ -50,12 +50,12 @@ settings_shared;
 
 % bias weight grid
 
-n_weight    = 1001;
-weight_grid = linspace(1,0,n_weight)';
+n_weight    = 501;
+weight_grid = linspace(1,0.5,n_weight)';
 
 % reference method
 
-base_names = {'VAR','LP'};
+base_names = {'VAR','LP','BC LP'};
 base_indic = NaN(length(exper_files),length(base_names)); % find index of reference method(s)
 
 % construction of choice plots: average over specifications?
@@ -72,20 +72,19 @@ lines_plot = lines_plot([4 3 1 2 8 5 6 7],:);
 % Colors
 %----------------------------------------------------------------
 
-n = 200;
 clear cmap
 
 cmap(1,:) = [1 1 1];
 cmap(2,:) = [0.5 0.5 0.5];
 cmap(3,:) = [0 0 0];
 
-[X,Y] = meshgrid([1:3],[1:50]);
+[X,Y] = meshgrid(1:3,1:50);
 
 cmap = interp2(X([1,25,50],:),Y([1,25,50],:),cmap,X,Y);
 
 % turn to coarse grid
 
-n_bin = 5;
+n_bin = 5; % Number of bins
 length_bin = 50/n_bin;
 
 for i_bin = 1:n_bin
@@ -168,24 +167,23 @@ for n_mode=1:length(mode_folders) % For each robustness check mode...
                     
                     % comparison with base method
                     
-                    pref_base = zeros(n_weight,max(res.settings.est.IRF_select),size(the_BIAS2rel,2));
+                    loss_diff = zeros(n_weight,length(res.settings.est.IRF_select),size(the_BIAS2rel,2));
                     for i_weight = 1:n_weight
                         loss_base   = weight_grid(i_weight) * the_BIAS2rel(:,:,base_indic(ne,nb)) + (1-weight_grid(i_weight)) * the_VCErel(:,:,base_indic(ne,nb));
                         loss_method = weight_grid(i_weight) * the_BIAS2rel(:,:,j) + (1-weight_grid(i_weight)) * the_VCErel(:,:,j);
     
-                        pref_base(i_weight,:,:) = (loss_base <= loss_method);
+                        loss_diff(i_weight,:,:) = loss_method-loss_base;
                     end
-                    pref_base = mean(pref_base,3);
+                    pref_base = mean(loss_diff>=0,3);
                     
-                    if strcmp(the_titles{j},'Pen LP')
-                        the_start_ind=1; % Include h=0 for penalized LP
+                    if all(abs(loss_diff(:,1,:))<1e-10,'all')
+                        the_start_ind=2; % Do not include h=0 if methods are numerically equivalent there
                     else
-                        the_start_ind=2;
+                        the_start_ind=1;
                     end
                     
                     % plot final results
-                    plot_tradeoff(pref_base(:,the_start_ind:end), cmap, horzs(the_start_ind:end)-1, weight_grid, ...
-                        strjoin({exper_plotname, ':', base_method_name, 'Preferred Over', the_titles{j}}), font_size)
+                    plot_tradeoff(pref_base(:,the_start_ind:end), cmap, horzs(the_start_ind:end)-1, weight_grid, n_bin, font_size);
                     plot_save(fullfile(output_folder, strcat(exper_names{ne}, '_tradeoff_', removeChars(base_method_name), '_vs_', removeChars(the_titles{j}))), output_suffix);
     
                 end
