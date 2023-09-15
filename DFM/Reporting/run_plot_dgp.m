@@ -38,8 +38,8 @@ tab_stat = {'LRV_Cov_tr_ratio', 'dLRV_dCov_tr_ratio', 'VAR_largest_root', 'VAR_q
 tab_quants = [0.1 0.25 0.5 0.75 0.9]; % Quantiles to report across specifications
 
 % Table with model specification tests
-spec_lags_cutoff = 2; % Report how often quantiles of lag length strictly exceeds this number
-spec_lags_quants = [0.5 0.75 0.9]; % Quantiles of lag length to report
+spec_lags_cutoffs = [0 1 2]; % Report how often quantile of lag length strictly exceeds each of these numbers
+spec_lags_quant = 0.9; % Quantile of lag length to report
 spec_lm_powers = [0.1 0.25 0.5]; % Report fraction of DGPs with at least this power of LM test
 spec_lm_signif = 0.1; % Significance level for LM test
 
@@ -123,9 +123,9 @@ for n_mode=1:length(mode_folders) % For each robustness check mode...
             tab_spec = table;
     
             % Number of lags
-            for ii=1:length(spec_lags_quants)
-                tab_spec.(sprintf('%s%02d', 'nlag_exceed_q', round(100*spec_lags_quants(ii)))) ...
-                    = mean(res.results.n_lags.svar(stat_index(spec_lags_quants(ii), res.settings),:)>spec_lags_cutoff);
+            for ii=1:length(spec_lags_cutoffs)
+                tab_spec.(sprintf('%s%d', 'nlag_exceed_', spec_lags_cutoffs(ii))) ...
+                    = mean(res.results.n_lags.svar(stat_index(spec_lags_quant, res.settings),:)>spec_lags_cutoffs(ii));
             end
             
             % Power of LM test
