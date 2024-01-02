@@ -36,7 +36,7 @@ methods_recursive_select = [1 2 3 4 5 6 7];
 
 % select a subset of DGPs
 select_DGP = 0; % if select a subset of DGPs?
-select_DGP_fn = @(i_dgp, res) res.DF_model.VAR_largest_root(i_dgp) > median(res.DF_model.VAR_largest_root); % binary selection criteria
+select_DGP_fn = @(i_dgp, res) any(res.settings.specifications.var_select(i_dgp,:)>=res.settings.specifications.random_category_range(11,1)); % binary selection criteria: specifications with asset price & sentiment
 
 % report quantile loss across DGPs in best-method plot
 loss_quant = []; % report which quantile loss across DGPs? (default is mean loss, i.e. [])
