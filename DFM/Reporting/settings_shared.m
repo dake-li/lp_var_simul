@@ -4,12 +4,12 @@ rootfolder = fullfile('..', 'Results'); % Root folder with files
 
 % select robustness check mode
 
-mode_list   = {'baseline', 'small', 'salient', 'diff', 'diff_cumulative', 'diff_small', 'diff_salient'};
+mode_list   = {'baseline', 'small', 'large', 'salient', 'more', 'diff'};
 mode_folders = mode_list(mode_select);
 
 % select lag length specifications
 
-lags_list      = {'lag_aic', 'lag4', 'lag8'}; % Folders with files
+lags_list      = {'lag_aic', 'lag4', 'lag8', 'lag12'}; % Folders with files
 lags_folders   = lags_list(lags_select);
 
 % record experiment group info

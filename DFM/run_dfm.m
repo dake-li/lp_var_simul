@@ -1,6 +1,5 @@
 %% DFM SIMULATION STUDY: MAIN FILE
 % Dake Li, Mikkel Plagborg-Møller and Christian Wolf
-% This version: 02/23/2021
 
 %% HOUSEKEEPING
 
@@ -28,9 +27,8 @@ dgp_type = 'G'; % structural shock: either 'G' or 'MP'
 estimand_type = 'ObsShock'; % structural estimand: either 'ObsShock', 'Recursive', or 'IV'
 lag_type = 4; % No. of lags to impose in estimation, or NaN (= AIC)
 mode_type = 1; % robustness check mode:
-               % 1 (baseline), 2 (small sample), 3 (salient series),
-               % 4 (first diff), 5 (first diff + cumulative IRF),
-               % 6 (first diff + small sample), 7 (first diff + salient series)
+               % 1 (baseline), 2 (small sample), 3 (large sample),
+               % 4 (salient series), 5 (more observables), 6 (first diff)
 
 estim_diagn = 0; % =1: show DFM estimation diagnostics
 

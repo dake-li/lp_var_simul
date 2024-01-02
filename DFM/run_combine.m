@@ -1,6 +1,5 @@
 %% COMBINE RESULTS FOR MULTIPLE DGP CHOICE SETS
 % Dake Li, Mikkel Plagborg-Møller and Christian Wolf
-% This version: 02/23/2021
 
 clear all;
 addpath(genpath(fullfile('..', 'Auxiliary_Functions')))
@@ -14,9 +13,8 @@ dgp_type = 'G'; % Either 'G' or 'MP'
 estimand_type = 'ObsShock'; % Either 'ObsShock', 'Recursive', or 'IV'
 lag_type = 4; % No. of lags to impose in estimation, or NaN (meaning AIC)
 mode_type = 1; % robustness check mode:
-               % 1 (baseline), 2 (small sample), 3 (salient series),
-               % 4 (first diff), 5 (first diff + cumulative IRF),
-               % 6 (first diff + small sample), 7 (first diff + salient series)
+               % 1 (baseline), 2 (small sample), 3 (large sample),
+               % 4 (salient series), 5 (more observables), 6 (first diff)
 
 % Cumulative IRF for certain variables
 
@@ -39,7 +37,7 @@ summ_option.summ_stat_name = [{'mean','std','winsorized_mean','winsorized_std'},
 
 save_pre = 'Results';
 
-mode_list   = {'baseline', 'small', 'salient', 'diff', 'diff_cumulative', 'diff_small', 'diff_salient'};
+mode_list   = {'baseline', 'small', 'large', 'salient', 'more', 'diff'};
 save_mode_dir = mode_list{mode_type}; % set up directory for robustness-check modes
 
 if isnan(lag_type)
