@@ -66,6 +66,16 @@ methods_names = {methods_iv_names(methods_iv_select),methods_obsshock_names(meth
                     methods_iv_names(methods_iv_select),methods_obsshock_names(methods_obsshock_select),methods_recursive_names(methods_recursive_select)};
 methods_names = methods_names(exper_select);
 
+% select DGP subsets
+
+if DGP_select == 1
+    select_DGP_fn = @(i_dgp, res) any(res.settings.specifications.var_select(i_dgp,:)>=res.settings.specifications.random_category_range(11,1)); % binary selection criteria: specifications with asset price & sentiment
+elseif DGP_select == 2
+    select_DGP_fn = @(i_dgp, res) res.DF_model.R0_sq(i_dgp) <= prctile(res.DF_model.R0_sq,10); % binary selection criteria: low degree of invertibility
+elseif DGP_select == 3
+    select_DGP_fn = @(i_dgp, res) res.DF_model.R0_sq(i_dgp) >= prctile(res.DF_model.R0_sq,90); % binary selection criteria: high degree of invertibility
+end
+
 %----------------------------------------------------------------
 % Figure Output
 %----------------------------------------------------------------

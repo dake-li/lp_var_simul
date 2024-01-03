@@ -28,8 +28,8 @@ methods_obsshock_select  = [1 2 3 4 5 6 7];
 methods_recursive_select = [1 2 3 4 5 6 7];
 
 % select a subset of DGPs
-select_DGP = 0; % if select a subset of DGPs?
-select_DGP_fn = @(i_dgp, res) any(res.settings.specifications.var_select(i_dgp,:)>=res.settings.specifications.random_category_range(11,1)); % binary selection criteria: specifications with asset price & sentiment
+DGP_select = 0; % options: 0 (all DGPs), 1 (specifications with asset price & sentiment),
+                % 2 (low degree of invertibility), 3 (high degree of invertibility)
 
 % regress bias/std on variable category counts
 reg_cat = 1; % if run regression?
@@ -61,7 +61,7 @@ for n_mode=1:length(mode_folders) % For each robustness check mode...
             end
             
             % keep only the selected subset of DGPs
-            if select_DGP == 1
+            if DGP_select > 0
                 DGP_selected = arrayfun(@(x) select_DGP_fn(x,res), 1:res.settings.specifications.n_spec)'; % binary DGP selection label
                 res = combine_struct(res,[],[],DGP_selected);
             end

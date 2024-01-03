@@ -26,8 +26,8 @@ methods_obsshock_select  = [1 2 3 4 5 6 7];
 methods_recursive_select = [1 2 3 4 5 6 7];
 
 % select a subset of DGPs
-select_DGP = 0; % if select a subset of DGPs?
-select_DGP_fn = @(i_dgp, res) any(res.settings.specifications.var_select(i_dgp,:)>=res.settings.specifications.random_category_range(11,1)); % binary selection criteria: specifications with asset price & sentiment
+DGP_select = 0; % options: 0 (all DGPs), 1 (specifications with asset price & sentiment),
+                % 2 (low degree of invertibility), 3 (high degree of invertibility)
 
 % Apply shared settings
 settings_shared;
@@ -67,7 +67,7 @@ for n_mode=1:length(mode_folders) % For each robustness check mode...
             end
             
             % keep only the selected subset of DGPs
-            if select_DGP == 1
+            if DGP_select > 0
                 DGP_selected = arrayfun(@(x) select_DGP_fn(x,res), 1:res.settings.specifications.n_spec)'; % binary DGP selection label
                 res = combine_struct(res,[],[],DGP_selected);
             end
@@ -184,23 +184,25 @@ for n_mode=1:length(mode_folders) % For each robustness check mode...
             end
             
             % Some IRFs
-            figure('Units', 'inches', 'Position', [0 0 8 4]);
-            hold on;
-            norm_irf = @(x) x/max(abs(x));
-            for i_spec_indx = 1:length(spec_select)
-                i_spec = spec_select(i_spec_indx);
-                plot(res.settings.est.IRF_select-1, norm_irf(res.DF_model.target_irf(:,i_spec)), ...
-                     linestyles{i_spec_indx}, 'Color', colors(i_spec_indx,:), 'Linewidth', 2, ...
-                     'MarkerSize', 4, 'MarkerFaceColor', colors(i_spec_indx,:));
+            if DGP_select == 0
+                figure('Units', 'inches', 'Position', [0 0 8 4]);
+                hold on;
+                norm_irf = @(x) x/max(abs(x));
+                for i_spec_indx = 1:length(spec_select)
+                    i_spec = spec_select(i_spec_indx);
+                    plot(res.settings.est.IRF_select-1, norm_irf(res.DF_model.target_irf(:,i_spec)), ...
+                         linestyles{i_spec_indx}, 'Color', colors(i_spec_indx,:), 'Linewidth', 2, ...
+                         'MarkerSize', 4, 'MarkerFaceColor', colors(i_spec_indx,:));
+                end
+                hold off;
+                xlabel('Horizon','interpreter','latex','FontSize',12);
+                set(gca,'XTick',[min(res.settings.est.IRF_select-1) 2:2:max(res.settings.est.IRF_select-1)]);
+                xlim([min(res.settings.est.IRF_select-1) max(res.settings.est.IRF_select-1)]);
+                grid on;
+                set(gca,'TickLabelInterpreter','latex');
+                set(gca,'FontSize',12);
+                plot_save(fullfile(output_folder, 'dgp_irfs'), output_suffix);
             end
-            hold off;
-            xlabel('Horizon','interpreter','latex','FontSize',12);
-            set(gca,'XTick',[min(res.settings.est.IRF_select-1) 2:2:max(res.settings.est.IRF_select-1)]);
-            xlim([min(res.settings.est.IRF_select-1) max(res.settings.est.IRF_select-1)]);
-            grid on;
-            set(gca,'TickLabelInterpreter','latex');
-            set(gca,'FontSize',12);
-            plot_save(fullfile(output_folder, 'dgp_irfs'), output_suffix);        
             
             %----------------------------------------------------------------
             % Tuning Parameters for Estimation Methods
