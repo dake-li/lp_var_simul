@@ -3,6 +3,7 @@
 
 clear all;
 addpath(genpath(fullfile('..', 'Auxiliary_Functions')))
+addpath(genpath('Subroutines'))
 
 %% SET UP DESTINATION FOLDER AND FILES
 
