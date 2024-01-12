@@ -23,10 +23,6 @@ cum_irf_by_trans_code = [0,0,0,0,0,0]; % cumulative IRF or not for each transfor
 % (1) y = x, (2) y = (1-L)x, (3) y = (1-L)^2 x,
 % (4) y = ln(x), (5) y = (1-L)ln(x), (6) y = (1-L)^2 ln(x)
 
-if mode_type == 5 % rewrite settings for cumulative IRF
-    cum_irf_by_trans_code = [0,1,1,0,1,1]; % cumulative IRF for some transformation codes
-end
-
 % Summary statistics across Monte Carlo simulations
 
 summ_option.winsor_percent = 0.025; % winsorize each tail with this percentage to compute winsorized mean and std
