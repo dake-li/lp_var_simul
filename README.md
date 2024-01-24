@@ -3,7 +3,7 @@
 Matlab code for large-scale simulation studies of impulse response estimators, including Local Projections (LPs), Vector Autoregressions (VARs), and several variants of these
 
 **Reference:**
-[Li, Dake](https://github.com/dake-li), [Mikkel Plagborg-Møller](https://www.mikkelpm.com), and [Christian K. Wolf](https://www.christiankwolf.com/) (2024), "Local Projections vs. VARs: Lessons From Thousands of DGPs" (:page_facing_up:[paper](Documents/lp_var_simul.pdf), :bar_chart:[supplement](Documents/lp_var_simul_supplement.pdf))
+[Li, Dake](https://github.com/dake-li), [Mikkel Plagborg-Møller](https://www.mikkelpm.com), and [Christian K. Wolf](https://www.christiankwolf.com/) (2024), "Local Projections vs. VARs: Lessons From Thousands of DGPs" ([paper](Documents/lp_var_simul.pdf), [supplement](Documents/lp_var_simul_supplement.pdf))
 
 Tested in: Matlab R2023a on Windows 10 PC (64-bit)
 
