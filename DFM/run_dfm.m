@@ -348,12 +348,6 @@ end
 clear results_* i_method thisMethod
 
 %----------------------------------------------------------------
-% Compute Mean-Squared Errors, Bias-Squared, Variance
-%----------------------------------------------------------------
-
-[results.MSE, results.BIAS2, results.VCE] = irf_perform_summary(results.irf, DF_model.target_irf, settings);
-
-%----------------------------------------------------------------
 % Export Results
 %----------------------------------------------------------------
 
