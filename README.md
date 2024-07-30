@@ -44,7 +44,7 @@ Tested in: Matlab R2023a on Windows 10 PC (64-bit)
     - In [run_dfm.m](DFM/run_dfm.m), first set ``estimand_type = 'ObsShock'``, ``lag_type = 4``, and ``mode_type = 1``.
     - After the setup above, run [run_dfm.m](DFM/run_dfm.m) 60 times, by varying the following, to iterate through 6000 DGPs:
       - ``dgp_type`` from ``'G'`` (for fiscal policy type) to ``'MP'`` (for monetary policy type);
-      - ``spec_id`` from 1 to 30 (for 30 distinct seeds, where each seed draws 100 random DGPs).
+      - ``spec_id`` from 1 to 30 (for 30 distinct seeds, where each seed draws 100 random DGPs). (**Note**: The code has been set up this way to allow the simulations to be split into several independent jobs on a research computing cluster.)
     - Raw IRF estimates will be saved in the directory "DFM/Results/". (**Warning**: File sizes will be very large.)
 
 2. **Summarize key statistics**: Run the following scripts to obtain summary statistics of raw IRF estimates across 5000 simulations. This step reduces the dimensionality of the results.
