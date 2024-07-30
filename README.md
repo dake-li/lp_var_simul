@@ -49,7 +49,7 @@ Tested in: Matlab R2023a on Windows 10 PC (64-bit)
 
 2. **Summarize key statistics**: Run the following scripts to obtain summary statistics of raw IRF estimates across 5000 simulations. This step reduces the dimensionality of the results.
 
-    - In [run_combine.m](DFM/run_combine.m), first set ``spec_id_array = [1:30]``, ``dgp_type = 'G'`` (or ``'MP'``). Additionally, specify ``estimand_type``, ``lag_type`` and ``mode_type`` to be consistent with Step 1.
+    - In [run_combine.m](DFM/run_combine.m), first set ``spec_id_array = [1:30]``, ``dgp_type = 'G'`` (or ``'MP'``). Additionally, specify ``estimand_type``, ``lag_type``, and ``mode_type`` to be consistent with Step 1.
     - Finally, run [run_combine.m](DFM/run_combine.m) once to summarize the 5000 simulations as 9 summary statistics for each DGP.
     - These summary statistics will also be saved in the directory "DFM/Results/".
 
@@ -63,7 +63,7 @@ Tested in: Matlab R2023a on Windows 10 PC (64-bit)
 
     - Always set ``mode_select = 1``, ``lags_select = 2``, and ``exper_select_group = {[2,5]}`` below.
     - Run [Reporting/run_plot_loss.m](DFM/Reporting/run_plot_loss.m) to get bias and variance profiles separately for each estimator (***Figures 2-3***).
-    - Run [Reporting/run_plot_tradeoff.m](DFM/Reporting/run_plot_tradeoff.m) to get head-to-head loss comparison btw. two estimators (***Figures 4-5 and 7-9***).
+    - Run [Reporting/run_plot_tradeoff.m](DFM/Reporting/run_plot_tradeoff.m) to get head-to-head loss comparison between two estimators (***Figures 4-5 and 7-9***).
     - Run the Jupyter Notebook [Reporting/plot_best_method.ipynb](DFM/Reporting/plot_best_method.ipynb) (with ``folder`` set to the output directory in Step 3), to depict the optimal estimator given different bias weights and target horizons (***Figure 6***).
     - Outputs are all saved in the directory "Reporting/fig/".
 
@@ -76,7 +76,7 @@ Tested in: Matlab R2023a on Windows 10 PC (64-bit)
 6. **Examples of estimated IRFs**: Run the following scripts to plot examples of IRF estimates, as in ***Appendix E***.
 
     - First finish Step 1.
-    - Then in [Subroutines/run_plot_irf_estimate.m](DFM/Subroutines/run_plot_irf_estimate.m), set ``spec_id = 1``, ``dgp_type = 'G'``. Additionally, specify ``estimand_type``, ``lag_type`` and ``mode_type`` to be consistent with Step 1.
+    - Then in [Subroutines/run_plot_irf_estimate.m](DFM/Subroutines/run_plot_irf_estimate.m), set ``spec_id = 1``, ``dgp_type = 'G'``. Additionally, specify ``estimand_type``, ``lag_type``, and ``mode_type`` to be consistent with Step 1.
     - Run [Subroutines/run_plot_irf_estimate.m](DFM/Subroutines/run_plot_irf_estimate.m) to plot examples of IRF estimates (***Figures E.1-E.7***)
     - Outputs are saved in the directory "Results/".
 
@@ -98,9 +98,7 @@ Tested in: Matlab R2023a on Windows 10 PC (64-bit)
     - Larger sample size and estimation lag length (***Figures F.27-F.29***): change ``mode_type = 3`` and ``lag_type = 12`` in Steps 1-2, coupled with ``mode_select = 3`` and ``lags_select = 4`` in Steps 3-4.
     - More observables (***Figure F.30-F.32***): change ``mode_type = 5`` in Steps 1-2, and ``mode_select = 5`` in Steps 3-4. Also redo Step 5 for IV estimators.
 
-9. **Splitting by variable categories**: Locate the following output to replicate the regression analysis in ***Appendix F.11***.
-
-    - ***Table F.3*** should have been generated in the outputs after finishing Steps 1-4.
+9. **Splitting by variable categories**: ***Table F.3*** should have been generated in the outputs after finishing Steps 1-4 (***Appendix F.11***).
 
 ## Acknowledgements
 
