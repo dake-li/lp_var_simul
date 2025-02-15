@@ -20,7 +20,7 @@ IRF = NaN(IRF_hor, n_y);
 IRF(1,:) = (D * shock_weight)';
 
 % go through horizon 1 to IRF_hor - 1
-for i = 1:IRF_hor
+for i = 2:IRF_hor
     IRF(i,:) = C * A^(i-2) * B * shock_weight; % iterate to get IRF
 end
 
